@@ -109,7 +109,7 @@
     </style>
 </head>
 <body>
-    <div class="container">Forgot Password
+    <div class="container">
         <div class="header">
             <h1>Reset Your Password</h1>
         </div>
@@ -126,6 +126,6 @@
             <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
         </div>
     </div>
-    
+
 </body>
 </html>

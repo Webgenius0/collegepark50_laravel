@@ -6,7 +6,7 @@ use App\Http\Controllers\Web\Backend\BusinessProfileController;
 
 Route::get('/',function (){
     return view('welcome');
-})->middleware('authCheck')->name('home');
+});
 
 
 Route::get('/run-migrate', function () {

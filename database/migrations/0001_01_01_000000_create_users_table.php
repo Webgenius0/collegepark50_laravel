@@ -13,29 +13,23 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
+            $table->string('first_name', 50);
+            $table->string('last_name', 50)->nullable();
             $table->string('email')->unique();
-            $table->string('role')->nullable();
-
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->string('phone_number')->nullable();
-            $table->string('date_of_birth')->nullable();
+            $table->string('password');
 
             $table->string('otp')->nullable();
             $table->boolean('is_otp_verified')->default(false);
             $table->timestamp('otp_expires_at')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
 
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expire_at')->nullable();
 
-            $table->longText('avatar')->nullable();
-            $table->string('gender')->nullable();
+            $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'other'])->default('user');
 
-            $table->string('google_id')->nullable();
-            $table->boolean('is_agree_termsconditions')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->boolean('is_social_logged')->nullable();
-            $table->string('password');
+            $table->boolean('is_agree_termsconditions')->default(value: false);
+
             $table->rememberToken();
             $table->timestamps();
         });

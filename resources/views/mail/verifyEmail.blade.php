@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -146,27 +147,29 @@
         }
     </style>
 </head>
+
 <body>
-<div class="container">
-    <div class="logo-section">
-        <div class="logo">LOGO</div>
-        <div style="font-size: 12px; color: #777777; margin-top: 5px;">{{ config('app.name') }}</div>
-    </div>
-    
-    <div class="content">
-        <h1>Verify your OTP</h1>
-        
-        <div class="verification-box">
-            <div class="code-label">Your OTP code</div>
-            <div class="verification-code">{{ $otp }}</div>
-            <div class="verification-note">This code will expire in 5 minutes</div>
+    <div class="container">
+        <div class="logo-section">
+            <div class="logo">LOGO</div>
+            <div style="font-size: 12px; color: #777777; margin-top: 5px;">{{ config('app.name') }}</div>
         </div>
-       
+
+        <div class="content">
+            <h1>Verify your OTP</h1>
+
+            <div class="verification-box">
+                <p>Dear, {{ $fullName }}</p> </br>
+                <div class="code-label">Your OTP code</div>
+                <div class="verification-code">{{ $otp }}</div>
+                <div class="verification-note">This code will expire in 5 minutes</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+        </div>
     </div>
-    
-    <div class="footer">
-        <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>    
-    </div>
-</div>
 </body>
+
 </html>

@@ -27,10 +27,10 @@ class SocialLoginController extends Controller
 
             $socialUser = Socialite::driver($provider)->stateless()->userFromToken($token);
 
-        
+
             $userData = $this->extractUserData($socialUser, $provider);
 
-           
+
             $user = User::updateOrCreate(
                 ['email' => $userData['email']],
                 [
@@ -50,7 +50,7 @@ class SocialLoginController extends Controller
             Auth::login($user);
             $token = auth('api')->login($user);
 
-           
+
             $response = [
                 'id' => $user->id,
                 'f_name' => $user->f_name,
