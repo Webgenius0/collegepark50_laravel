@@ -46,7 +46,7 @@ class AuthenticationController extends Controller
             // full name
             $fullName = $user->first_name . ' ' . $user->last_name;
 
-            // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
+            Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
 
             return $this->success(
                 [

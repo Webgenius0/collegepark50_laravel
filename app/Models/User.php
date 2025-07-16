@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -28,17 +29,25 @@ class User extends Authenticatable implements JWTSubject
         'last_name',
         'email',
         'password',
-
         'otp',
         'is_otp_verified',
         'otp_expires_at',
         'email_verified_at',
-
         'reset_password_token',
         'reset_password_token_expire_at',
-
         'role',
-        'is_agree_termsconditions',
+        'profession',
+        'gender',
+        'age',
+        'avater',
+        'address',
+        'country',
+        'city',
+        'state',
+        'latitude',
+        'longitude',
+        'get_notification',
+        'remember_token'
     ];
 
     protected $hidden = [
@@ -66,30 +75,23 @@ class User extends Authenticatable implements JWTSubject
         return trim("{$this->first_name} {$this->last_name}");
     }
 
-    //chat model relation
-    public function senders()
+    public function posts()
     {
-        return $this->hasMany(Chat::class, 'sender_id');
+        return $this->hasMany(Post::class);
     }
 
-    public function receivers()
+    public function likes()
     {
-        return $this->hasMany(Chat::class, 'receiver_id');
+        return $this->hasMany(PostLike::class);
     }
 
-    public function roomsAsUserOne()
+    public function comments()
     {
-        return $this->hasMany(Room::class, 'first_user_id');
+        return $this->hasMany(PostComment::class);
     }
 
-    public function roomsAsUserTwo()
+    public function shares()
     {
-        return $this->hasMany(Room::class, 'second_user_id');
+        return $this->hasMany(PostShare::class);
     }
-
-    public function allRooms()
-    {
-        return Room::where('first_user_id', $this->id)->orWhere('second_user_id', $this->id);
-    }
-
 }

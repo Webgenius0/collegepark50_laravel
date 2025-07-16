@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\OtpVerifyRequest;
+use App\Http\Requests\Auth\SetNewPasswordRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -43,7 +44,7 @@ class ResetPasswordController extends Controller
 
             if ($user) {
                 try {
-                    // Mail::to($email)->send(new OtpMail($otp, $user, 'Your OTP for Reset Password'));
+                    Mail::to($email)->send(new OtpMail($otp, $user, 'Your OTP for Reset Password'));
 
                     $user->update([
                         'otp'            => $otp,
@@ -72,7 +73,7 @@ class ResetPasswordController extends Controller
     */
     public function VerifyOTP(OtpVerifyRequest $request)
     {
-       $validatedData = $request->validated();
+        $validatedData = $request->validated();
 
         try {
             $email = $validatedData['email'];
@@ -116,22 +117,13 @@ class ResetPasswordController extends Controller
     /*
     ** Set new password
     */
-    public function ResetPassword(Request $request)
+    public function ResetPassword(SetNewPasswordRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email'    => 'required|email|exists:users,email',
-            'token'    => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error([], $validator->errors()->first(), 422);
-        }
-
+        $validatedData = $request->validated();
 
         try {
-            $email       = $request->input('email');
-            $newPassword = $request->input('password');
+            $email       = $validatedData['email'];
+            $newPassword = $validatedData['password'];
 
             $user = User::where('email', $email)->first();
             if (!$user) {
@@ -144,7 +136,7 @@ class ResetPasswordController extends Controller
                     'reset_password_token' => null,
                     'reset_password_token_expire_at' => null,
                 ]);
-                return $this->success(true, 'Password reset Successfully.', 200);
+                return $this->success(true, 'New password set successfully.', 200);
             } else {
                 return $this->error(false, 'Invalid token or token expired', 401);
             }

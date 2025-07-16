@@ -83,6 +83,22 @@ class Helper
         return false;
     }
 
+    //delete videos
+    public static function deleteVideos($videoPaths)
+    {
+        if (!is_array($videoPaths)) {
+            $videoPaths = [$videoPaths];
+        }
+
+        foreach ($videoPaths as $path) {
+            $fullPath = public_path($path);
+            if (file_exists($fullPath) && is_file($fullPath)) {
+                @unlink($fullPath); // suppress warning
+            }
+        }
+    }
+
+
 
     // calculate age from date of birth
     public static function calculateAge($dateOfBirth)

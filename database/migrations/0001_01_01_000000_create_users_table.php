@@ -28,7 +28,19 @@ return new class extends Migration
 
             $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'other'])->default('user');
 
-            $table->boolean('is_agree_termsconditions')->default(value: false);
+            $table->string('profession', 255)->nullable();
+            $table->string('gender', 50)->nullable();
+            $table->string('age', 50)->nullable();
+            $table->string('avater',200)->nullable();
+
+            $table->string('address')->nullable();
+            $table->string('country', 100)->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('state', 100)->nullable();
+            $table->string('latitude', 200)->nullable();
+            $table->string('longitude', 200)->nullable();
+
+            $table->boolean('get_notification')->default(value: false);
 
             $table->rememberToken();
             $table->timestamps();
