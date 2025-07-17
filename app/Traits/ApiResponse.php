@@ -22,7 +22,7 @@ trait ApiResponse
             'status' => false ,
             'message' => $message ,
             'data' => $data ,
-            'code' => $code 
+            'code' => $code
         ],$code);
     }
 }

@@ -24,30 +24,21 @@ class User extends Authenticatable implements JWTSubject
     }
 
     protected $fillable = [
-
-        'name',
-
+        'first_name',
+        'last_name',
         'email',
         'password',
-        'phone_number',
-        'date_of_birth',
-        'age',
-
-        'avatar',
-        'role',
 
         'otp',
         'is_otp_verified',
         'otp_expires_at',
+        'email_verified_at',
+
         'reset_password_token',
         'reset_password_token_expire_at',
-        'status',
 
-        'provider',
-        'provider_id',
+        'role',
         'is_agree_termsconditions',
-
-        'is_social_logged',
     ];
 
     protected $hidden = [
@@ -55,41 +46,24 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
         'created_at',
         'updated_at',
+        'otp',
+        'reset_password_token',
     ];
 
     protected function casts(): array
     {
         return [
-            'email_verified_at'               => 'datetime',
+            'email_verified_at'              => 'datetime',
             'otp_expires_at'                  => 'datetime',
-            'is_otp_verified'                 => 'boolean',
-            'reset_password_token_expires_at' => 'datetime',
-            'password'                        => 'hashed',
+            'reset_password_token_expire_at' => 'datetime',
+            'is_otp_verified'                => 'boolean',
+            'is_agree_termsconditions'               => 'boolean',
         ];
     }
 
-    public function getAvatarAttribute($value): string | null
+    public function getNameAttribute(): string
     {
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
-            return $value;
-        }
-        if (request()->is('api/*') && ! empty($value)) {
-
-            return url($value);
-        }
-        return $value;
-    }
-
-    // company
-    public function company()
-    {
-        return $this->hasOne(Company::class, 'user_id', 'id');
-    }
-
-    // employee
-    public function employee()
-    {
-        return $this->hasOne(Employee::class, 'user_id', 'id');
+        return trim("{$this->first_name} {$this->last_name}");
     }
 
     //chat model relation

@@ -1,6 +1,6 @@
-@extends('auth.app')
+{{-- @extends('auth.app') --}}
 
-@section('content')
+{{-- @section('content')
 <!-- CONTAINER OPEN -->
 <div class="col col-login mx-auto text-center">
     <a href="index.html" class="text-center">
@@ -19,4 +19,7 @@
     </div>
 </div>
 <!-- CONTAINER CLOSED -->
-@endsection
+@endsection --}}
+
+
+Hello

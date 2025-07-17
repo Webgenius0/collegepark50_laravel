@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\OtpVerifyRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -22,16 +23,17 @@ class ResetPasswordController extends Controller
 {
     use ApiResponse;
 
+    /*
+    ** Forget password
+    */
     public function forgotPassword(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email'
         ]);
 
-
         if ($validator->fails()) {
-            return $this->error(['validation failed'] , $validator->errors()->first(), 422);
+            return $this->error(['Validation failed'], $validator->errors()->first(), 422);
         }
 
         try {
@@ -41,9 +43,7 @@ class ResetPasswordController extends Controller
 
             if ($user) {
                 try {
-
                     // Mail::to($email)->send(new OtpMail($otp, $user, 'Your OTP for Reset Password'));
-
 
                     $user->update([
                         'otp'            => $otp,
@@ -53,41 +53,30 @@ class ResetPasswordController extends Controller
                     $data = [
                         'email' => $user->email,
                         'otp' => $otp,
-                      
                     ];
-
                     return $this->success($data, 'OTP Code Sent Successfully. Please check your email.', 200);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return $this->error([], 'Failed to send OTP email. Please try again later.', 500);
                 }
             }
-
             return $this->error([], 'Invalid email address.', 404);
-        } catch (\Exception $e) {
-            
-            Log::error($e->getMessage());
+        } catch (Exception $e) {
+            Log::error('OTP Mail Error: ' . $e->getMessage());
             return $this->error([], $e->getMessage(), 500);
         }
     }
 
-    public function VerifyOTP(Request $request)
+
+    /*
+    ** Verify forgot password otp
+    */
+    public function VerifyOTP(OtpVerifyRequest $request)
     {
-
-
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-            'otp'   => 'required',
-        ]);
-
-
-        if ($validator->fails()) {
-            return $this->error([], $validator->errors()->first(), 422);
-        }
+       $validatedData = $request->validated();
 
         try {
-
-            $email = $request->input('email');
-            $otp   = $request->input('otp');
+            $email = $validatedData['email'];
+            $otp   = $validatedData['otp'];
             $user = User::where('email', $email)->first();
 
             if (!$user) {
@@ -95,12 +84,10 @@ class ResetPasswordController extends Controller
             }
 
             if (Carbon::parse($user->otp_expires_at)->isPast()) {
-
                 return $this->error([], 'OTP has expaired', 400);
             }
 
             if ($user->otp !== $otp) {
-
                 return $this->error([], 'Invalid OTP', 400);
             }
 
@@ -113,33 +100,29 @@ class ResetPasswordController extends Controller
                 'reset_password_token_expire_at' => Carbon::now()->addHour(),
             ]);
 
-            return response()->json([
-                'status'     => true,
-                'message'    => 'OTP verified successfully.',
-                'code'       => 200,
-                'token'      => $token,
-            ]);
+            return $this->success(
+                [
+                    'status'     => true,
+                    'message'    => 'OTP verified successfully.',
+                    'token'      => $token,
+                ],
+            );
         } catch (Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
     }
 
 
+    /*
+    ** Set new password
+    */
     public function ResetPassword(Request $request)
     {
-        $request->validate([
-            'email'    => 'required|email|exists:users,email',
-            'token'    => 'required|string',
-            'password' => 'required|string|min:6',
-        ]);
-
-
         $validator = Validator::make($request->all(), [
             'email'    => 'required|email|exists:users,email',
             'token'    => 'required|string',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8|confirmed',
         ]);
-
 
         if ($validator->fails()) {
             return $this->error([], $validator->errors()->first(), 422);
@@ -147,7 +130,6 @@ class ResetPasswordController extends Controller
 
 
         try {
-
             $email       = $request->input('email');
             $newPassword = $request->input('password');
 
@@ -162,7 +144,6 @@ class ResetPasswordController extends Controller
                     'reset_password_token' => null,
                     'reset_password_token_expire_at' => null,
                 ]);
-
                 return $this->success(true, 'Password reset Successfully.', 200);
             } else {
                 return $this->error(false, 'Invalid token or token expired', 401);

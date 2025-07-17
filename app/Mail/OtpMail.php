@@ -18,7 +18,7 @@ class OtpMail extends Mailable {
     /**
      * Create a new message instance.
      */
-    public function __construct(int $otp,User $user, string $message) {
+    public function __construct(int $otp, User $user, string $message) {
         $this->otp = $otp;
         $this->user = $user;
         $this->header_message= $message;
@@ -38,7 +38,7 @@ class OtpMail extends Mailable {
      */
     public function content(): Content {
         return new Content(
-            view: 'mail.otpmail',
+            view: 'mail.passResetOtp',
         );
     }
 
