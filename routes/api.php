@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Auth\SocialLoginController;
-use App\Http\Controllers\Api\React\Auth\UserProfileController;
-use App\Http\Controllers\Api\React\Auth\AuthenticationController;
+use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
+use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
 
 //health-check
@@ -12,7 +12,7 @@ Route::get("/check", function () {
     return "Project running!";
 });
 
-
+//Guest user routes
 Route::group(['middleware' => 'guest:api'], function () {
     // Authentication
     Route::post('/login', [AuthenticationController::class, 'login']);
@@ -30,15 +30,18 @@ Route::group(['middleware' => 'guest:api'], function () {
 });
 
 
+// Authenticatd user routes
 Route::group(['middleware' => 'auth:api'], function () {
 
     Route::post('/logout', [AuthenticationController::class, 'logout']);
     Route::put('/update-role', [AuthenticationController::class, 'updateRole']);
 
+    // Profile update
     Route::get('/profile', [UserProfileController::class, 'profile']);
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
     Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
     Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']);
+    Route::delete('/delete-profile', [UserProfileController::class, 'deleteProfile']);
 
 
     //Post routes

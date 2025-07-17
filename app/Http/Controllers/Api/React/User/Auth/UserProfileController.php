@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\Auth;
+namespace App\Http\Controllers\Api\React\User\Auth;
 
 use Exception;
 use App\Models\User;
@@ -18,6 +18,7 @@ class UserProfileController extends Controller
     use ApiResponse;
 
 
+    //get user progile
     public function profile()
     {
         try {
@@ -39,7 +40,7 @@ class UserProfileController extends Controller
         }
     }
 
-
+    // update profile
     public function updateProfile(Request $request)
     {
         try {
@@ -78,7 +79,7 @@ class UserProfileController extends Controller
         }
     }
 
-
+// update avatar
     public function updateAvatar(Request $request)
     {
         try {
@@ -107,7 +108,7 @@ class UserProfileController extends Controller
         }
     }
 
-
+    //update password
     public function updatePassword(Request $request)
     {
         try {
@@ -134,6 +135,7 @@ class UserProfileController extends Controller
         }
     }
 
+    //delete profile
     public function deleteProfile()
     {
         try {

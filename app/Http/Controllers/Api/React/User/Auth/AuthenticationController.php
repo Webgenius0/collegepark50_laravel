@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\Auth;
+namespace App\Http\Controllers\Api\React\User\Auth;
 
 use Exception;
 use Carbon\Carbon;
@@ -149,7 +149,7 @@ class AuthenticationController extends Controller
 
             // validate role
             $request->validate([
-                'role' => ['required', 'in:user,dj,promoter,artist,venue,other'],
+                'role' => ['required', 'in:user,dj,promoter,artist,venue,admin'],
             ]);
 
             if (!empty($user->role) && $user->role !== 'user') {
@@ -164,7 +164,7 @@ class AuthenticationController extends Controller
             ], 'User role updated successfully.');
 
         } catch (Exception $e) {
-            return $this->error([], 'An error occurred while updating the role.', 500);
+            return $this->error([], 'An error occurred while updating the role.' .$e->getMessage(), 500);
         }
     }
 
