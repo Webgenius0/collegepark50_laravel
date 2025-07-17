@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\User\Auth;
+namespace App\Http\Controllers\Api\React\Auth;
 
 use Exception;
 use Carbon\Carbon;
@@ -15,7 +15,7 @@ use App\Http\Requests\Auth\OtpVerifyRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
+
 use App\Http\Requests\Auth\UserRegisterRequest;
 
 class AuthenticationController extends Controller
@@ -30,12 +30,12 @@ class AuthenticationController extends Controller
         try {
             $validatedData = $request->validated();
 
-            $otp = rand(1000, 9999);
+            $otp = rand(100000, 999999);
             $otpExpiresAt = Carbon::now()->addMinutes(5);
 
             $user = User::create([
-                'first_name' => $validatedData['first_name'],
-                'last_name' => $validatedData['last_name'],
+                'first_name' => $validatedData['f_name'],
+                'last_name' => $validatedData['l_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
                 'otp' => $otp,
@@ -44,13 +44,14 @@ class AuthenticationController extends Controller
             ]);
 
             // full name
-            $fullName = $user->first_name . ' ' . $user->last_name;
+            $fullName = $user->f_name . ' ' . $user->l_name;
 
             // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
 
             return $this->success(
                 [
                     'message' => 'OTP has been sent to your email. Please verify to complete registration.',
+                    'name' => $fullName,
                     'email' => $user->email,
                     'otp' => $user->otp,
                 ],
@@ -161,6 +162,7 @@ class AuthenticationController extends Controller
             return $this->success([
                 'user'       => new UserResource($user),
             ], 'User role updated successfully.');
+
         } catch (Exception $e) {
             return $this->error([], 'An error occurred while updating the role.', 500);
         }

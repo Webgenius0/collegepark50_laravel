@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name', 50);
-            $table->string('last_name', 50)->nullable();
+            $table->string('f_name', 50);
+            $table->string('l_name', 50)->nullable();
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('avatar')->nullable();
 
             $table->string('otp')->nullable();
             $table->boolean('is_otp_verified')->default(false);
@@ -26,9 +27,10 @@ return new class extends Migration
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expire_at')->nullable();
 
-            $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'other'])->default('user');
+            $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'admin'])->default('user');
 
-            $table->boolean('is_agree_termsconditions')->default(value: false);
+            $table->string('provider')->nullable();
+            $table->string('provider_id')->nullable();
 
             $table->rememberToken();
             $table->timestamps();

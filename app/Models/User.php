@@ -24,10 +24,11 @@ class User extends Authenticatable implements JWTSubject
     }
 
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'f_name',
+        'l_name',
         'email',
         'password',
+        'avatar',
 
         'otp',
         'is_otp_verified',
@@ -38,7 +39,8 @@ class User extends Authenticatable implements JWTSubject
         'reset_password_token_expire_at',
 
         'role',
-        'is_agree_termsconditions',
+        'provider',
+        'provider_id',
     ];
 
     protected $hidden = [
@@ -57,7 +59,7 @@ class User extends Authenticatable implements JWTSubject
             'otp_expires_at'                  => 'datetime',
             'reset_password_token_expire_at' => 'datetime',
             'is_otp_verified'                => 'boolean',
-            'is_agree_termsconditions'               => 'boolean',
+            'is_google_signin'               => 'boolean',
         ];
     }
 
@@ -67,29 +69,29 @@ class User extends Authenticatable implements JWTSubject
     }
 
     //chat model relation
-    public function senders()
-    {
-        return $this->hasMany(Chat::class, 'sender_id');
-    }
+    // public function senders()
+    // {
+    //     return $this->hasMany(Chat::class, 'sender_id');
+    // }
 
-    public function receivers()
-    {
-        return $this->hasMany(Chat::class, 'receiver_id');
-    }
+    // public function receivers()
+    // {
+    //     return $this->hasMany(Chat::class, 'receiver_id');
+    // }
 
-    public function roomsAsUserOne()
-    {
-        return $this->hasMany(Room::class, 'first_user_id');
-    }
+    // public function roomsAsUserOne()
+    // {
+    //     return $this->hasMany(Room::class, 'first_user_id');
+    // }
 
-    public function roomsAsUserTwo()
-    {
-        return $this->hasMany(Room::class, 'second_user_id');
-    }
+    // public function roomsAsUserTwo()
+    // {
+    //     return $this->hasMany(Room::class, 'second_user_id');
+    // }
 
-    public function allRooms()
-    {
-        return Room::where('first_user_id', $this->id)->orWhere('second_user_id', $this->id);
-    }
+    // public function allRooms()
+    // {
+    //     return Room::where('first_user_id', $this->id)->orWhere('second_user_id', $this->id);
+    // }
 
 }

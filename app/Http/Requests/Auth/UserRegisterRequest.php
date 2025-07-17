@@ -19,7 +19,6 @@ class UserRegisterRequest extends FormRequest
             'last_name'     => ['required', 'string', 'max:50'],
             'email'         => ['required', 'string', 'email', 'unique:users', 'max:100'],
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
-            'is_agree_termsconditions' => ['required', 'boolean']
         ];
     }
 }
