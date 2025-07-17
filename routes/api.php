@@ -1,19 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\React\Auth\SocialLoginController;
-use App\Http\Controllers\Api\React\Auth\UserProfileController;
-use App\Http\Controllers\Api\React\Auth\AuthenticationController;
+use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
+use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
 
-//health-check
-Route::get("/check", function () {
-    return "Project running!";
-});
+
 
 
 Route::group(['middleware' => 'guest:api'], function () {
-    // Authentication
+
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/register', [AuthenticationController::class, 'register']);
     Route::post('/register-otp-verify', [AuthenticationController::class, 'RegistrationVerifyOtp']);

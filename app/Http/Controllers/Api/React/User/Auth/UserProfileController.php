@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\Auth;
+namespace App\Http\Controllers\Api\React\User\Auth;
 
 use Exception;
 use App\Models\User;

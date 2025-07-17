@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\Auth;
+namespace App\Http\Controllers\Api\React\User\Auth;
 
 use Exception;
 use Carbon\Carbon;
@@ -43,7 +43,6 @@ class AuthenticationController extends Controller
                 'is_otp_verified' => false,
             ]);
 
-            // full name
             $fullName = $user->f_name . ' ' . $user->l_name;
 
             // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
