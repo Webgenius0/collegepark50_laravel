@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\User\Auth;
+namespace App\Http\Controllers\Api\React\Auth;
 
 use App\Models\User;
 use App\Traits\ApiResponse;
@@ -82,10 +82,7 @@ class SocialLoginController extends Controller
         if ($provider === 'google') {
             $firstName = $socialUser->user['given_name'] ?? $fullName;
             $lastName = $socialUser->user['family_name'] ?? '';
-        } elseif ($provider === 'facebook') {
-            $firstName = $socialUser->user['first_name'] ?? $fullName;
-            $lastName = $socialUser->user['last_name'] ?? '';
-        } elseif ($provider === 'apple') {
+        }elseif ($provider === 'apple') {
 
             if (!isset($socialUser->user['name'])) {
                 $nameParts = explode('@', $email);
@@ -95,10 +92,6 @@ class SocialLoginController extends Controller
                 $firstName = $socialUser->user['name']['firstName'] ?? $fullName;
                 $lastName = $socialUser->user['name']['lastName'] ?? '';
             }
-        } elseif ($provider === 'twitter') {
-            $nameParts = explode(' ', $fullName, 2);
-            $firstName = $nameParts[0] ?? $fullName;
-            $lastName = $nameParts[1] ?? '';
         }
 
         return [

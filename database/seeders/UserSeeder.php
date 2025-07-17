@@ -2,49 +2,60 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Support\Carbon;
-use App\Models\BusinessProfile;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run()
     {
         DB::table('users')->insert([
+
             [
-                'name' => 'John',
-     
-                'email' => 'user@gmail.com',
-                'role' => 'employee',
-                'password' => Hash::make('12345678'),
-               
-            ],
-            [
-                'name' => 'Jane',
-             
+                'f_name' => 'Sarah',
+                'l_name' => 'Wilson',
                 'email' => 'admin@gmail.com',
                 'role' => 'admin',
                 'password' => Hash::make('12345678'),
-                
             ],
             [
-                'name' => 'Alice',
-            
-                'email' => 'business@gmail.com',
-                'role' => 'company',
+                'f_name' => 'John',
+                'l_name' => 'Doe',
+                'email' => 'user@gmail.com',
+                'role' => 'user',
                 'password' => Hash::make('12345678'),
-               
             ],
-            
+            [
+                'f_name' => 'Jane',
+                'l_name' => 'Smith',
+                'email' => 'dj@gmail.com',
+                'role' => 'dj',
+                'password' => Hash::make('12345678'),
+            ],
+            [
+                'f_name' => 'Mike',
+                'l_name' => 'Johnson',
+                'email' => 'promoter@gmail.com',
+                'role' => 'promoter',
+                'password' => Hash::make('12345678'),
+            ],
+            [
+                'f_name' => 'Emily',
+                'l_name' => 'Brown',
+                'email' => 'artist@gmail.com',
+                'role' => 'artist',
+                'password' => Hash::make('12345678'),
+            ],
+            [
+                'f_name' => 'Robert',
+                'l_name' => 'Taylor',
+                'email' => 'venue@gmail.com',
+                'role' => 'venue',
+                'password' => Hash::make('12345678'),
+            ],
+
         ]);
-    
-       
     }
-    
 }

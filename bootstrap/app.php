@@ -14,8 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             Route::middleware(['web', 'auth', 'admin'])->prefix('admin')->group(base_path('routes/backend.php'));
-            Route::middleware(['web'])->prefix('api/company')->group(base_path('routes/company.php'));
-            Route::middleware(['web'])->prefix('api/website')->group(base_path('routes/website.php'));
         }
     )
     ->withMiddleware(function (Middleware $middleware) {

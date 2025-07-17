@@ -25,8 +25,8 @@ class User extends Authenticatable implements JWTSubject
     }
 
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'f_name',
+        'l_name',
         'email',
         'password',
         'otp',
@@ -66,7 +66,7 @@ class User extends Authenticatable implements JWTSubject
             'otp_expires_at'                  => 'datetime',
             'reset_password_token_expire_at' => 'datetime',
             'is_otp_verified'                => 'boolean',
-            'is_agree_termsconditions'               => 'boolean',
+            'is_google_signin'               => 'boolean',
         ];
     }
 
