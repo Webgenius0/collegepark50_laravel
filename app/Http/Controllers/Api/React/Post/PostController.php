@@ -23,6 +23,7 @@ class PostController extends Controller
     //store post
     public function store(Request $request)
     {
+        // dd($request->all());
         DB::beginTransaction();
 
         try {
@@ -95,7 +96,7 @@ class PostController extends Controller
         }
     }
 
-    //get all posts
+    //get all posts of auth user
     public function index()
     {
         try {
@@ -106,7 +107,7 @@ class PostController extends Controller
             }
 
             $posts = $user->posts()
-                ->with(['images', 'videos', 'hashtags'])
+                ->with(['user', 'images', 'videos', 'hashtags', 'comments', 'shares'])
                 ->latest()
                 ->get();
 
@@ -120,11 +121,48 @@ class PostController extends Controller
         }
     }
 
+    //get all posts of other users
+    public function getAllPosts(Request $request)
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return $this->error([], 'Unauthorized user.', 401);
+            }
+
+            // Number of posts per page (default: 10)
+            $perPage = $request->input('per_page', 10);
+
+            // Get all posts with relationships, paginated
+            $posts = Post::with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user', 'shares'])
+                ->latest()
+                ->paginate($perPage);
+
+            // Return paginated data with PostResource
+            return $this->success(
+                [
+                    'posts'       => PostResource::collection($posts),
+                    'pagination'  => [
+                        'total'        => $posts->total(),
+                        'current_page' => $posts->currentPage(),
+                        'last_page'    => $posts->lastPage(),
+                        'per_page'     => $posts->perPage(),
+                    ],
+                ],
+                'Newsfeed posts retrieved successfully.',
+                200
+            );
+        } catch (\Exception $e) {
+            return $this->error([], 'Failed to fetch posts. ' . $e->getMessage(), 500);
+        }
+    }
+
     //get single post
     public function show($id)
     {
         try {
-            $post = Post::with(['images', 'videos', 'hashtags'])
+            $post = Post::with(['user', 'images', 'videos', 'hashtags', 'comments', 'shares'])
                 ->find($id);
 
             if (!$post) {
@@ -147,7 +185,7 @@ class PostController extends Controller
         DB::beginTransaction();
 
         try {
-            $post = Post::with(['images', 'videos', 'hashtags'])->find($id);
+            $post = Post::with(['images', 'videos', 'hashtags', 'likes', 'comments', 'shares'])->find($id);
 
             if (!$post) {
                 return $this->error([], 'Post not found.', 404);
@@ -202,7 +240,7 @@ class PostController extends Controller
         }
 
         $posts = $hashtag->posts()
-            ->with(['images', 'videos', 'hashtags'])
+            ->with(['images', 'videos', 'hashtags', 'likes', 'comments', 'shares'])
             ->latest()
             ->paginate(10);
 
@@ -219,7 +257,7 @@ class PostController extends Controller
         DB::beginTransaction();
 
         try {
-            $post = Post::with(['images', 'videos', 'hashtags'])->find($id);
+            $post = Post::with(['images', 'videos', 'hashtags', 'likes', 'comments', 'shares'])->find($id);
 
             if (!$post) {
                 return $this->error([], 'Post not found.', 404);

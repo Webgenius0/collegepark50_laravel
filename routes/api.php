@@ -2,10 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\React\Post\PostController;
+use App\Http\Controllers\Api\React\Post\PostLikeController;
+use App\Http\Controllers\Api\React\Post\PostShareController;
 use App\Http\Controllers\Api\React\Auth\SocialLoginController;
+use App\Http\Controllers\Api\React\Post\PostCommentController;
+use App\Http\Controllers\Api\React\Post\PostCommentReplyController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
-use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
 
 //health-check
 Route::get("/check", function () {
@@ -47,10 +51,41 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Post routes
     Route::group(['prefix' => 'post'], function () {
         Route::post('/store', [PostController::class, 'store']);    // Create new post
-        Route::get('/all', [PostController::class, 'index']);       // Fetch all posts
+        Route::get('/index', [PostController::class, 'index']);       // Fetch all posts of auth user
+        Route::get('/all', [PostController::class, 'getAllPosts']);       // Fetch all posts of other users
         Route::get('/show/{id}', [PostController::class, 'show']);       // Single post view
         Route::delete('/delete/{id}', [PostController::class, 'destroy']); // Delete post
         Route::get('/tag/{tag}', [PostController::class, 'postsByTag']); // Get posts by hashtag
         Route::post('/update/{id}', [PostController::class, 'update']); // Update post
+
+        //post list/unlike
+        Route::group(['prefix' => 'like'], function () {
+            Route::post('/{post}', [PostLikeController::class, 'toggleLike']);        // Like/Unlike a post
+            Route::get('/index/{postId}', [PostLikeController::class, 'index']);           // Get all likes
+        });
+
+        // Comment routes
+        Route::group(['prefix' => 'comment'], function () {
+            Route::post('/store/{postId}', [PostCommentController::class, 'store']);         // Add comment
+            Route::get('/list/{postId}', [PostCommentController::class, 'index']);         // Get all comments
+            Route::put('/update/{id}', [PostCommentController::class, 'update']);             // Edit comment
+            Route::delete('/delete/{id}', [PostCommentController::class, 'destroy']);  // Delete comment
+        });
+
+        // Comment reply routes
+        Route::group(['prefix' => 'comment-reply'], function () {
+            Route::post('/store', [PostCommentReplyController::class, 'store']);             // Create reply
+            Route::put('/update/{id}', [PostCommentReplyController::class, 'update']);       // Update reply
+            Route::delete('/delete/{id}', [PostCommentReplyController::class, 'destroy']);   // Delete reply
+            Route::get('/list/{commentId}', [PostCommentReplyController::class, 'index']);   // List replies of a comment
+        });
+
+        // Post share routes
+        Route::group(['prefix' => 'post-share'],function () {
+            Route::post('/store/{postId}', [PostShareController::class, 'store']); // Create share
+            Route::get('/index/{postId}', [PostShareController::class, 'index']); // get share with user and share count
+            Route::put('/update/{id}', [PostShareController::class, 'update']); // share update
+            Route::delete('delete/{id}', [PostShareController::class, 'destroy']); // share delete
+        });
     });
 });
