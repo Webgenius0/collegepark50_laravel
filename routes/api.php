@@ -60,5 +60,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/all', [PostController::class, 'index']);       // Fetch all posts
         Route::get('/show/{id}', [PostController::class, 'show']);       // Single post view
         Route::delete('/delete/{id}', [PostController::class, 'destroy']); // Delete post
+        Route::get('/tag/{tag}', [PostController::class, 'postsByTag']); // Get posts by hashtag
+        Route::post('/update/{id}', [PostController::class, 'update']); // Update post
     });
 });

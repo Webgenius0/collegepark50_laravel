@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Post\PostResource;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\Post\PostStoreRequest;
 
 class PostController extends Controller
 {
@@ -190,6 +189,124 @@ class PostController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             return $this->error([], 'Failed to delete post. ' . $e->getMessage(), 500);
+        }
+    }
+
+    //get posts by tag
+    public function postsByTag($tag)
+    {
+        $hashtag = Hashtag::where('tag', '#' . $tag)->first();
+
+        if (!$hashtag) {
+            return $this->error([], 'Hashtag not found.', 404);
+        }
+
+        $posts = $hashtag->posts()
+            ->with(['images', 'videos', 'hashtags'])
+            ->latest()
+            ->paginate(10);
+
+        return $this->success(
+            PostResource::collection($posts)->response()->getData(true),
+            'Posts fetched by tag: #' . $tag,
+            200
+        );
+    }
+
+    //update post
+    public function update(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $post = Post::with(['images', 'videos', 'hashtags'])->find($id);
+
+            if (!$post) {
+                return $this->error([], 'Post not found.', 404);
+            }
+
+            if ($post->user_id !== auth('api')->id()) {
+                return $this->error([], 'Unauthorized to update this post.', 403);
+            }
+
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'content'     => ['nullable', 'string'],
+                'images.*'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:5120'],  // 5MB
+                'videos.*'    => ['nullable', 'mimes:mp4,mov,avi', 'max:51200'],              // 50MB
+            ]);
+
+            if ($validator->fails()) {
+                return $this->error(['Validation failed'], $validator->errors()->first(), 422);
+            }
+
+            // Update post content
+            $post->update([
+                'content' => $request->input('content'),
+            ]);
+
+            // Delete old images (optional, or let user remove selectively)
+            $oldImages = $post->images->pluck('image_path')->map(fn($path) => asset($path))->toArray();
+            Helper::deleteImages($oldImages);
+            $post->images()->delete();
+
+            // Upload new images
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $imagePath = Helper::uploadImage($image, 'posts/images');
+                    PostImage::create([
+                        'post_id'    => $post->id,
+                        'image_path' => $imagePath,
+                    ]);
+                }
+            }
+
+            // Delete old videos
+            foreach ($post->videos as $video) {
+                $fullPath = public_path($video->video_path);
+                if (file_exists($fullPath)) {
+                    @unlink($fullPath);
+                }
+            }
+            $post->videos()->delete();
+
+            // Upload new videos
+            if ($request->hasFile('videos')) {
+                foreach ($request->file('videos') as $video) {
+                    $videoPath = Helper::fileUpload($video, 'posts/videos', 'post-video-' . Str::random(8));
+                    PostVideo::create([
+                        'post_id'    => $post->id,
+                        'video_path' => $videoPath,
+                    ]);
+                }
+            }
+
+            // Sync hashtags
+            if ($request->filled('content')) {
+                preg_match_all('/#(\w+)/', $request->input('content'), $matches);
+
+                if (!empty($matches[1])) {
+                    $tagIds = [];
+                    foreach ($matches[1] as $tag) {
+                        $hashtag = Hashtag::firstOrCreate(['tag' => '#' . $tag]);
+                        $tagIds[] = $hashtag->id;
+                    }
+                    $post->hashtags()->sync($tagIds);
+                } else {
+                    $post->hashtags()->detach(); // If no hashtags in updated content
+                }
+            }
+
+            DB::commit();
+
+            return $this->success(
+                new PostResource($post->fresh(['images', 'videos', 'hashtags'])),
+                'Post updated successfully.',
+                200
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $this->error([], 'Failed to update post. ' . $e->getMessage(), 500);
         }
     }
 }
