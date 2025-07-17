@@ -34,8 +34,8 @@ class AuthenticationController extends Controller
             $otpExpiresAt = Carbon::now()->addMinutes(5);
 
             $user = User::create([
-                'first_name' => $validatedData['f_name'],
-                'last_name' => $validatedData['l_name'],
+                'f_name' => $validatedData['f_name'],
+                'l_name' => $validatedData['l_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
                 'otp' => $otp,
@@ -46,7 +46,7 @@ class AuthenticationController extends Controller
             // full name
             $fullName = $user->f_name . ' ' . $user->l_name;
 
-            // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
+            Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
 
             return $this->success(
                 [

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -94,4 +95,25 @@ class User extends Authenticatable implements JWTSubject
     //     return Room::where('first_user_id', $this->id)->orWhere('second_user_id', $this->id);
     // }
 
+
+    // relation user with post
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(PostLike::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(PostComment::class);
+    }
+
+    public function shares()
+    {
+        return $this->hasMany(PostShare::class);
+    }
 }

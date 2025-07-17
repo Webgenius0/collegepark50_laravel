@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Auth\SocialLoginController;
 use App\Http\Controllers\Api\React\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\Auth\AuthenticationController;
@@ -38,4 +39,15 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
     Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
     Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']);
+
+
+    //Post routes
+    Route::group(['prefix' => 'post'], function () {
+        Route::post('/store', [PostController::class, 'store']);    // Create new post
+        Route::get('/all', [PostController::class, 'index']);       // Fetch all posts
+        Route::get('/show/{id}', [PostController::class, 'show']);       // Single post view
+        Route::delete('/delete/{id}', [PostController::class, 'destroy']); // Delete post
+        Route::get('/tag/{tag}', [PostController::class, 'postsByTag']); // Get posts by hashtag
+        Route::post('/update/{id}', [PostController::class, 'update']); // Update post
+    });
 });
