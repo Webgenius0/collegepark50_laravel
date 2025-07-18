@@ -77,6 +77,48 @@ class UserProfileController extends Controller
     }
 
 
+    public function updateLocation(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'address'       => ['nullable', 'string', 'max:50'],
+                'city'       => ['nullable', 'string', 'max:50'],
+                'state'       => ['nullable', 'string', 'max:255'],
+                'zip_code'   => ['nullable', 'string', 'max:100'],
+                'latitude'       => ['nullable', 'string', 'max:255'],
+                'longitude'      => ['nullable', 'string', 'max:255'],
+            ]);
+
+            if ($validator->fails()) {
+                return $this->error([], $validator->errors()->first(), 422);
+            }
+
+            $user = auth('api')->user();
+
+            $data = $validator->validated();
+
+            $user->update($data);
+
+            $userData = [
+                'address' => $user->address,
+                'city' => $user->city,
+                'state' => $user->state,
+                'zip_code' => $user->zip_code,
+                'latitude' => $user->latitude,
+                'longitude' => $user->longitude,
+            ];
+
+
+            return $this->success($userData, 'Profile updated successfully.', 200);
+
+        } catch (Exception $e) {
+
+            Log::error('Profile Update Error: ' . $e->getMessage());
+            return $this->error([], 'Failed to update profile.', 500);
+        }
+    }
+
+
     public function updateAvatar(Request $request)
     {
         try {
@@ -136,7 +178,6 @@ class UserProfileController extends Controller
     {
         try {
             $user = auth('api')->user();
-            dd($user->avatar);
 
             if ($user->avatar) {
                 Helper::deleteImage($user->avatar);

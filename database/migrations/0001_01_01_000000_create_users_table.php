@@ -37,6 +37,7 @@ return new class extends Migration
             $table->string('country', 100)->nullable();
             $table->string('city', 100)->nullable();
             $table->string('state', 100)->nullable();
+            $table->string('zip_code', 20)->nullable();
             $table->string('latitude', 200)->nullable();
             $table->string('longitude', 200)->nullable();
 

@@ -35,7 +35,7 @@ class UserResource extends JsonResource
 
             'get_notification' => $this->get_notification,
 
-            'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null
+            'created_at' => $this->created_at ? $this->created_at->diffForHumans() : null
         ];
     }
 }

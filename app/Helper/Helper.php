@@ -44,6 +44,7 @@ class Helper
     public static function deleteImage($imageUrl)
     {
         if (!$imageUrl) {
+
             dd("jalis");
             return false;
         }
