@@ -4,8 +4,11 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class AuthCheckMiddleware
 {
@@ -16,16 +19,19 @@ class AuthCheckMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
-            switch (Auth::user()->role) {
-                case 'admin':
-                    return redirect()->route('dashboard');
-                case 'user':
-                    return redirect()->route('user.dashboard');
-                case 'business':
-                    return redirect()->route('business.dashboard');
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) {
+                return response()->json(['message' => 'User not found'], 404);
             }
+        } catch (TokenExpiredException $e) {
+            return response()->json(['message' => 'Token expired'], 401);
+        } catch (TokenInvalidException $e) {
+            return response()->json(['message' => 'Token invalid'], 401);
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Authorization token not found'], 401);
         }
+
         return $next($request);
     }
 }
