@@ -14,12 +14,8 @@ class UserResource extends JsonResource
             'f_name' => $this->f_name,
             'l_name' => $this->l_name,
             'email' => $this->email,
-            'email_verified_at' => $this->email_verified_at?->format('Y-m-d H:i:s'),
-
 
             'role' => $this->role,
-            'is_otp_verified' => $this->is_otp_verified,
-
 
             'profession' => $this->profession,
             'gender' => $this->gender,
@@ -39,9 +35,7 @@ class UserResource extends JsonResource
 
             'get_notification' => $this->get_notification,
 
-           
-            'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
-            'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
+            'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null
         ];
     }
 }

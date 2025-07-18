@@ -33,6 +33,11 @@ class ResetPasswordController extends Controller
 
         try {
             $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return $this->error([], 'User not found.', 404);
+            }
+
             $otp = rand(100000, 999999);
 
             $user->update([
@@ -40,14 +45,19 @@ class ResetPasswordController extends Controller
                 'otp_expires_at' => Carbon::now()->addMinutes(5),
             ]);
 
+            // Optional: Enable mail sending
             // Mail::to($user->email)->queue(new SendForgotOtpMail($otp));
 
-            return $this->success(['otp' => $otp], 'Forgot password OTP sent successfully.', 200);
+            return $this->success([
+                'email' => $user->email,
+                'otp'   => $otp
+            ], 'Forgot password OTP sent successfully.', 200);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return $this->error([], $e->getMessage(), 500);
+            return $this->error([], 'An error occurred. Please try again later.', 500);
         }
     }
+
 
 
     public function verifyOTP(Request $request)

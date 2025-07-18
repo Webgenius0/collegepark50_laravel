@@ -44,6 +44,7 @@ class Helper
     public static function deleteImage($imageUrl)
     {
         if (!$imageUrl) {
+            dd("jalis");
             return false;
         }
         $filePath = public_path($imageUrl);
@@ -59,6 +60,14 @@ class Helper
     //         unlink($path);
     //     }
     // }
+
+
+    public static function fileDelete(string $path): void
+    {
+        if (file_exists($path)) {
+            unlink($path);
+        }
+    }
 
 
     public static function deleteImages($imageUrls)
