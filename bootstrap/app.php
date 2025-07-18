@@ -29,8 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'auth' => App\Http\Middleware\AuthCheckMiddleware::class,
-            'admin'         => App\Http\Middleware\AdminMiddleware::class,
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class, // for web
+            'auth.jwt' => App\Http\Middleware\AuthCheckMiddleware::class, // for API
+            'admin' => App\Http\Middleware\AdminMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'payment/stripe-webhook',

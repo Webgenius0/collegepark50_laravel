@@ -17,9 +17,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalCategories = JobCategory::count();
-   
-       
-        return view('backend.layouts.dashboard', compact('totalCategories',));
+
+
+
+        return view('backend.layouts.dashboard');
     }
 }

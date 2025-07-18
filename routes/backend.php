@@ -21,7 +21,7 @@ use App\Http\Controllers\Web\Backend\Settings\SocialSettingController;
 use App\Http\Controllers\Web\Backend\SpecializeController;
 
 
-Route::middleware(['auth:web', 'admin'])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 

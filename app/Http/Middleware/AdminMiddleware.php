@@ -12,11 +12,11 @@ class AdminMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
-
-       if (Auth::check('web') && Auth::user('web')->role === 'admin') {
+        $user = auth()->user();
+        
+        if ($user && $user->role === 'admin') {
             return $next($request);
         }
-
-       return response()->json(['status' => false, 'message' => 'Unauthorized access.Role should be admin.', 'code' => 403], 403);
+        return response()->json(['status' => false, 'message' => 'Unauthorized access. Role should be admin.', 'code' => 403], 403);
     }
 }

@@ -32,7 +32,6 @@ return new class extends Migration
             $table->string('profession', 255)->nullable();
             $table->string('gender', 50)->nullable();
             $table->string('age', 50)->nullable();
-            $table->string('avater',200)->nullable();
 
             $table->string('address')->nullable();
             $table->string('country', 100)->nullable();
