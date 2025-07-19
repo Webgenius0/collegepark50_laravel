@@ -10,6 +10,9 @@ use App\Http\Controllers\Web\Backend\TestimonialController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
 use App\Http\Controllers\Web\Backend\BusinessProfileController;
 use App\Http\Controllers\Web\Backend\ChatManageController;
+use App\Http\Controllers\Web\Backend\CMS\EventController;
+use App\Http\Controllers\Web\Backend\CMS\FeatureController;
+use App\Http\Controllers\Web\Backend\CMS\HomeController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -23,6 +26,55 @@ use App\Http\Controllers\Web\Backend\SpecializeController;
 
 Route::middleware(['auth:web', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // cms management
+    Route::prefix('cms')->group(function () {
+        //home page
+        Route::prefix('home')->group(function () {
+            // hero section
+            Route::get('/hero', [HomeController::class, 'showHeroSection'])->name('home.hero');
+            Route::post('/hero/update', [HomeController::class, 'updateHeroSection'])->name('update.hero.section');
+
+            //upcoming event seciton
+            Route::get('/upcoming-event', [HomeController::class, 'showEventSection'])->name('event.section');
+            Route::post('/upcoming-event/update', [HomeController::class, 'updateEventSection'])->name('update.event.section');
+
+            //popular vanue section
+            Route::get('/popular-vanue', [HomeController::class, 'showVanueSection'])->name('vanue.section');
+            Route::post('/popular-vanue/update', [HomeController::class, 'updateVanueSection'])->name('update.vanue.section');
+
+            // app-download section
+            Route::get('/app-download', [HomeController::class, 'showAppDownloadSection'])->name('app.download.hero');
+            Route::post('/app-download/update', [HomeController::class, 'updateAppDownloadSection'])->name('update.app.download.section');
+        });
+
+        //event page
+        Route::prefix('event')->group(function () {
+            // event page hero section
+            Route::get('/hero', [EventController::class, 'showEventHeroSection'])->name('event.hero.section');
+            Route::post('/update/hero', [EventController::class, 'updateEventHeroSection'])->name('update.event.hero.section');
+
+            // event details page hero section
+            Route::get('/event-details-hero', [EventController::class, 'showEventDetailsHeroSection'])->name('event.details.hero.section');
+            Route::post('/event-details-hero/update/hero', [EventController::class, 'updateEventDetailsHeroSection'])->name('update.event.details.hero.section');
+        });
+
+        //feature page
+        Route::prefix('feature')->group(function () {
+            // feature page hero section
+            Route::get('/hero', [FeatureController::class, 'showFeatureHeroSection'])->name('feature.hero.section');
+            Route::post('/update/hero', [FeatureController::class, 'updateFeatureHeroSection'])->name('update.feature.hero.section');
+
+            // feature item section
+            Route::get('/item', [FeatureController::class, 'showFeatureItemSection'])->name('feature.item.section');
+            Route::post('/update-item-hero', [FeatureController::class, 'updateFeatureItemHeroSection'])->name('update.feature.item.hero.section');
+            Route::post('/item/store', [FeatureController::class, 'storeFeatureItem'])->name('store.feature.item');
+            Route::get('/item/edit/{id}', [FeatureController::class, 'editFeatureItem'])->name('edit.feature.item');
+            Route::post('/item/update/{id}', [FeatureController::class, 'updateFeatureItem'])->name('update.feature.item');
+            Route::post('/item/update-status/{id}', [FeatureController::class, 'updateItemStatus'])->name('feature.item.status.update');
+            Route::delete('/item/{id}', [FeatureController::class, 'deleteFeatureItem'])->name('feature.item.delete');
+        });
+    });
 });
 
 
@@ -46,8 +98,6 @@ Route::middleware(['auth:web'])->group(function () {
     Route::put('category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('category/delete/{id}', [CategoryController::class, 'destroy'])->name('admin.category.destroy');
     Route::post('/category/status/{id}', [CategoryController::class, 'status'])->name('admin.category.status');
-
-
 });
 
 
@@ -60,8 +110,6 @@ Route::middleware(['auth:web'])->group(function () {
     Route::put('specialize/update/{id}', [SpecializeController::class, 'update'])->name('admin.specialize.update');
     Route::delete('specialize/delete/{id}', [SpecializeController::class, 'destroy'])->name('admin.specialize.destroy');
     Route::post('/specialize/status/{id}', [SpecializeController::class, 'status'])->name('admin.specialize.status');
-
-
 });
 
 
@@ -76,7 +124,6 @@ Route::controller(ChatManageController::class)->prefix('chat')->name('admin.chat
     Route::get('/search', 'search')->name('search');
     Route::get('/seen/all/{receiver_id}', 'seenAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
-
 });
 
 
@@ -87,8 +134,8 @@ Route::controller(ChatManageController::class)->prefix('chat')->name('admin.chat
 
 
 
-Route::get('/user-list',[UserListController::class,'index'])->name('admin.user.index');
-Route::delete('/user-list/delete/{id}',[UserListController::class,'destroy'])->name('admin.user.destroy');
+Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
+Route::delete('/user-list/delete/{id}', [UserListController::class, 'destroy'])->name('admin.user.destroy');
 
 
 Route::controller(FaqController::class)->group(function () {
@@ -102,9 +149,9 @@ Route::controller(FaqController::class)->group(function () {
 });
 
 
-Route::get('/testimonials',[TestimonialController::class,'index'])->name('admin.testimonial.index');
-Route::post('/testimonial/status/{id}',[TestimonialController::class,'status'])->name('admin.testimonial.status');
-Route::delete('/testimonial/delete/{id}',[TestimonialController::class,'destroy'])->name('admin.testimonial.destroy');
+Route::get('/testimonials', [TestimonialController::class, 'index'])->name('admin.testimonial.index');
+Route::post('/testimonial/status/{id}', [TestimonialController::class, 'status'])->name('admin.testimonial.status');
+Route::delete('/testimonial/delete/{id}', [TestimonialController::class, 'destroy'])->name('admin.testimonial.destroy');
 
 
 Route::get('/admin/social-media-settings', [SocialSettingController::class, 'index'])->name('admin.social_media.index');
@@ -170,4 +217,3 @@ Route::controller(DynamicPageController::class)->group(function () {
     Route::post('/dynamic-page/status/{id}', 'status')->name('admin.dynamic_page.status');
     Route::delete('/dynamic-page/destroy/{id}', 'destroy')->name('admin.dynamic_page.destroy');
 });
-

@@ -83,7 +83,7 @@
                     </a>
                 </li>
 
-                 <li class="slide">
+                <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}"
                         href="{{ route('admin.chat.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -97,7 +97,7 @@
 
 
 
-                 <li class="slide">
+                <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('dynamic_page') ? 'has-link' : '' }}"
                         href="{{ route('admin.dynamic_page.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -108,10 +108,6 @@
                         <span class="side-menu__label">Dynamic Page</span>
                     </a>
                 </li>
-
-
-
-
 
 
                 <li class="slide">
@@ -126,8 +122,97 @@
                     </a>
                 </li>
 
+                <h3>CMS</h3>
+
+                {{-- cms-management --}}
+                {{-- home page --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                        </svg>
+                        <span class="side-menu__label">Home Page</span><i class="angle fa fa-angle-right"></i>
+                    </a>
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('home.hero') }}" class="slide-item">Hero Section</a>
+                        </li>
+                        <li><a href="{{ route('app.download.hero') }}" class="slide-item">App Download
+                                Section</a>
+                        </li>
+                        <li><a href="{{ route('event.section') }}" class="slide-item">Event Section</a>
+                        </li>
+                        <li><a href="{{ route('vanue.section') }}" class="slide-item">Venue Section</a>
+                        </li>
+                    </ul>
+                </li>
+
+                {{-- event page --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path
+                                d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm13 8H4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10zm-2 4h-3v3h3v-3z" />
+                        </svg>
+                        <span class="side-menu__label">Event Page</span><i class="angle fa fa-angle-right"></i>
+                    </a>
+
+                    <ul class="slide-menu">
+                        <li><a href="{{route('event.hero.section')}}" class="slide-item">Event Hero Section</a>
+                        </li>
+                        <li><a href="{{route('event.details.hero.section')}}" class="slide-item">Event Details Hero Section</a>
+                        </li>
+                    </ul>
+                </li>
 
 
+                {{-- features page --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path
+                                d="M4 6h2v2H4V6zm0 5h2v2H4v-2zm0 5h2v2H4v-2zm4-10h12v2H8V6zm0 5h12v2H8v-2zm0 5h12v2H8v-2z" />
+                        </svg>
+                        <span class="side-menu__label">Features Page</span><i class="angle fa fa-angle-right"></i>
+                    </a>
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('feature.hero.section') }}" class="slide-item">Hero Section</a>
+                        </li>
+                        <li><a href="{{ route('feature.item.section') }}" class="slide-item">Feature Item</a>
+                        </li>
+                    </ul>
+                </li>
+
+                {{-- newsletter --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
+                        href="{{ route('admin.faq.index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path
+                                d="M20 4H4a2 2 0 0 0-2 2v1.8l10 6.25L22 7.8V6a2 2 0 0 0-2-2zm0 4.25-8 5-8-5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.25z" />
+                        </svg>
+                        <span class="side-menu__label">Newsletter</span>
+                    </a>
+                </li>
+
+                {{-- footer --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
+                        href="{{ route('admin.faq.index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path d="M4 4h16v2H4V4zm0 6h16v2H4v-2zm0 6h16v6H4v-6z" />
+                        </svg>
+                        <span class="side-menu__label">Footer</span>
+                    </a>
+                </li>
+
+                {{-- Setttings --}}
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 512 512">
@@ -138,8 +223,10 @@
                     </a>
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a></li>
-                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a></li>
+                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a>
+                        </li>
+                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a>
+                        </li>
 
                         <li><a href="{{ route('setting.mail.index') }}" class="slide-item">Mail Settings</a></li>
                         <li><a href="{{ route('setting.stripe.index') }}" class="slide-item">Stripe Settings</a></li>

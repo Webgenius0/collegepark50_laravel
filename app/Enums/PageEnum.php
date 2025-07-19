@@ -5,5 +5,7 @@ namespace App\Enums;
 
 enum PageEnum: string
 {
-    const AUTH = 'login';
+    case HOME_PAGE  = 'home-page';
+    case EVENT_PAGE  = 'event-page';
+    case FEATURES_PAGE  = 'features-page';
 }
