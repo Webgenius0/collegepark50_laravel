@@ -13,6 +13,7 @@ use App\Http\Controllers\Web\Backend\ChatManageController;
 use App\Http\Controllers\Web\Backend\CMS\EventController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\CMS\HomeController;
+use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -28,51 +29,62 @@ Route::middleware(['auth:web', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // cms management
-    Route::prefix('cms')->group(function () {
-        //home page
-        Route::prefix('home')->group(function () {
-            // hero section
-            Route::get('/hero', [HomeController::class, 'showHeroSection'])->name('home.hero');
-            Route::post('/hero/update', [HomeController::class, 'updateHeroSection'])->name('update.hero.section');
+    Route::prefix('cms')->name('cms.')->group(function () {
 
-            //upcoming event seciton
-            Route::get('/upcoming-event', [HomeController::class, 'showEventSection'])->name('event.section');
-            Route::post('/upcoming-event/update', [HomeController::class, 'updateEventSection'])->name('update.event.section');
+        // Home Page
+        Route::prefix('home')->name('home.')->group(function () {
+            // Hero Section
+            Route::get('/hero', [HomeController::class, 'hero'])->name('hero');
+            Route::post('/hero/update', [HomeController::class, 'updateHero'])->name('hero.update');
 
-            //popular vanue section
-            Route::get('/popular-vanue', [HomeController::class, 'showVanueSection'])->name('vanue.section');
-            Route::post('/popular-vanue/update', [HomeController::class, 'updateVanueSection'])->name('update.vanue.section');
+            // Upcoming Event Section
+            Route::get('/upcoming-events', [HomeController::class, 'upcomingEvents'])->name('event');
+            Route::post('/upcoming-events/update', [HomeController::class, 'updateUpcomingEvents'])->name('event.update');
 
-            // app-download section
-            Route::get('/app-download', [HomeController::class, 'showAppDownloadSection'])->name('app.download.hero');
-            Route::post('/app-download/update', [HomeController::class, 'updateAppDownloadSection'])->name('update.app.download.section');
+            // Popular Venue Section
+            Route::get('/popular-venues', [HomeController::class, 'popularVenues'])->name('venues');
+            Route::post('/popular-venues/update', [HomeController::class, 'updatePopularVenues'])->name('venues.update');
+
+            // App Download Section
+            Route::get('/app-download', [HomeController::class, 'appDownload'])->name('app.download');
+            Route::post('/app-download/update', [HomeController::class, 'updateAppDownload'])->name('app.download.update');
         });
 
-        //event page
-        Route::prefix('event')->group(function () {
-            // event page hero section
-            Route::get('/hero', [EventController::class, 'showEventHeroSection'])->name('event.hero.section');
-            Route::post('/update/hero', [EventController::class, 'updateEventHeroSection'])->name('update.event.hero.section');
+        // Event Page
+        Route::prefix('event')->name('event.')->group(function () {
+            // Hero Section
+            Route::get('/hero', [EventController::class, 'hero'])->name('hero');
+            Route::post('/hero/update', [EventController::class, 'updateHero'])->name('hero.update');
 
-            // event details page hero section
-            Route::get('/event-details-hero', [EventController::class, 'showEventDetailsHeroSection'])->name('event.details.hero.section');
-            Route::post('/event-details-hero/update/hero', [EventController::class, 'updateEventDetailsHeroSection'])->name('update.event.details.hero.section');
+            //Up coming event
+            Route::get('/upcoming-events', [EventController::class, 'upcomingEvents'])->name('upcoming');
+            Route::post('/upcoming-events/update', [EventController::class, 'updateUpcomingEvents'])->name('upcoming.update');
+
+            // Event Details Hero
+            Route::get('/details-hero', [EventController::class, 'detailsHero'])->name('details.hero');
+            Route::post('/details-hero/update', [EventController::class, 'updateDetailsHero'])->name('details.hero.update');
         });
 
-        //feature page
-        Route::prefix('feature')->group(function () {
-            // feature page hero section
-            Route::get('/hero', [FeatureController::class, 'showFeatureHeroSection'])->name('feature.hero.section');
-            Route::post('/update/hero', [FeatureController::class, 'updateFeatureHeroSection'])->name('update.feature.hero.section');
+        // Feature Page
+        Route::prefix('feature')->name('feature.')->group(function () {
+            // Hero Section
+            Route::get('/hero', [FeatureController::class, 'hero'])->name('hero');
+            Route::post('/hero/update', [FeatureController::class, 'updateHero'])->name('hero.update');
 
-            // feature item section
-            Route::get('/item', [FeatureController::class, 'showFeatureItemSection'])->name('feature.item.section');
-            Route::post('/update-item-hero', [FeatureController::class, 'updateFeatureItemHeroSection'])->name('update.feature.item.hero.section');
-            Route::post('/item/store', [FeatureController::class, 'storeFeatureItem'])->name('store.feature.item');
-            Route::get('/item/edit/{id}', [FeatureController::class, 'editFeatureItem'])->name('edit.feature.item');
-            Route::post('/item/update/{id}', [FeatureController::class, 'updateFeatureItem'])->name('update.feature.item');
-            Route::post('/item/update-status/{id}', [FeatureController::class, 'updateItemStatus'])->name('feature.item.status.update');
-            Route::delete('/item/{id}', [FeatureController::class, 'deleteFeatureItem'])->name('feature.item.delete');
+            // Feature Items
+            Route::get('/items', [FeatureController::class, 'index'])->name('items.index');
+            Route::post('/items/hero/update', [FeatureController::class, 'updateItemHero'])->name('items.hero.update');
+            Route::post('/items', [FeatureController::class, 'store'])->name('items.store');
+            Route::get('/items/{id}/edit', [FeatureController::class, 'edit'])->name('items.edit');
+            Route::post('/items/{id}/update', [FeatureController::class, 'update'])->name('items.update');
+            Route::post('/items/{id}/status', [FeatureController::class, 'toggleStatus'])->name('items.status');
+            Route::delete('/items/{id}', [FeatureController::class, 'destroy'])->name('items.destroy');
+        });
+
+        // Newsletter Section
+        Route::prefix('newsletter')->name('newsletter.')->group(function () {
+            Route::get('/', [NewsletterController::class, 'index'])->name('index');
+            Route::post('/update', [NewsletterController::class, 'update'])->name('update');
         });
     });
 });

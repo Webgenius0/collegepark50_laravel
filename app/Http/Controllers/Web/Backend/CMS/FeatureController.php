@@ -15,28 +15,28 @@ class FeatureController extends Controller
     /**
      * show feature page hero section
      */
-    public function showFeatureHeroSection()
+    public function hero()
     {
-        $data = CMS::where('page', 'feature-page')->where('section', 'hero')->first();
+        $data = CMS::where('page', 'features-page')->where('section', 'hero')->first();
         return view("backend.layouts.cms.feature-page.hero", compact("data"));
     }
 
     /**
      * update feature hero section
      **/
-    public function updateFeatureHeroSection(CmsManageRequest $request)
+    public function updateHero(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();
 
             // get the existing record
-            $existing = CMS::where('page', 'feature-page')
+            $existing = CMS::where('page', 'features-page')
                 ->where('section', 'hero')
                 ->first();
 
             CMS::updateOrCreate(
                 [
-                    'page' => 'feature-page',
+                    'page' => 'features-page',
                     'section' => 'hero',
                 ],
                 $validated_data
@@ -51,10 +51,10 @@ class FeatureController extends Controller
     /**
      * show feature item hero section
      */
-    public function showFeatureItemSection(Request $request)
+    public function index(Request $request)
     {
         if ($request->ajax()) {
-            $feature_items = CMS::where('page', 'feature-page')->where('section', 'card')->get();
+            $feature_items = CMS::where('page', 'features-page')->where('section', 'card')->get();
 
             return DataTables::of($feature_items)
                 ->addIndexColumn()
@@ -73,10 +73,10 @@ class FeatureController extends Controller
                 ->addColumn('status', function ($item) {
                     $checked = $item->status == 'active' ? 'checked' : '';
 
-                    return '<div style="display: flex; justify-content: center; align-items: center;">
+                    return '<div class="form-check form-switch" style="display: flex; justify-content: center; align-items: center;">
                                 <input onclick="showStatusChangeAlert(' . $item->id . ')"
                                     type="checkbox"
-                                    class="form-check-input status-toggle"
+                                    class="form-check-input" type="checkbox" role="switch"
                                     style="cursor: pointer; width: 40px; height: 20px;"
                                     ' . $checked . '>
                             </div>';
@@ -84,9 +84,12 @@ class FeatureController extends Controller
 
                 ->addColumn('action', function ($item) {
                     return '<div class="d-flex justify-content-start align-items-center gap-1">
-                    <button type="button" onclick="goToEdit(' . $item->id . ')" class="btn btn-primary btn-sm">
+                   <button type="button"
+                            class="btn btn-primary btn-sm editItem"
+                            data-id="' . $item->id . '">
                         <i class="fe fe-edit"></i>
                     </button>
+
                     <button type="button" onclick="showDeleteConfirm(' . $item->id . ')" class="btn btn-danger btn-sm">
                         <i class="fe fe-trash"></i>
                     </button>
@@ -96,7 +99,7 @@ class FeatureController extends Controller
                 ->make();
         }
 
-        $item = CMS::where('page', 'feature-page')->where('section', 'text')->first();
+        $item = CMS::where('page', 'features-page')->where('section', 'text')->first();
 
         return view('backend.layouts.cms.feature-page.feature-item', compact('item'));
     }
@@ -104,19 +107,19 @@ class FeatureController extends Controller
     /**
      * update feature hero section
      **/
-    public function updateFeatureItemHeroSection(CmsManageRequest $request)
+    public function updateItemHero(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();
 
             // get the existing record
-            CMS::where('page', 'feature-page')
+            CMS::where('page', 'features-page')
                 ->where('section', 'text')
                 ->first();
 
             CMS::updateOrCreate(
                 [
-                    'page' => 'feature-page',
+                    'page' => 'features-page',
                     'section' => 'text',
                 ],
                 $validated_data
@@ -131,13 +134,13 @@ class FeatureController extends Controller
     /**
      * store feature item
      **/
-    public function storeFeatureItem(CmsManageRequest $request)
+    public function store(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();
 
             // get the existing record
-            $existing = CMS::where('page', 'feature-page')
+            $existing = CMS::where('page', 'features-page')
                 ->where('section', 'card')
                 ->first();
 
@@ -149,7 +152,7 @@ class FeatureController extends Controller
 
             CMS::updateOrCreate(
                 [
-                    'page' => 'feature-page',
+                    'page' => 'features-page',
                     'section' => 'card',
                 ] +
                     $validated_data
@@ -170,28 +173,58 @@ class FeatureController extends Controller
     /**
      * edit feature item
      **/
-    public function editFeatureItem(int $id)
+    public function edit($id)
     {
         $data = CMS::find($id);
-
         if (!$data) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Establishment not found.',
-            ]);
+            return response()->json(['success' => false, 'message' => 'Item not found.']);
         }
+        return response()->json(['success' => true, 'data' => $data]);
+    }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Status Changed successfully!',
-        ]);
+    /**
+     * edit feature item
+     **/
+    public function update(CmsManageRequest $request, $id)
+    {
+        try {
+            $validated_data = $request->validated();
+
+            $item = CMS::findOrFail($id);
+
+            // Handle image update
+            if ($request->hasFile('image')) {
+                // Delete old image if it exists
+                if ($item && $item->image) {
+                    Helper::deleteImage($item->image);
+                }
+
+                // Store new image
+                $image_path = Helper::uploadImage($request->file('image'), 'cms/feature-item');
+                $validated_data['image'] = $image_path;
+            }
+
+            // Update the item record
+            $item->update($validated_data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item updated successfully.'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while updating the item.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
     /**
      * update feature item status
      **/
-    public function updateItemStatus(int $id)
+    public function toggleStatus(int $id)
     {
         $data = CMS::find($id);
 
@@ -213,7 +246,7 @@ class FeatureController extends Controller
     /**
      * delete item
      **/
-    public function deleteFeatureItem($id)
+    public function destroy($id)
     {
         $item = CMS::find($id);
 

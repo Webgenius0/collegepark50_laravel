@@ -140,8 +140,11 @@ class AuthenticationController extends Controller
     */
     public function updateRole(Request $request)
     {
+
         try {
             $user = auth('api')->user();
+
+            // dd($user);
 
             if (!$user) {
                 return $this->error([], 'User not found.', 404);

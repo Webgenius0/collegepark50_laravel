@@ -27,7 +27,7 @@
                     <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
                         <div class="card box-shadow-0">
                             <div class="card-body">
-                                <form class="form-horizontal" method="post" action="{{ route('update.event.section') }}"
+                                <form class="form-horizontal" method="post" action="{{ route('cms.home.event.update') }}"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="row mb-4">
@@ -49,23 +49,6 @@
                                             <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror"
                                                 rows="5">{{ old('description', $data->description ?? '') }}</textarea>
                                             @error('description')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- status field --}}
-                                        <div class="form-group">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select name="status" id="status"
-                                                class="form-control @error('status') is-invalid @enderror">
-                                                <option value="active"
-                                                    {{ old('status', $data->status ?? '') == 'active' ? 'selected' : '' }}>
-                                                    Active</option>
-                                                <option value="inactive"
-                                                    {{ old('status', $data->status ?? '') == 'inactive' ? 'selected' : '' }}>
-                                                    Inactive</option>
-                                            </select>
-                                            @error('status')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>

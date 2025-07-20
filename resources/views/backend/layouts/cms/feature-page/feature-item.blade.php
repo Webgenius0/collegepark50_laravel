@@ -29,7 +29,7 @@
                         <div class="card box-shadow-0">
                             <div class="card-body">
                                 <form class="form-horizontal" method="post"
-                                    action="{{ route('update.feature.item.hero.section') }}" enctype="multipart/form-data">
+                                    action="{{ route('cms.feature.items.hero.update') }}" enctype="multipart/form-data">
                                     @csrf
                                     <div class="row mb-4">
 
@@ -50,23 +50,6 @@
                                             <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror"
                                                 rows="5">{{ old('description', $item->description ?? '') }}</textarea>
                                             @error('description')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        {{-- status field --}}
-                                        <div class="form-group">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select name="status" id="status"
-                                                class="form-control @error('status') is-invalid @enderror">
-                                                <option value="active"
-                                                    {{ old('status', $item->status ?? '') == 'active' ? 'selected' : '' }}>
-                                                    Active</option>
-                                                <option value="inactive"
-                                                    {{ old('status', $item->status ?? '') == 'inactive' ? 'selected' : '' }}>
-                                                    Inactive</option>
-                                            </select>
-                                            @error('status')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
@@ -130,29 +113,30 @@
                         <h5 class="modal-title" id="itemModalLabel">Create Feature Item</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" id="modal-body">
                         <div class="row">
+                            {{-- item title --}}
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="title" class="form-label">Title</label>
+                                    <label for="item_title" class="form-label">Title</label>
                                     <input type="text" class="form-control" name="title" placeholder="Title"
-                                        id="title">
+                                        id="item_title">
                                     <span class="text-danger error-text title_error"></span>
                                 </div>
                             </div>
 
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="description" class="form-label">Description</label>
-                                    <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+                                    <label for="item_description" class="form-label">Description</label>
+                                    <textarea name="description" id="item_description" class="form-control" rows="3"></textarea>
                                     <span class="text-danger error-text description_error"></span>
                                 </div>
                             </div>
 
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select name="status" id="status" class="form-control">
+                                    <label for="item_status" class="form-label">Status</label>
+                                    <select name="status" id="item_status" class="form-control">
                                         <option value="active">Active</option>
                                         <option value="inactive">Inactive</option>
                                     </select>
@@ -160,12 +144,12 @@
                                 </div>
                             </div>
 
+                            {{-- item image --}}
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="image" class="form-label">Image</label>
-                                    <input type="file" class="form-control" name="image" id="image">
-                                    <span class="text-danger error-text image_error"></span>
-                                    <div id="imagePreview" class="mt-2"></div>
+                                <div class="mb-3" id="image_show_section">
+                                    <label class="form-label">Item Image</label>
+                                    <input type="file" id="item_image" name="image" class="form-control dropify"
+                                        accept="image/*">
                                 </div>
                             </div>
                         </div>
@@ -214,7 +198,7 @@
                     pagingType: "full_numbers",
                     dom: "<'row justify-content-between table-topbar'<'col-md-4 col-sm-3'l><'col-md-5 col-sm-5 px-0'f>>tipr",
                     ajax: {
-                        url: "{{ route('feature.item.section') }}",
+                        url: "{{ route('cms.feature.items.index') }}",
                         type: "GET",
                     },
 
@@ -262,23 +246,34 @@
                 });
             }
 
+
             // Reset form and open modal for adding new item
             $('#addItemBtn').click(function() {
                 $('#itemModalLabel').text('Create Feature Item');
                 $('#itemForm')[0].reset();
                 $('#itemID').val('');
-                $('#imagePreview').html('');
                 $('.error-text').text('');
+
+                // Rebuild the image field from scratch
+                $('#image_show_section').html(`
+                        <label class="form-label">Item Image</label>
+                        <input type="file" id="item_image" name="image" class="form-control dropify"
+                            data-default-file="{{ asset('default/placeholder-image.avif') }}" accept="image/*">
+                    `);
+
+                // Reinitialize dropify
+                $('#item_image').dropify();
             });
+
 
             // Handle form submission
             $('#itemForm').on('submit', function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
                 var id = $('#itemID').val();
-                var url = id ? "{{ route('update.feature.item', ':id') }}".replace(':id', id) :
-                    "{{ route('store.feature.item') }}";
-                var method = id ? 'POST' : 'POST';
+                var url = id ? "{{ route('cms.feature.items.update', ':id') }}".replace(':id', id) :
+                    "{{ route('cms.feature.items.store') }}";
+                var method = id ? 'POST' : 'POST'; // Keep as POST for both create and update
 
                 $.ajax({
                     url: url,
@@ -298,7 +293,11 @@
                         } else {
                             $('#itemModal').modal('hide');
                             $('#itemForm')[0].reset();
-                            table.ajax.reload();
+                            // Reset dropify after successful submission
+                            $('.dropify').dropify('destroy');
+                            $('#item_image').attr('data-default-file',
+                                "{{ asset('default/placeholder-image.avif') }}").dropify();
+                            $('#datatable').DataTable().ajax.reload();
                             toastr.success(response.message);
                         }
                         $('#submitBtn').prop('disabled', false).html('Save changes');
@@ -313,22 +312,35 @@
             // Edit item
             $(document).on('click', '.editItem', function() {
                 var id = $(this).data('id');
-                var url = "{{ route('edit.feature.item', ':id') }}".replace(':id', id);
+                var url = "{{ route('cms.feature.items.edit', ':id') }}".replace(':id', id);
 
                 $.get(url, function(response) {
                     $('#itemModalLabel').text('Edit Feature Item');
                     $('#itemID').val(response.data.id);
-                    $('#title').val(response.data.title);
-                    $('#description').val(response.data.description);
-                    $('#status').val(response.data.status);
+                    $('#item_title').val(response.data.title);
+                    $('#item_description').val(response.data.description);
+                    $('#item_status').val(response.data.status);
 
-                    // Show image preview if exists
                     if (response.data.image) {
-                        $('#imagePreview').html(
-                            `<img src="${response.data.image}" class="img-thumbnail" width="100">`
-                        );
-                    } else {
-                        $('#imagePreview').html('');
+                        let imageUrl = response.data.image ? "{{ asset('') }}" + response
+                            .data.image : '';
+                        // Remove existing image input section
+                        $('#image_show_section').remove();
+
+                        // Create new image input section dynamically
+                        let newImageInput = `
+                                <div class="mb-3" id="image_show_section">
+                                    <label class="form-label">Item Image</label>
+                                    <input type="file" id="item_image" class="form-control dropify" name="image"
+                                    data-default-file="${imageUrl}">
+                                </div>
+                            `;
+
+                        // Append the new input field inside the modal body
+                        $('#modal-body').append(newImageInput);
+
+                        // Initialize Dropify on the new input
+                        $('#item_image').dropify();
                     }
 
                     $('#itemModal').modal('show');
@@ -357,7 +369,7 @@
         // Status Change
         function statusChange(id) {
             NProgress.start();
-            let url = "{{ route('feature.item.status.update', ':id') }}";
+            let url = "{{ route('cms.feature.items.status', ':id') }}";
             $.ajax({
                 type: "POST",
                 url: url.replace(':id', id),
@@ -394,7 +406,7 @@
         // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('feature.item.delete', ':id') }}";
+            let url = "{{ route('cms.feature.items.destroy', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",
@@ -415,93 +427,3 @@
         }
     </script>
 @endpush
-
-{{-- @push('scripts')
-    <script>
-        $(document).ready(function() {
-            $.ajaxSetup({
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                }
-            });
-
-            // Initialize DataTable
-            var table = $('#datatable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('feature.item.section') }}",
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'page',
-                        name: 'page'
-                    },
-                    {
-                        data: 'section',
-                        name: 'section'
-                    },
-                    {
-                        data: 'title',
-                        name: 'title'
-                    },
-                    {
-                        data: 'description',
-                        name: 'description'
-                    },
-                    {
-                        data: 'image',
-                        name: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ]
-            });
-
-
-
-            // Delete item
-            $(document).on('click', '.deleteItem', function() {
-                var id = $(this).data('id');
-                var url = "{{ route('delete.feature.item', ':id') }}".replace(':id', id);
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: url,
-                            type: 'DELETE',
-                            success: function(response) {
-                                table.ajax.reload();
-                                toastr.success(response.message);
-                            },
-                            error: function(xhr) {
-                                toastr.error('Something went wrong. Please try again.');
-                            }
-                        });
-                    }
-                });
-            });
-        });
-    </script>
-@endpush --}}

@@ -5,6 +5,10 @@ use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\Post\PostShareController;
 use App\Http\Controllers\Api\React\Auth\SocialLoginController;
+use App\Http\Controllers\Api\React\CMS\EventController;
+use App\Http\Controllers\Api\React\CMS\FeatureController;
+use App\Http\Controllers\Api\React\CMS\HomeController;
+use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
 use App\Http\Controllers\Api\React\Post\PostCommentReplyController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
@@ -31,6 +35,12 @@ Route::group(['middleware' => 'guest:api'], function () {
 
 
     Route::post('social/signin/{provider}', [SocialLoginController::class, 'socialSignin']);
+
+    //cms-routes-get pages dynamic data
+    Route::get('/home-page-data', [HomeController::class,'index']);     //get home-page data
+    Route::get('/event-page-data', [EventController::class,'index']);    //get event-page data
+    Route::get('/feature-page-data', [FeatureController::class,'index']);    //get features-page data
+    Route::get('/newsletter-page-data', [NewsletterController::class,'index']);    //get features-page data
 });
 
 

@@ -27,7 +27,7 @@
                     <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
                         <div class="card box-shadow-0">
                             <div class="card-body">
-                                <form class="form-horizontal" method="post" action="{{ route('update.app.download.section') }}"
+                                <form class="form-horizontal" method="post" action="{{ route('cms.home.app.download.update') }}"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="row mb-4">
@@ -54,7 +54,7 @@
                                         </div>
 
                                         {{-- section button text --}}
-                                        <div class="form-group">
+                                        {{-- <div class="form-group">
                                             <label for="btn_text" class="form-label">Button text</label>
                                             <input type="text" class="form-control @error('btn_text') is-invalid @enderror"
                                                 name="btn_text" placeholder="Enter button text" id="btn_text"
@@ -62,10 +62,10 @@
                                             @error('btn_text')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
-                                        </div>
+                                        </div> --}}
 
                                         {{-- section btn_link --}}
-                                        <div class="form-group">
+                                        {{-- <div class="form-group">
                                             <label for="btn_link" class="form-label">Button link</label>
                                             <input type="link" class="form-control @error('btn_link') is-invalid @enderror"
                                                 name="btn_link" placeholder="Enter button link" id="btn_link"
@@ -73,25 +73,7 @@
                                             @error('btn_link')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
-                                        </div>
-
-                                        {{-- status field --}}
-                                        <div class="form-group">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select name="status" id="status"
-                                                class="form-control @error('status') is-invalid @enderror">
-                                                <option value="active"
-                                                    {{ old('status', $data->status ?? '') == 'active' ? 'selected' : '' }}>
-                                                    Active</option>
-                                                <option value="inactive"
-                                                    {{ old('status', $data->status ?? '') == 'inactive' ? 'selected' : '' }}>
-                                                    Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
+                                        </div> --}}
 
                                         {{-- hero image --}}
                                         <div class="row">

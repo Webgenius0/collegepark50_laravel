@@ -17,7 +17,7 @@ class HomeController extends Controller
     /**
      * show hero section
      **/
-    public function showHeroSection()
+    public function hero()
     {
         $data = CMS::where('page', 'home-page')->where('section', 'hero')->first();
         return view("backend.layouts.cms.home-page.hero", compact("data"));
@@ -26,7 +26,7 @@ class HomeController extends Controller
     /**
      * update hero section
      **/
-    public function updateHeroSection(CmsManageRequest $request)
+    public function updateHero(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();
@@ -63,7 +63,7 @@ class HomeController extends Controller
     /**
      * show upcoming events section
      **/
-    public function showEventSection()
+    public function upcomingEvents()
     {
         $data = CMS::where('page', 'home-page')->where('section', 'upcoming-event')->first();
         return view("backend.layouts.cms.home-page.event", compact("data"));
@@ -73,7 +73,7 @@ class HomeController extends Controller
     /**
      * update update upcoming section
      **/
-    public function updateEventSection(CmsManageRequest $request)
+    public function updateUpcomingEvents(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();
@@ -100,7 +100,7 @@ class HomeController extends Controller
     /**
      * show popular vanue section
      **/
-    public function showVanueSection()
+    public function popularVenues()
     {
         $data = CMS::where('page', 'home-page')->where('section', 'popular-vanue')->first();
         return view("backend.layouts.cms.home-page.vanue", compact("data"));
@@ -109,7 +109,7 @@ class HomeController extends Controller
     /**
      * update popular vanue section
      **/
-    public function updateVanueSection(CmsManageRequest $request)
+    public function updatePopularVenues(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();
@@ -136,7 +136,7 @@ class HomeController extends Controller
     /**
      * show app download section
      **/
-    public function showAppDownloadSection()
+    public function appDownload()
     {
         $data = CMS::where('page', 'home-page')->where('section', 'app-download')->first();
         return view("backend.layouts.cms.home-page.app-download", compact("data"));
@@ -145,7 +145,7 @@ class HomeController extends Controller
     /**
      * update app download section
      **/
-    public function updateAppDownloadSection(CmsManageRequest $request)
+    public function updateAppDownload(CmsManageRequest $request)
     {
         try {
             $validated_data = $request->validated();

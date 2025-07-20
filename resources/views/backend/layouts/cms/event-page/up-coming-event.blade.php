@@ -1,4 +1,4 @@
-@extends('backend.app', ['title' => 'Hero section'])
+@extends('backend.app', ['title' => 'Upcoming events'])
 
 @section('content')
     <!--app-content open-->
@@ -11,12 +11,12 @@
                 {{-- PAGE-HEADER --}}
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Home page - Hero section</h1>
+                        <h1 class="page-title">Event page - Upcoming event</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Home page</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Hero section</li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Event page</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Upcoming event</li>
                         </ol>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                     <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
                         <div class="card box-shadow-0">
                             <div class="card-body">
-                                <form class="form-horizontal" method="post" action="{{ route('cms.home.hero.update') }}"
+                                <form class="form-horizontal" method="post" action="{{ route('cms.event.upcoming.update') }}"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="row mb-4">
@@ -51,40 +51,6 @@
                                             @error('description')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
-                                        </div>
-
-                                        {{-- status field --}}
-                                        {{-- <div class="form-group">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select name="status" id="status"
-                                                class="form-control @error('status') is-invalid @enderror">
-                                                <option value="active"
-                                                    {{ old('status', $data->status ?? '') == 'active' ? 'selected' : '' }}>
-                                                    Active</option>
-                                                <option value="inactive"
-                                                    {{ old('status', $data->status ?? '') == 'inactive' ? 'selected' : '' }}>
-                                                    Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div> --}}
-
-
-                                        {{-- hero image --}}
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label for="image" class="form-label">Image</label>
-                                                    <input type="file"
-                                                        class="dropify form-control @error('image') is-invalid @enderror"
-                                                        data-default-file="{{ !empty($data->image) && file_exists(public_path($data->image)) ? asset($data->image) : asset('default/placeholder-image.avif') }}"
-                                                        name="image" id="image">
-                                                    @error('image')
-                                                        <span class="text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
                                         </div>
 
                                         <div class="form-group">

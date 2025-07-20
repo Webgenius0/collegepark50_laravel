@@ -136,14 +136,14 @@
                     </a>
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('home.hero') }}" class="slide-item">Hero Section</a>
+                        <li><a href="{{ route('cms.home.hero') }}" class="slide-item">Hero Section</a>
                         </li>
-                        <li><a href="{{ route('app.download.hero') }}" class="slide-item">App Download
+                        <li><a href="{{ route('cms.home.event') }}" class="slide-item">Event Section</a>
+                        </li>
+                        <li><a href="{{ route('cms.home.venues') }}" class="slide-item">Venue Section</a>
+                        </li>
+                        <li><a href="{{ route('cms.home.app.download') }}" class="slide-item">App Download
                                 Section</a>
-                        </li>
-                        <li><a href="{{ route('event.section') }}" class="slide-item">Event Section</a>
-                        </li>
-                        <li><a href="{{ route('vanue.section') }}" class="slide-item">Venue Section</a>
                         </li>
                     </ul>
                 </li>
@@ -160,9 +160,12 @@
                     </a>
 
                     <ul class="slide-menu">
-                        <li><a href="{{route('event.hero.section')}}" class="slide-item">Event Hero Section</a>
+                        <li><a href="{{ route('cms.event.hero') }}" class="slide-item">Event Hero Section</a>
                         </li>
-                        <li><a href="{{route('event.details.hero.section')}}" class="slide-item">Event Details Hero Section</a>
+                        <li><a href="{{ route('cms.event.upcoming') }}" class="slide-item">Upcoming Event</a>
+                        </li>
+                        <li><a href="{{ route('cms.event.details.hero') }}" class="slide-item">Event Details Hero
+                                Section</a>
                         </li>
                     </ul>
                 </li>
@@ -180,9 +183,9 @@
                     </a>
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('feature.hero.section') }}" class="slide-item">Hero Section</a>
+                        <li><a href="{{ route('cms.feature.hero') }}" class="slide-item">Hero Section</a>
                         </li>
-                        <li><a href="{{ route('feature.item.section') }}" class="slide-item">Feature Item</a>
+                        <li><a href="{{ route('cms.feature.items.index') }}" class="slide-item">Feature Item</a>
                         </li>
                     </ul>
                 </li>
@@ -190,7 +193,7 @@
                 {{-- newsletter --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
-                        href="{{ route('admin.faq.index') }}">
+                        href="{{ route('cms.newsletter.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             class="side-menu__icon" viewBox="0 0 24 24">
                             <path
@@ -201,7 +204,7 @@
                 </li>
 
                 {{-- footer --}}
-                <li class="slide">
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
                         href="{{ route('admin.faq.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -210,7 +213,7 @@
                         </svg>
                         <span class="side-menu__label">Footer</span>
                     </a>
-                </li>
+                </li> --}}
 
                 {{-- Setttings --}}
                 <li class="slide">

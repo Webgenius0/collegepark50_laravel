@@ -1,7 +1,7 @@
 @php
 use App\Enums\PageEnum;
 use App\Enums\SectionEnum;
-$cms = \App\Models\CMS::where('page', PageEnum::AUTH)->where('section', SectionEnum::BG)->first();
+// $cms = \App\Models\CMS::where('page', PageEnum::AUTH)->where('section', SectionEnum::BG)->first();
 $settings = \App\Models\Setting::first();
 @endphp
 <!doctype html>

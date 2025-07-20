@@ -10,4 +10,6 @@ enum SectionEnum: string
     case POPULAR_VANUE = 'popular-vanue';
     case APP_DOWNLOAD = 'app-download';
     case NEWSLETTER = 'newsletter';
+    case CARD = 'card';
+    case TEXT = 'text';
 }
