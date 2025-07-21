@@ -66,7 +66,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getNameAttribute(): string
     {
-        return trim("{$this->first_name} {$this->last_name}");
+        return trim("{$this->f_name} {$this->l_name}");
     }
 
     //chat model relation
@@ -115,5 +115,24 @@ class User extends Authenticatable implements JWTSubject
     public function shares()
     {
         return $this->hasMany(PostShare::class);
+    }
+
+    //follower and following
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'user_followers', 'following_id', 'follower_id');
+    }
+
+    public function followings()
+    {
+        return $this->belongsToMany(User::class, 'user_followers', 'follower_id', 'following_id');
+    }
+
+
+    //venuse table relation
+    public function venues()
+    {
+        return $this->hasMany(Venue::class);
     }
 }
