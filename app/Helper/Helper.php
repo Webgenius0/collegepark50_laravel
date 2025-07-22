@@ -122,4 +122,12 @@ class Helper
 
         return (int) $dob->diffInYears($now);
     }
+
+    //delete file
+    public static function deleteFile($filePath)
+    {
+        if ($filePath && file_exists(public_path($filePath))) {
+            unlink(public_path($filePath));
+        }
+    }
 }

@@ -29,7 +29,7 @@ class AuthenticationController extends Controller
     public function register(UserRegisterRequest $request)
     {
         try {
-            
+
             $validatedData = $request->validated();
 
             $otp = rand(100000, 999999);
@@ -47,7 +47,7 @@ class AuthenticationController extends Controller
 
             $fullName = $user->f_name . ' ' . $user->l_name;
 
-            // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
+            Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
 
             return $this->success(
                 [
@@ -168,9 +168,12 @@ class AuthenticationController extends Controller
     */
     public function updateRole(Request $request)
     {
+
         try {
 
             $user = auth('api')->user();
+
+            // dd($user);
 
             if (!$user) {
                 return $this->error([], 'User not found.', 404);

@@ -73,7 +73,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getNameAttribute(): string
     {
-        return trim("{$this->first_name} {$this->last_name}");
+        return trim("{$this->f_name} {$this->l_name}");
     }
 
     public function posts()

@@ -10,6 +10,10 @@ use App\Http\Controllers\Web\Backend\TestimonialController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
 use App\Http\Controllers\Web\Backend\BusinessProfileController;
 use App\Http\Controllers\Web\Backend\ChatManageController;
+use App\Http\Controllers\Web\Backend\CMS\EventController;
+use App\Http\Controllers\Web\Backend\CMS\FeatureController;
+use App\Http\Controllers\Web\Backend\CMS\HomeController;
+use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -23,6 +27,66 @@ use App\Http\Controllers\Web\Backend\SpecializeController;
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // cms management
+    Route::prefix('cms')->name('cms.')->group(function () {
+
+        // Home Page
+        Route::prefix('home')->name('home.')->group(function () {
+            // Hero Section
+            Route::get('/hero', [HomeController::class, 'hero'])->name('hero');
+            Route::post('/hero/update', [HomeController::class, 'updateHero'])->name('hero.update');
+
+            // Upcoming Event Section
+            Route::get('/upcoming-events', [HomeController::class, 'upcomingEvents'])->name('event');
+            Route::post('/upcoming-events/update', [HomeController::class, 'updateUpcomingEvents'])->name('event.update');
+
+            // Popular Venue Section
+            Route::get('/popular-venues', [HomeController::class, 'popularVenues'])->name('venues');
+            Route::post('/popular-venues/update', [HomeController::class, 'updatePopularVenues'])->name('venues.update');
+
+            // App Download Section
+            Route::get('/app-download', [HomeController::class, 'appDownload'])->name('app.download');
+            Route::post('/app-download/update', [HomeController::class, 'updateAppDownload'])->name('app.download.update');
+        });
+
+        // Event Page
+        Route::prefix('event')->name('event.')->group(function () {
+            // Hero Section
+            Route::get('/hero', [EventController::class, 'hero'])->name('hero');
+            Route::post('/hero/update', [EventController::class, 'updateHero'])->name('hero.update');
+
+            //Up coming event
+            Route::get('/upcoming-events', [EventController::class, 'upcomingEvents'])->name('upcoming');
+            Route::post('/upcoming-events/update', [EventController::class, 'updateUpcomingEvents'])->name('upcoming.update');
+
+            // Event Details Hero
+            Route::get('/details-hero', [EventController::class, 'detailsHero'])->name('details.hero');
+            Route::post('/details-hero/update', [EventController::class, 'updateDetailsHero'])->name('details.hero.update');
+        });
+
+        // Feature Page
+        Route::prefix('feature')->name('feature.')->group(function () {
+            // Hero Section
+            Route::get('/hero', [FeatureController::class, 'hero'])->name('hero');
+            Route::post('/hero/update', [FeatureController::class, 'updateHero'])->name('hero.update');
+
+            // Feature Items
+            Route::get('/items', [FeatureController::class, 'index'])->name('items.index');
+            Route::post('/items/hero/update', [FeatureController::class, 'updateItemHero'])->name('items.hero.update');
+            Route::post('/items', [FeatureController::class, 'store'])->name('items.store');
+            Route::get('/items/{id}/edit', [FeatureController::class, 'edit'])->name('items.edit');
+            Route::post('/items/{id}/update', [FeatureController::class, 'update'])->name('items.update');
+            Route::post('/items/{id}/status', [FeatureController::class, 'toggleStatus'])->name('items.status');
+            Route::delete('/items/{id}', [FeatureController::class, 'destroy'])->name('items.destroy');
+        });
+
+        // Newsletter Section
+        Route::prefix('newsletter')->name('newsletter.')->group(function () {
+            Route::get('/', [NewsletterController::class, 'index'])->name('index');
+            Route::post('/update', [NewsletterController::class, 'update'])->name('update');
+        });
+    });
 });
 
 
@@ -46,8 +110,6 @@ Route::middleware(['auth:web'])->group(function () {
     Route::put('category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
     Route::delete('category/delete/{id}', [CategoryController::class, 'destroy'])->name('admin.category.destroy');
     Route::post('/category/status/{id}', [CategoryController::class, 'status'])->name('admin.category.status');
-
-
 });
 
 
@@ -60,8 +122,6 @@ Route::middleware(['auth:web'])->group(function () {
     Route::put('specialize/update/{id}', [SpecializeController::class, 'update'])->name('admin.specialize.update');
     Route::delete('specialize/delete/{id}', [SpecializeController::class, 'destroy'])->name('admin.specialize.destroy');
     Route::post('/specialize/status/{id}', [SpecializeController::class, 'status'])->name('admin.specialize.status');
-
-
 });
 
 
@@ -76,7 +136,6 @@ Route::controller(ChatManageController::class)->prefix('chat')->name('admin.chat
     Route::get('/search', 'search')->name('search');
     Route::get('/seen/all/{receiver_id}', 'seenAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
-
 });
 
 
@@ -87,8 +146,8 @@ Route::controller(ChatManageController::class)->prefix('chat')->name('admin.chat
 
 
 
-Route::get('/user-list',[UserListController::class,'index'])->name('admin.user.index');
-Route::delete('/user-list/delete/{id}',[UserListController::class,'destroy'])->name('admin.user.destroy');
+Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
+Route::delete('/user-list/delete/{id}', [UserListController::class, 'destroy'])->name('admin.user.destroy');
 
 
 Route::controller(FaqController::class)->group(function () {
@@ -102,9 +161,9 @@ Route::controller(FaqController::class)->group(function () {
 });
 
 
-Route::get('/testimonials',[TestimonialController::class,'index'])->name('admin.testimonial.index');
-Route::post('/testimonial/status/{id}',[TestimonialController::class,'status'])->name('admin.testimonial.status');
-Route::delete('/testimonial/delete/{id}',[TestimonialController::class,'destroy'])->name('admin.testimonial.destroy');
+Route::get('/testimonials', [TestimonialController::class, 'index'])->name('admin.testimonial.index');
+Route::post('/testimonial/status/{id}', [TestimonialController::class, 'status'])->name('admin.testimonial.status');
+Route::delete('/testimonial/delete/{id}', [TestimonialController::class, 'destroy'])->name('admin.testimonial.destroy');
 
 
 Route::get('/admin/social-media-settings', [SocialSettingController::class, 'index'])->name('admin.social_media.index');
@@ -170,4 +229,3 @@ Route::controller(DynamicPageController::class)->group(function () {
     Route::post('/dynamic-page/status/{id}', 'status')->name('admin.dynamic_page.status');
     Route::delete('/dynamic-page/destroy/{id}', 'destroy')->name('admin.dynamic_page.destroy');
 });
-

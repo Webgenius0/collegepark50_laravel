@@ -21,6 +21,7 @@ class ResetPasswordController extends Controller
 {
     use ApiResponse;
 
+    //send forget otp
     public function forgotPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -107,7 +108,7 @@ class ResetPasswordController extends Controller
         }
     }
 
-
+    // set new password
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -150,6 +151,8 @@ class ResetPasswordController extends Controller
             return $this->error([], $e->getMessage(), 500);
         }
     }
+
+    //resend otp
     public function resendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
