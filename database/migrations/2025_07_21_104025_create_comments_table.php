@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('comment_replays', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_comment_id')->nullable()->constrained('post_comments')->onDelete('cascade');
-            $table->foreignId('event_comment_id')->nullable()->constrained('post_comments')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->text('reply');
+            $table->morphs('commentable'); // commentable_id + commentable_type
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade'); // reply system
+            $table->text('comment');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comment_replays');
+        Schema::dropIfExists('comments');
     }
 };

@@ -55,7 +55,7 @@ class Event extends Model
 
     public function comments()
     {
-        return $this->hasMany(PostComment::class);
+        return $this->morphMany(Comment::class, 'commentable')->whereNull('parent_id');
     }
 
     public function shares()

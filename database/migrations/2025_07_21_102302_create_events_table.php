@@ -36,6 +36,7 @@ return new class extends Migration
 
             $table->enum('status', ['going_live', 'pending', 'postponed', 'cancelled', 'completed'])->default('pending');
 
+            //like/share/comment count
             $table->unsignedInteger('like_count')->default(0);
             $table->unsignedInteger('comment_count')->default(0);
             $table->unsignedInteger('share_count')->default(0);

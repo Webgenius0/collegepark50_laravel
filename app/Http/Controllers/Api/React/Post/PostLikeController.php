@@ -37,8 +37,8 @@ class PostLikeController extends Controller
             return $this->success([
                 'post_id'    => $model->id,
                 'user_id'    => $user->id,
-                'status'     => 'unliked',
-                'type'       => 'post',
+                'status'     => 'Unliked',
+                'type'       => 'Post',
                 'like_count' => $model->like_count,
                 'user'       => [
                     'id'     => $user->id,
@@ -59,8 +59,8 @@ class PostLikeController extends Controller
             return $this->success([
                 'post_id'    => $model->id,
                 'user_id'    => $user->id,
-                'status'     => 'liked',
-                'type'       => 'post',
+                'status'     => 'Liked',
+                'type'       => 'Post',
                 'like_count' => $model->like_count,
                 'user'       => [
                     'id'     => $user->id,

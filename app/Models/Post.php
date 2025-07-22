@@ -31,22 +31,26 @@ class Post extends Model
         return $this->hasMany(PostVideo::class);
     }
 
+    // like
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
     }
 
-
+    //comment
     public function comments()
     {
-        return $this->hasMany(PostComment::class);
+        return $this->morphMany(Comment::class, 'commentable')->whereNull('parent_id');
     }
 
+
+    //share
     public function shares()
     {
         return $this->hasMany(PostShare::class);
     }
 
+    // post hashtag
     public function hashtags()
     {
         return $this->belongsToMany(Hashtag::class, 'hashtag_posts');

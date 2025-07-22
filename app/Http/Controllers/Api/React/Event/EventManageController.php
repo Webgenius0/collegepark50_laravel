@@ -26,8 +26,7 @@ class EventManageController extends Controller
                 return $this->error([], 'Unauthorized user.', 401);
             }
 
-            $events = $user->events()
-                ->with(['venue','user'])
+            $events = Event::with(['venue', 'user'])
                 ->latest()
                 ->get();
 
@@ -68,22 +67,36 @@ class EventManageController extends Controller
     //get single event by id
     public function show($id)
     {
-        $event = Event::with('venue')->find($id);
+        try {
 
-        if (!$event) {
-            return $this->error([], 'Event not found', 404);
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return $this->error([], 'Unauthorized user.', 401);
+            }
+
+            $event = Event::with('venue')->find($id);
+
+            if (!$event) {
+                return $this->error([], 'Event not found', 404);
+            }
+
+            return $this->success([
+                'event' => new EventResource($event)
+            ], 'Event fetched successfully.');
+        } catch (Exception $e) {
+            return $this->error([], 'Failed to fetch events. ' . $e->getMessage(), 500);
         }
-
-        return $this->success(new EventResource($event), 'Event fetched successfully');
     }
 
     //update event
     public function update(EventRequest $request, $id)
     {
-        $event = Event::find($id);
+        $user = auth('api')->user();
+        $event = Event::where('id', $id)->where('user_id', $user->id)->first();
 
         if (!$event) {
-            return $this->error([], 'Event not found', 404);
+            return $this->error([], 'Event not found or unauthorized', 404);
         }
 
         $validated = $request->validated();
@@ -93,10 +106,8 @@ class EventManageController extends Controller
             if ($event->banner) {
                 Helper::deleteImage($event->banner);
             }
-            $imagePath = Helper::uploadImage($request->file('banner'), 'event/banners');
-            $validated['banner'] = $imagePath;
+            $validated['banner'] = Helper::uploadImage($request->file('banner'), 'event/banners');
         }
-
 
         $event->update($validated);
 
@@ -106,13 +117,13 @@ class EventManageController extends Controller
     //delete event
     public function destroy($id)
     {
-        $event = Event::find($id);
+        $user = auth('api')->user();
+        $event = Event::where('id', $id)->where('user_id', $user->id)->first();
 
         if (!$event) {
-            return $this->error([], 'Event not found', 404);
+            return $this->error([], 'Event not found or unauthorized', 404);
         }
 
-        // Delete banner image if exists
         if ($event->banner) {
             Helper::deleteImage($event->banner);
         }
@@ -129,10 +140,11 @@ class EventManageController extends Controller
             'status' => 'required|in:going_live,pending,postponed,cancelled,completed'
         ]);
 
-        $event = Event::find($id);
+        $user = auth('api')->user();
+        $event = Event::where('id', $id)->where('user_id', $user->id)->first();
 
         if (!$event) {
-            return $this->error([], 'Event not found', 404);
+            return $this->error([], 'Event not found or unauthorized', 404);
         }
 
         $event->status = $request->status;
@@ -144,15 +156,17 @@ class EventManageController extends Controller
     //upcoming events
     public function upcoming()
     {
+        $user = auth('api')->user();
         $now = Carbon::now();
 
-        $events = Event::where(function ($query) use ($now) {
-            $query->where('start_date', '>', $now->toDateString())
-                ->orWhere(function ($q) use ($now) {
-                    $q->where('start_date', '=', $now->toDateString())
-                        ->where('start_time', '>=', $now->toTimeString());
-                });
-        })
+        $events = Event::where('user_id', $user->id)
+            ->where(function ($query) use ($now) {
+                $query->where('start_date', '>', $now->toDateString())
+                    ->orWhere(function ($q) use ($now) {
+                        $q->where('start_date', '=', $now->toDateString())
+                            ->where('start_time', '>=', $now->toTimeString());
+                    });
+            })
             ->orderBy('start_date')
             ->orderBy('start_time')
             ->get();

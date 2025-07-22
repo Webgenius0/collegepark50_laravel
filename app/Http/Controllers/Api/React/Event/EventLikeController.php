@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\React\Event;
 
+use App\Models\Like;
 use App\Models\Event;
+use App\Models\PostLike;
 use App\Models\eventLike;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\PostLike;
 
 class EventLikeController extends Controller
 {
@@ -18,52 +19,58 @@ class EventLikeController extends Controller
     {
         $user = auth('api')->user();
 
-        // Check if the event exists
-        $event = Event::find($eventId);
-        if (!$event) {
-            return $this->error([], 'event not found.', 404);
+        // Check if the post exists
+        $model = Event::find($eventId);
+        if (!$model) {
+            return $this->error([], 'Event not found.', 404);
         }
 
-        // Check if the user already liked the event
-        $alreadyLiked = PostLike::where('event_id', $eventId)
-            ->where('user_id', $user->id)
-            ->first();
+        // Check if the user already liked the post
+        $alreadyLiked = Like::where([
+            ['likeable_id', $model->id],
+            ['likeable_type', get_class($model)],
+            ['user_id', $user->id]
+        ])->first();
 
         if ($alreadyLiked) {
             // Unlike the event
             $alreadyLiked->delete();
-            $event->decrement('like_count');
+            $model->decrement('like_count');
 
             return $this->success([
-                'event_id'    => $event->id,
+                'event_id'    => $model->id,
                 'user_id'    => $user->id,
-                'status'     => 'unliked',
-                'like_count' => $event->like_count,
+                'status'     => 'Unliked',
+                'type'       => 'Event',
+                'like_count' => $model->like_count,
                 'user'       => [
                     'id'     => $user->id,
                     'name'   => $user->f_name . ' ' . $user->l_name,
                     'avatar' => $user->avatar,
                 ],
-            ], 'Event unliked successfully.', 200);
+            ], 'Unliked successfully.', 200);
         } else {
-            // Like the event
-            PostLike::create([
-                'event_id' => $eventId,
-                'user_id' => $user->id,
+            // Like the post
+            Like::create([
+                'likeable_id' => $eventId,
+                'user_id'     => $user->id,
+                'likeable_type' => Event::class
             ]);
-            $event->increment('like_count');
+
+            $model->increment('like_count');
 
             return $this->success([
-                'event_id'    => $event->id,
+                'post_id'    => $model->id,
                 'user_id'    => $user->id,
-                'status'     => 'liked',
-                'like_count' => $event->like_count,
+                'status'     => 'Liked',
+                'type'       => 'Event',
+                'like_count' => $model->like_count,
                 'user'       => [
                     'id'     => $user->id,
                     'name'   => $user->f_name . ' ' . $user->l_name,
                     'avatar' => $user->avatar,
                 ],
-            ], 'Event liked successfully.', 200);
+            ], 'Liked successfully.', 200);
         }
     }
 

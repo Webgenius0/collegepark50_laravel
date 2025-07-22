@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\React\Post;
 
 use App\Models\Post;
-use App\Models\PostComment;
+use App\Models\Comment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -16,7 +16,8 @@ class PostCommentController extends Controller
     public function store(Request $request, $postId)
     {
         $validator = Validator::make($request->all(), [
-            'comment' => 'required|string|max:1000',
+            'comment'    => 'required|string|max:1000',
+            'parent_id'  => 'nullable|exists:comments,id' // For replies
         ]);
 
         if ($validator->fails()) {
@@ -31,30 +32,35 @@ class PostCommentController extends Controller
 
         $user = auth('api')->user();
 
-        // Save comment
-        $comment = PostComment::create([
-            'post_id' => $post->id,
-            'user_id' => $user->id,
-            'comment' => $request->comment,
+        // Create comment with morphable relation
+        $comment = new Comment([
+            'comment'   => $request->comment,
+            'user_id'   => $user->id,
+            'parent_id' => $request->parent_id,
         ]);
 
-        // Load user relation for response
+        $post->comments()->save($comment); // attaches commentable_type & commentable_id
+
+        // increment comment count only for root comments
+        if (!$request->parent_id) {
+            $post->increment('comment_count');
+        }
+
+        // Load user for response
         $comment->load('user');
 
         $response = [
-            'id'      => $comment->id,
-            'user_id' => $comment->user->id,
-            'comment' => $comment->comment,
+            'id'            => $comment->id,
+            'user_id'       => $comment->user->id,
+            'comment'       => $comment->comment,
+            'parent_id'     => $comment->parent_id,
             'comment_count' => $post->comment_count,
-            'user'    => [
+            'user'          => [
                 'id'     => $comment->user->id,
                 'name'   => $comment->user->f_name . ' ' . $comment->user->l_name,
                 'avatar' => $comment->user->avatar,
             ],
         ];
-
-        // Increment comment count
-        $post->increment('comment_count');
 
         return $this->success($response, 'Comment added successfully.', 201);
     }
@@ -68,24 +74,38 @@ class PostCommentController extends Controller
             return $this->error([], 'Post not found.', 404);
         }
 
-        $comments = PostComment::with('user')
-            ->where('post_id', $postId)
+        $comments = Comment::with(['user', 'replies'])
+            ->where('commentable_type', Post::class)
+            ->where('commentable_id', $postId)
+            ->whereNull('parent_id') // Only top-level comments
             ->latest()
             ->get()
             ->map(function ($comment) {
                 return [
-                    'id' => $comment->id,
-                    'comment' => $comment->comment,
-                    'user' => [
-                        'id' => $comment->user->id,
-                        'name' => $comment->user->f_name . ' ' . $comment->user->l_name,
+                    'id'         => $comment->id,
+                    'comment'    => $comment->comment,
+                    'created_at' => $comment->created_at->diffForHumans(),
+                    'user'       => [
+                        'id'     => $comment->user->id,
+                        'name'   => $comment->user->f_name . ' ' . $comment->user->l_name,
                         'avatar' => $comment->user->avatar,
                     ],
-                    'created_at' => $comment->created_at->diffForHumans(),
+                    'replies' => $comment->replies->map(function ($reply) {
+                        return [
+                            'id'         => $reply->id,
+                            'comment'    => $reply->comment,
+                            'created_at' => $reply->created_at->diffForHumans(),
+                            'user'       => [
+                                'id'     => $reply->user->id,
+                                'name'   => $reply->user->f_name . ' ' . $reply->user->l_name,
+                                'avatar' => $reply->user->avatar,
+                            ],
+                        ];
+                    }),
                 ];
             });
 
-        return $this->success($comments, 'Post comments retrieved successfully.', 200);
+        return $this->success($comments, 'Post comments with replies retrieved successfully.', 200);
     }
 
     // Update comment
@@ -96,10 +116,10 @@ class PostCommentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error(['Validation failed'], $validator->errors()->first(), 422);
+            return $this->error([], $validator->errors()->first(), 422);
         }
 
-        $comment = PostComment::with('user')->find($id); // eager load user
+        $comment = Comment::with('user')->find($id);
 
         if (!$comment) {
             return $this->error([], 'Comment not found.', 404);
@@ -109,16 +129,17 @@ class PostCommentController extends Controller
             return $this->error([], 'Unauthorized to update this comment.', 403);
         }
 
-        $comment->update(['comment' => $request->comment]);
+        $comment->comment = $request->comment;
+        $comment->save();
 
-        // Return consistent response structure with user
         $response = [
-            'id'      => $comment->id,
-            'user_id' => $comment->user->id,
-            'comment' => $comment->comment,
-            'user'    => [
+            'id'        => $comment->id,
+            'user_id'   => $comment->user->id,
+            'comment'   => $comment->comment,
+            'parent_id' => $comment->parent_id,
+            'user'      => [
                 'id'     => $comment->user->id,
-                'name'   => $comment->user->f_name . ' ' . $comment->user->l_name,
+                'name'   => trim($comment->user->f_name . ' ' . $comment->user->l_name),
                 'avatar' => $comment->user->avatar,
             ],
         ];
@@ -129,7 +150,7 @@ class PostCommentController extends Controller
     // Delete comment
     public function destroy($id)
     {
-        $comment = PostComment::find($id);
+        $comment = Comment::find($id);
 
         if (!$comment) {
             return $this->error([], 'Comment not found.', 404);
@@ -139,11 +160,17 @@ class PostCommentController extends Controller
             return $this->error([], 'Unauthorized to delete this comment.', 403);
         }
 
-        $post = $comment->post;
+        $post = null;
+        if ($comment->commentable_type === Post::class) {
+            $post = Post::find($comment->commentable_id);
+        }
+
+        $isRootComment = is_null($comment->parent_id);
 
         $comment->delete();
 
-        if ($post) {
+        // Only decrement comment_count if root comment deleted
+        if ($post && $isRootComment && $post->comment_count > 0) {
             $post->decrement('comment_count');
         }
 

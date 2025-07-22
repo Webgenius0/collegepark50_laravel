@@ -11,11 +11,11 @@ use App\Http\Controllers\Api\React\User\FollowerController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Api\React\Post\PostShareController;
 use App\Http\Controllers\Api\React\Auth\SocialLoginController;
+use App\Http\Controllers\Api\React\Event\EventCommentController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
 use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
-use App\Http\Controllers\Api\React\Post\PostCommentReplyController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
@@ -84,20 +84,12 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::get('/index/{postId}', [PostLikeController::class, 'index']);           // Get all likes
         });
 
-        // Comment routes
+        // Comment-reply routes
         Route::group(['prefix' => 'comment'], function () {
             Route::post('/store/{postId}', [PostCommentController::class, 'store']);         // Add comment
             Route::get('/list/{postId}', [PostCommentController::class, 'index']);         // Get all comments
-            Route::put('/update/{id}', [PostCommentController::class, 'update']);             // Edit comment
+            Route::post('/update/{id}', [PostCommentController::class, 'update']);             // Edit comment
             Route::delete('/delete/{id}', [PostCommentController::class, 'destroy']);  // Delete comment
-        });
-
-        // Comment reply routes
-        Route::group(['prefix' => 'comment-reply'], function () {
-            Route::post('/store', [PostCommentReplyController::class, 'store']);             // Create reply
-            Route::put('/update/{id}', [PostCommentReplyController::class, 'update']);       // Update reply
-            Route::delete('/delete/{id}', [PostCommentReplyController::class, 'destroy']);   // Delete reply
-            Route::get('/list/{commentId}', [PostCommentReplyController::class, 'index']);   // List replies of a comment
         });
 
         // Post share routes
@@ -136,10 +128,18 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/change-status/{id}', [EventManageController::class, 'changeStatus']); // Update event status
         Route::get('/upcoming', [EventManageController::class, 'upcoming']);  // Get upcoming events only
 
-         //event list/unlike
+        //event list/unlike
         Route::group(['prefix' => 'like'], function () {
-            Route::post('/{post}', [EventLikeController::class, 'toggleLike']);        // Like/Unlike a post
-            Route::get('/index/{postId}', [EventLikeController::class, 'index']);           // Get all likes
+            Route::post('/{event}', [EventLikeController::class, 'toggleLike']);        // Like/Unlike an event
+            Route::get('/index/{eventId}', [EventLikeController::class, 'index']);           // Get all likes
+        });
+
+        // Comment-reply routes
+        Route::group(['prefix' => 'comment'], function () {
+            Route::post('/store/{eventId}', [EventCommentController::class, 'store']);         // Add comment
+            Route::get('/list/{eventId}', [EventCommentController::class, 'index']);         // Get all comments
+            Route::post('/update/{id}', [EventCommentController::class, 'update']);             // Edit comment
+            Route::delete('/delete/{id}', [EventCommentController::class, 'destroy']);  // Delete comment
         });
     });
 });

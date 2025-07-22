@@ -153,7 +153,7 @@ class PostController extends Controller
                 'Newsfeed posts retrieved successfully.',
                 200
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->error([], 'Failed to fetch posts. ' . $e->getMessage(), 500);
         }
     }
