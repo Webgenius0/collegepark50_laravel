@@ -280,4 +280,9 @@ class VenueController extends Controller
             return $this->error([], 'Failed to delete venue. ' . $e->getMessage(), 500);
         }
     }
+
+    //toggle venue status
+    public function status($id, $data){
+        
+    }
 }
