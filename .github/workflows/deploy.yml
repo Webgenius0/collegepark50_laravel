@@ -29,5 +29,4 @@ jobs:
           **/.github*
           node_modules/
           vendor/
-          collegepark.txt/
           .env
