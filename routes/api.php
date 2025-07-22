@@ -48,7 +48,9 @@ Route::group(['middleware' => 'guest:api'], function () {
 
 Route::group(['middleware' => 'auth:api'], function () {
 
+    Route::post('/logout', [AuthenticationController::class, 'logout']);
     Route::post('/update-role', [AuthenticationController::class, 'updateRole']);
+
     Route::get('/profile', [UserProfileController::class, 'profile']);
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
     Route::post('/update-location', [UserProfileController::class, 'updateLocation']);
@@ -136,4 +138,3 @@ Route::group(['middleware' => 'auth:api'], function () {
         });
     });
 });
-

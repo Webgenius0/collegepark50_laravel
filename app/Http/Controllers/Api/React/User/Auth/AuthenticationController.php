@@ -180,7 +180,7 @@ class AuthenticationController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'role' => 'required|in:user,dj,promoter,artist,venue',
+                'role' => 'required|in:user,dj,promoter,artist,venue,admin',
             ]);
 
             if ($validator->fails()) {
