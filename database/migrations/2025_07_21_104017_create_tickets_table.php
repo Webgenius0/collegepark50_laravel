@@ -25,7 +25,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->time('end_time')->nullable();
 
-            $table->decimal('price', 10, 2)->nullable();
+            $table->decimal('price', 10, 2)->default(0.00)->nullable();
 
             // Capacity
             $table->enum('capacity_type', ['shared', 'individual', 'unlimited'])->default('shared');

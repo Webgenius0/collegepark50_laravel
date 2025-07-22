@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\React\User\FollowerController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Api\React\Post\PostShareController;
 use App\Http\Controllers\Api\React\Auth\SocialLoginController;
+use App\Http\Controllers\Api\React\Event\EventLikeController;
+use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
 use App\Http\Controllers\Api\React\Post\PostCommentReplyController;
@@ -121,6 +123,23 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::get('/{venue_id}', [VenueReviewController::class, 'index']);     // Get all reviews for a venue
             Route::post('/{venue_id}', [VenueReviewController::class, 'store']);    // Add or update review for a venue
             Route::delete('/delete/{id}', [VenueReviewController::class, 'destroy']);  // Delete a review
+        });
+    });
+
+    // Event routes
+    Route::prefix('event')->group(function () {
+        Route::get('/', [EventManageController::class, 'index']);             // List all events
+        Route::post('/store', [EventManageController::class, 'store']);       // Create a new event
+        Route::get('/show/{id}', [EventManageController::class, 'show']);     // Get a specific event
+        Route::post('/update/{id}', [EventManageController::class, 'update']); // Update an event
+        Route::delete('/delete/{id}', [EventManageController::class, 'destroy']); // Delete an event
+        Route::post('/change-status/{id}', [EventManageController::class, 'changeStatus']); // Update event status
+        Route::get('/upcoming', [EventManageController::class, 'upcoming']);  // Get upcoming events only
+
+         //event list/unlike
+        Route::group(['prefix' => 'like'], function () {
+            Route::post('/{post}', [EventLikeController::class, 'toggleLike']);        // Like/Unlike a post
+            Route::get('/index/{postId}', [EventLikeController::class, 'index']);           // Get all likes
         });
     });
 });

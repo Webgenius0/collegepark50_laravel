@@ -104,7 +104,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function likes()
     {
-        return $this->hasMany(PostLike::class);
+        return $this->hasMany(Like::class);
     }
 
     public function comments()
@@ -135,4 +135,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Venue::class);
     }
+
+    //events table relation
+    public function events()
+    {
+        return $this->hasMany(Venue::class);
+    }
+
 }

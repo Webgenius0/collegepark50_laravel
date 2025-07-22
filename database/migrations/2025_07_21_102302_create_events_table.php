@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
 
+            //venue
             $table->foreignId('venue_id')->nullable()->constrained()->nullOnDelete();
+
+            //user
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
             $table->string('title');
             $table->text('description')->nullable();
@@ -25,12 +29,16 @@ return new class extends Migration
             $table->time('end_time');
 
             $table->string('time_zone')->default('UTC');
-            $table->boolean('all_day_event')->default(false);
+            $table->boolean('all_day_event')->default(value: false);
 
             $table->string('banner');
             $table->json('tags')->nullable();
 
             $table->enum('status', ['going_live', 'pending', 'postponed', 'cancelled', 'completed'])->default('pending');
+
+            $table->unsignedInteger('like_count')->default(0);
+            $table->unsignedInteger('comment_count')->default(0);
+            $table->unsignedInteger('share_count')->default(0);
 
             $table->timestamps();
         });
