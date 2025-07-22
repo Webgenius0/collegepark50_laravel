@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\React\CMS\HomeController;
 use App\Http\Controllers\Api\React\CMS\EventController;
-
-
 use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Venue\VenueController;
 use App\Http\Controllers\Api\React\Post\PostLikeController;
