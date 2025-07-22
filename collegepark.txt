@@ -10,5 +10,5 @@ Database User : softvencefsd_collegepark
 Database password : aTQZ72O#5l]Gu2Z{
 
 
-Database Credencials :
+Database Credencials : 
 
