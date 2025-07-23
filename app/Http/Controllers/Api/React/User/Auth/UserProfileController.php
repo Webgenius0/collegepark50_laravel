@@ -9,6 +9,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -26,15 +27,8 @@ class UserProfileController extends Controller
             if (!$user) {
                 return $this->error([], 'User not found.', 200);
             }
-            $userData = [
-                'id' => $user->id,
-                'f_name' => $user->f_name,
-                'l_name' => $user->l_name,
-                'email' => $user->email,
-                'avatar' => $user->avatar,
-                'role' => $user->role,
-            ];
-            return $this->success($userData, 'User Profile Retrieved successfully', 200);
+
+            return $this->success(new UserResource($user), 'User Profile Retrieved successfully', 200);
         } catch (Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
@@ -45,15 +39,24 @@ class UserProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'f_name' => ['nullable', 'string', 'max:50'],
-                'l_name' => ['nullable', 'string', 'max:50'],
-                'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'],
+                'f_name'       => ['nullable', 'string', 'max:50'],
+                'l_name'       => ['nullable', 'string', 'max:50'],
+                'avatar'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'],
+                'profession'   => ['nullable', 'string', 'max:100'],
+                'gender'       => ['nullable', 'string', 'in:male,female,Other'],
+                'country'      => ['nullable', 'string', 'max:255'],
+                'age'          => ['nullable', 'integer', 'min:0'],
+                'address'      => ['nullable', 'string', 'max:255'],
             ]);
+
             if ($validator->fails()) {
                 return $this->error([], $validator->errors()->first(), 422);
             }
+
             $user = auth('api')->user();
+
             $data = $validator->validated();
+
             if ($request->hasFile('avatar')) {
                 if ($user->avatar) {
                     Helper::deleteImage($user->avatar);
@@ -61,19 +64,56 @@ class UserProfileController extends Controller
                 $avatarPath = Helper::uploadImage($request->file('avatar'), 'profile');
                 $data['avatar'] = $avatarPath;
             }
+
             $user->update($data);
-            $userData = [
-                'id' => $user->id,
-                'f_name' => $user->f_name,
-                'l_name' => $user->l_name,
-                'email' => $user->email,
-                'avatar' => $user->avatar ? url($user->avatar) : null,
-                'role' => $user->role,
-                'provider' => $user->provider,
-                'provider_id' => $user->provider_id,
-            ];
-            return $this->success($userData, 'Profile updated successfully.', 200);
+
+
+            return $this->success(new UserResource($user), 'Profile updated successfully.', 200);
+
         } catch (Exception $e) {
+
+            Log::error('Profile Update Error: ' . $e->getMessage());
+            return $this->error([], 'Failed to update profile.', 500);
+        }
+    }
+
+
+    public function updateLocation(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'address'       => ['nullable', 'string', 'max:50'],
+                'city'       => ['nullable', 'string', 'max:50'],
+                'state'       => ['nullable', 'string', 'max:255'],
+                'zip_code'   => ['nullable', 'string', 'max:100'],
+                'latitude'       => ['nullable', 'string', 'max:255'],
+                'longitude'      => ['nullable', 'string', 'max:255'],
+            ]);
+
+            if ($validator->fails()) {
+                return $this->error([], $validator->errors()->first(), 422);
+            }
+
+            $user = auth('api')->user();
+
+            $data = $validator->validated();
+
+            $user->update($data);
+
+            $userData = [
+                'address' => $user->address,
+                'city' => $user->city,
+                'state' => $user->state,
+                'zip_code' => $user->zip_code,
+                'latitude' => $user->latitude,
+                'longitude' => $user->longitude,
+            ];
+
+
+            return $this->success($userData, 'Profile updated successfully.', 200);
+
+        } catch (Exception $e) {
+
             Log::error('Profile Update Error: ' . $e->getMessage());
             return $this->error([], 'Failed to update profile.', 500);
         }

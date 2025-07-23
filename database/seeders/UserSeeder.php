@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
                 'email' => 'admin@gmail.com',
                 'role' => 'admin',
                 'password' => Hash::make('12345678'),
+                'is_otp_verified' => true,
             ],
             [
                 'f_name' => 'John',
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
                 'email' => 'user@gmail.com',
                 'role' => 'user',
                 'password' => Hash::make('12345678'),
+                'is_otp_verified' => true,
             ],
             [
                 'f_name' => 'Jane',
@@ -33,6 +35,7 @@ class UserSeeder extends Seeder
                 'email' => 'dj@gmail.com',
                 'role' => 'dj',
                 'password' => Hash::make('12345678'),
+                'is_otp_verified' => true,
             ],
             [
                 'f_name' => 'Mike',
@@ -40,6 +43,7 @@ class UserSeeder extends Seeder
                 'email' => 'promoter@gmail.com',
                 'role' => 'promoter',
                 'password' => Hash::make('12345678'),
+                'is_otp_verified' => true,
             ],
             [
                 'f_name' => 'Emily',
@@ -47,6 +51,7 @@ class UserSeeder extends Seeder
                 'email' => 'artist@gmail.com',
                 'role' => 'artist',
                 'password' => Hash::make('12345678'),
+                'is_otp_verified' => true,
             ],
             [
                 'f_name' => 'Robert',
@@ -54,6 +59,7 @@ class UserSeeder extends Seeder
                 'email' => 'venue@gmail.com',
                 'role' => 'venue',
                 'password' => Hash::make('12345678'),
+                'is_otp_verified' => true,
             ],
 
         ]);

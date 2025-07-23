@@ -29,19 +29,26 @@ class User extends Authenticatable implements JWTSubject
         'l_name',
         'email',
         'password',
-        'avatar',
-
         'otp',
         'is_otp_verified',
         'otp_expires_at',
         'email_verified_at',
-
         'reset_password_token',
         'reset_password_token_expire_at',
-
         'role',
-        'provider',
-        'provider_id',
+        'profession',
+        'gender',
+        'age',
+        'avatar',
+        'address',
+        'country',
+        'city',
+        'state',
+        'zip_code',
+        'latitude',
+        'longitude',
+        'get_notification',
+        'remember_token'
     ];
 
     protected $hidden = [
@@ -69,34 +76,6 @@ class User extends Authenticatable implements JWTSubject
         return trim("{$this->f_name} {$this->l_name}");
     }
 
-    //chat model relation
-    // public function senders()
-    // {
-    //     return $this->hasMany(Chat::class, 'sender_id');
-    // }
-
-    // public function receivers()
-    // {
-    //     return $this->hasMany(Chat::class, 'receiver_id');
-    // }
-
-    // public function roomsAsUserOne()
-    // {
-    //     return $this->hasMany(Room::class, 'first_user_id');
-    // }
-
-    // public function roomsAsUserTwo()
-    // {
-    //     return $this->hasMany(Room::class, 'second_user_id');
-    // }
-
-    // public function allRooms()
-    // {
-    //     return Room::where('first_user_id', $this->id)->orWhere('second_user_id', $this->id);
-    // }
-
-
-    // relation user with post
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -104,7 +83,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(PostLike::class);
     }
 
     public function comments()
@@ -118,7 +97,6 @@ class User extends Authenticatable implements JWTSubject
     }
 
     //follower and following
-
     public function followers()
     {
         return $this->belongsToMany(User::class, 'user_followers', 'following_id', 'follower_id');
@@ -141,5 +119,4 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Venue::class);
     }
-
 }

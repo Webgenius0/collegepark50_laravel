@@ -4,30 +4,27 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\React\CMS\HomeController;
 use App\Http\Controllers\Api\React\CMS\EventController;
 use App\Http\Controllers\Api\React\Post\PostController;
-use App\Http\Controllers\Api\React\CMS\FeatureController;
 use App\Http\Controllers\Api\React\Venue\VenueController;
 use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\User\FollowerController;
+use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Api\React\Post\PostShareController;
-use App\Http\Controllers\Api\React\Auth\SocialLoginController;
-use App\Http\Controllers\Api\React\Event\EventCommentController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
-use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
+use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
+use App\Http\Controllers\Api\React\Event\EventCommentController;
+use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
 
-//health-check
-Route::get("/check", function () {
-    return "Project running!";
-});
+
 
 //Guest user routes
 Route::group(['middleware' => 'guest:api'], function () {
-    // Authentication
+
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/register', [AuthenticationController::class, 'register']);
     Route::post('/register-otp-verify', [AuthenticationController::class, 'RegistrationVerifyOtp']);
@@ -35,9 +32,8 @@ Route::group(['middleware' => 'guest:api'], function () {
     // Password Reset
     Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOTP']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
     Route::post('/resend-otp', [ResetPasswordController::class, 'resendOtp']);
-
+    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
 
     Route::post('social/signin/{provider}', [SocialLoginController::class, 'socialSignin']);
 
@@ -49,16 +45,15 @@ Route::group(['middleware' => 'guest:api'], function () {
 });
 
 
-// Authenticatd user routes
+
 Route::group(['middleware' => 'auth:api'], function () {
 
     Route::post('/logout', [AuthenticationController::class, 'logout']);
-    Route::put('/update-role', [AuthenticationController::class, 'updateRole']);
+    Route::post('/update-role', [AuthenticationController::class, 'updateRole']);
 
-    // Profile update
     Route::get('/profile', [UserProfileController::class, 'profile']);
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
-    Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
+    Route::post('/update-location', [UserProfileController::class, 'updateLocation']);
     Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']);
     Route::delete('/delete-profile', [UserProfileController::class, 'deleteProfile']);
 

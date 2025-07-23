@@ -44,6 +44,8 @@ class Helper
     public static function deleteImage($imageUrl)
     {
         if (!$imageUrl) {
+
+            dd("jalis");
             return false;
         }
         $filePath = public_path($imageUrl);
@@ -59,6 +61,14 @@ class Helper
     //         unlink($path);
     //     }
     // }
+
+
+    public static function fileDelete(string $path): void
+    {
+        if (file_exists($path)) {
+            unlink($path);
+        }
+    }
 
 
     public static function deleteImages($imageUrls)
@@ -82,6 +92,22 @@ class Helper
 
         return false;
     }
+
+    //delete videos
+    public static function deleteVideos($videoPaths)
+    {
+        if (!is_array($videoPaths)) {
+            $videoPaths = [$videoPaths];
+        }
+
+        foreach ($videoPaths as $path) {
+            $fullPath = public_path($path);
+            if (file_exists($fullPath) && is_file($fullPath)) {
+                @unlink($fullPath); // suppress warning
+            }
+        }
+    }
+
 
 
     // calculate age from date of birth

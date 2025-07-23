@@ -29,8 +29,19 @@ return new class extends Migration
 
             $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'admin'])->default('user');
 
-            $table->string('provider')->nullable();
-            $table->string('provider_id')->nullable();
+            $table->string('profession', 255)->nullable();
+            $table->string('gender', 50)->nullable();
+            $table->string('age', 50)->nullable();
+
+            $table->string('address')->nullable();
+            $table->string('country', 100)->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('state', 100)->nullable();
+            $table->string('zip_code', 20)->nullable();
+            $table->string('latitude', 200)->nullable();
+            $table->string('longitude', 200)->nullable();
+
+            $table->boolean('get_notification')->default(value: false);
 
             $table->rememberToken();
             $table->timestamps();

@@ -1,0 +1,32 @@
+name: 🚀 Deploy via FTP on CollegePark50
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  ftp-deploy:
+    name: 📦 Upload to Softvencefsd FTP Server
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⏬ Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: 📁 FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        protocol: ftp
+        port: 21
+        local-dir: ./
+        server-dir: /
+        exclude: |
+          **/.git*
+          **/.github*
+          node_modules/
+          vendor/
+          .env

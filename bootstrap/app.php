@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->appendToGroup('web', [
-            CorsMiddleware::class, // for CORS
+            // CorsMiddleware::class, // for CORS
 
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -29,14 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'admin'     => App\Http\Middleware\AdminMiddleware::class,
-            'authCheck' => App\Http\Middleware\AuthCheckMiddleware::class,
-            'business'  => App\Http\Middleware\BusinessMiddleware::class,
-            'role'      => App\Http\Middleware\RoleMiddleware::class,
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class, // for web
+            'auth.jwt' => App\Http\Middleware\AuthCheckMiddleware::class, // for API
+            'admin' => App\Http\Middleware\AdminMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'payment/stripe-webhook',
-            // 'api/business/*',
+            'api/*'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -2,45 +2,61 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class CMS extends Model
 {
-    protected $fillable = [
-        'page',
-        'section',
-        'name',
-        'slug',
-        'title',
-        'sub_title',
-        'description',
-        'sub_description',
-        'bg',
-        'image',
-        'btn_text',
+    protected $guarded = [];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'status',
         'btn_link',
         'btn_color',
         'metadata',
-        'status',
+        'bg'
     ];
-
 
     protected $casts = [
         'metadata' => 'array',
     ];
 
-    public function getImageAttribute($value): string | null
+    public function generateUniqueSlug(string $title): string
     {
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
-            return $value;
-        }
-        // Check if the request is an API request
-        if (request()->is('api/*') && !empty($value)) {
-            // Return the full URL for API requests
-            return url($value);
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (self::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
         }
 
-        // Return only the path for web requests
+        return $slug;
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(PostComment::class, 'blog_id');
+    }
+
+    public function getImageAttribute($value): string | null
+    {
+        if (filter_var($value)) {
+            return $value;
+        }
+
+        if (request()->is('api/*') && !empty($value)) {
+            return url($value);
+        }
         return $value;
     }
 
@@ -49,13 +65,10 @@ class CMS extends Model
         if (filter_var($value, FILTER_VALIDATE_URL)) {
             return $value;
         }
-        // Check if the request is an API request
+
         if (request()->is('api/*') && !empty($value)) {
-            // Return the full URL for API requests
             return url($value);
         }
-
-        // Return only the path for web requests
         return $value;
     }
 }
