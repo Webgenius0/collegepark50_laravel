@@ -23,15 +23,15 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
 
-            $table->date('start_date');
-            $table->time('start_time');
-            $table->date('end_date');
-            $table->time('end_time');
+            $table->date('start_date')->nullable();
+            $table->time('start_time')->nullable();
+            $table->date('end_date')->nullable();
+            $table->time('end_time')->nullable();
 
             $table->string('time_zone')->default('UTC');
             $table->boolean('all_day_event')->default(value: false);
 
-            $table->string('banner');
+            $table->string('banner')->nullable();
             $table->json('tags')->nullable();
 
             $table->enum('status', ['going_live', 'pending', 'postponed', 'cancelled', 'completed'])->default('pending');

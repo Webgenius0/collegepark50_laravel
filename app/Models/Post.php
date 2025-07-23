@@ -55,4 +55,11 @@ class Post extends Model
     {
         return $this->belongsToMany(Hashtag::class, 'hashtag_posts');
     }
+
+    //posts
+    public function posts()
+    {
+        return $this->belongsToMany(Post::class, 'hashtag_posts')
+            ->withTimestamps();
+    }
 }

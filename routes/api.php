@@ -9,18 +9,22 @@ use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\User\FollowerController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
-use App\Http\Controllers\Api\React\Post\PostShareController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
 use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
 use App\Http\Controllers\Api\React\Event\EventCommentController;
+use App\Http\Controllers\Api\React\Event\EventPageController;
 use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
+use App\Http\Controllers\Api\React\Venue\VenuePageController;
 
-
+//health-check
+Route::get("/check", function () {
+    return "Project is running!";
+});
 
 //Guest user routes
 Route::group(['middleware' => 'guest:api'], function () {
@@ -51,10 +55,12 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/logout', [AuthenticationController::class, 'logout']);
     Route::post('/update-role', [AuthenticationController::class, 'updateRole']);
 
+    //Profile
     Route::get('/profile', [UserProfileController::class, 'profile']);
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
     Route::post('/update-location', [UserProfileController::class, 'updateLocation']);
     Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']);
+    Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
     Route::delete('/delete-profile', [UserProfileController::class, 'deleteProfile']);
 
     //user followers routes
@@ -86,19 +92,15 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::post('/update/{id}', [PostCommentController::class, 'update']);             // Edit comment
             Route::delete('/delete/{id}', [PostCommentController::class, 'destroy']);  // Delete comment
         });
-
-        // Post share routes
-        Route::group(['prefix' => 'post-share'], function () {
-            Route::post('/store/{postId}', [PostShareController::class, 'store']); // Create share
-            Route::get('/index/{postId}', [PostShareController::class, 'index']); // get share with user and share count
-            Route::put('/update/{id}', [PostShareController::class, 'update']); // share update
-            Route::delete('delete/{id}', [PostShareController::class, 'destroy']); // share delete
-        });
     });
 
     //Venue routes
     Route::prefix('venue')->group(function () {
-        Route::get('/', [VenueController::class, 'index']);            // List all venues
+        //venue page route according to prototype
+        Route::get('/', [VenuePageController::class, 'allVenue']);  // List all events
+        Route::get('/details/{id}', [VenuePageController::class, 'venueDetails']);  // get a single venue with detials by id
+
+        //venue manage
         Route::post('/store', [VenueController::class, 'store']);           // Store a new venue
         Route::get('/edit/{id}', [VenueController::class, 'edit']);    // Get a venue for editing
         Route::post('/update/{id}', [VenueController::class, 'update']);       // Update a venue
@@ -115,13 +117,20 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // Event routes
     Route::prefix('event')->group(function () {
-        Route::get('/', [EventManageController::class, 'index']);             // List all events
+        //event page route according to prototype
+        Route::get('/', [EventPageController::class, 'allEvents']);  // List all events
+        Route::get('/upcoming', [EventPageController::class, 'upcomingEvents']);  // Get upcoming events only
+        Route::get('/past', [EventPageController::class, 'pastEvents']); // Get pasts events
+        Route::get('/my', [EventPageController::class, 'myEvents']); // Get authorized user events
+        Route::get('/gallery', [EventPageController::class, 'eventGallery']); //Get event's images
+
+        //event manage
         Route::post('/store', [EventManageController::class, 'store']);       // Create a new event
         Route::get('/show/{id}', [EventManageController::class, 'show']);     // Get a specific event
         Route::post('/update/{id}', [EventManageController::class, 'update']); // Update an event
         Route::delete('/delete/{id}', [EventManageController::class, 'destroy']); // Delete an event
         Route::post('/change-status/{id}', [EventManageController::class, 'changeStatus']); // Update event status
-        Route::get('/upcoming', [EventManageController::class, 'upcoming']);  // Get upcoming events only
+
 
         //event list/unlike
         Route::group(['prefix' => 'like'], function () {

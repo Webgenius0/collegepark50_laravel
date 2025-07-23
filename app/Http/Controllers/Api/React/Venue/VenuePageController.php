@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Http\Controllers\Api\React\Venue;
+
+use Exception;
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Venue\VenueResource;
+use App\Models\Venue;
+
+class VenuePageController extends Controller
+{
+    use ApiResponse;
+
+    //get all venues of auth user
+    public function allVenue()
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return $this->error([], 'Unauthorized user.', 401);
+            }
+
+            $venues = Venue::with(['detail', 'media', 'reviews'])
+                ->latest()
+                ->get();
+
+            return $this->success(
+                VenueResource::collection($venues),
+                'Venues retrieved successfully.',
+                200
+            );
+        } catch (Exception $e) {
+            return $this->error([], 'Failed to fetch venues. ' . $e->getMessage(), 500);
+        }
+    }
+
+    //venue details
+    public function venueDetails($id)
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return $this->error([], 'Unauthorized user.', 401);
+            }
+
+            $venue = Venue::with(['detail', 'media', 'reviews'])
+                ->where('id', $id)
+                ->first();
+
+            if (!$venue) {
+                return $this->error([], 'Venue not found.', 404);
+            }
+
+            return $this->success(
+                new VenueResource($venue),
+                'Venue fetched successfully.',
+                200
+            );
+        } catch (Exception $e) {
+            return $this->error([], 'Failed to fetch venue. ' . $e->getMessage(), 500);
+        }
+    }
+}

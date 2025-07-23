@@ -29,9 +29,10 @@ class VenueController extends Controller
             }
 
             $venues = $user->venues()
-                ->with(['detail', 'media'])
+                ->with(['detail', 'media', 'reviews'])
                 ->latest()
                 ->get();
+            // $users = Venue::with(['detail','media','media'])->wh
 
             return $this->success(
                 VenueResource::collection($venues),
@@ -282,7 +283,26 @@ class VenueController extends Controller
     }
 
     //toggle venue status
-    public function status($id, $data){
-        
+    public function status($id)
+    {
+        $user = auth('api')->user();
+
+        if (!$user) {
+            return $this->error([], 'Unauthorized user.', 401);
+        }
+
+        $venue = Venue::find($id);
+
+        if (!$venue) {
+            return $this->error([], 'Venue not found.', 404);
+        }
+
+        // Toggle status
+        $venue->status = $venue->status == 0 ? 1 : 0;
+        $venue->save();
+
+        $statusText = $venue->status ? 'activated' : 'deactivated';
+
+        return $this->success([], "Venue $statusText successfully.", 200);
     }
 }

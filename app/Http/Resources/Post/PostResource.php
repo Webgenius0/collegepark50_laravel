@@ -36,6 +36,14 @@ class PostResource extends JsonResource
             // Timestamps
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+
+            // user info
+            'user' => [
+                'id'     => $this->user->id,
+                'name'   => $this->user->f_name . ' ' . $this->user->l_name,
+                'avatar' => $this->user->avatar,
+            ],
+
         ];
     }
 }

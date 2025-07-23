@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\React\Event;
 
 use Exception;
-use Carbon\Carbon;
 use App\Models\Event;
 use App\Helper\Helper;
+use App\Models\Ticket;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventRequest;
 use App\Http\Resources\Event\EventResource;
@@ -16,53 +17,60 @@ class EventManageController extends Controller
 {
     use ApiResponse;
 
-    //get all events
-    public function index()
-    {
-        try {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
-
-            $events = Event::with(['venue', 'user'])
-                ->latest()
-                ->get();
-
-            return $this->success([
-                'events' => EventResource::collection($events)
-            ], 'Events fetched successfully.');
-        } catch (Exception $e) {
-            return $this->error([], 'Failed to fetch events. ' . $e->getMessage(), 500);
-        }
-    }
-
     //store event
     public function store(EventRequest $request)
     {
+        DB::beginTransaction();
+
         try {
             $validated = $request->validated();
             $user = auth('api')->user();
 
-            // Attach the authenticated user's ID
             $validated['user_id'] = $user->id;
 
-            // Handle image upload
+            if (isset($validated['tags'])) {
+                $tags = array_map('trim', $validated['tags']);
+                $tags = array_filter($tags);
+                $tags = array_unique($tags);
+                $validated['tags'] = json_encode(array_values($tags));
+            }
+
             if ($request->hasFile('banner')) {
                 $validated['banner'] = Helper::uploadImage($request->file('banner'), 'event/banners');
             }
 
+            // Create Event
             $event = Event::create($validated);
+
+            // Ticket handling
+            $ticketData = $request->input('ticket');
+
+            if (is_array($ticketData)) {
+                $ticketData['event_id'] = $event->id;
+                Ticket::create($ticketData);
+            } else {
+                // Insert a blank/default ticket for this event
+                Ticket::create([
+                    'event_id' => $event->id,
+                    'ticket_name' => null,
+                    'price' => 0,
+                    'capacity_type' => 'shared',
+                    'shared_capacity' => null,
+                    'independent_capacity' => null,
+                    'attendee_collection' => 'none'
+                ]);
+            }
+
+            DB::commit();
 
             return $this->success([
                 'event' => new EventResource($event)
             ], 'Event created successfully.');
         } catch (Exception $e) {
-            return $this->error([], 'Failed to create event.', 500, $e);
+            DB::rollBack();
+            return $this->error([], 'Failed to create event.' . $e->getMessage(), 500, $e);
         }
     }
-
 
     //get single event by id
     public function show($id)
@@ -92,26 +100,68 @@ class EventManageController extends Controller
     //update event
     public function update(EventRequest $request, $id)
     {
-        $user = auth('api')->user();
-        $event = Event::where('id', $id)->where('user_id', $user->id)->first();
+        DB::beginTransaction();
 
-        if (!$event) {
-            return $this->error([], 'Event not found or unauthorized', 404);
-        }
+        try {
+            $user = auth('api')->user();
 
-        $validated = $request->validated();
+            $event = Event::where('id', $id)
+                ->where('user_id', $user->id)
+                ->first();
 
-        // Handle banner upload
-        if ($request->hasFile('banner')) {
-            if ($event->banner) {
-                Helper::deleteImage($event->banner);
+            if (!$event) {
+                return $this->error([], 'Event not found or unauthorized', 404);
             }
-            $validated['banner'] = Helper::uploadImage($request->file('banner'), 'event/banners');
+
+            $validated = $request->validated();
+
+            // Tags cleanup
+            if (isset($validated['tags'])) {
+                $tags = array_map('trim', $validated['tags']);
+                $tags = array_filter($tags);
+                $tags = array_unique($tags);
+                $validated['tags'] = json_encode(array_values($tags));
+            }
+
+            // Banner image upload + delete old
+            if ($request->hasFile('banner')) {
+                if ($event->banner) {
+                    Helper::deleteImage($event->banner);
+                }
+
+                $validated['banner'] = Helper::uploadImage(
+                    $request->file('banner'),
+                    'event/banners'
+                );
+            }
+
+            // Update event
+            $event->update($validated);
+
+            // Ticket update or create
+            $ticketData = $request->input('ticket');
+
+            if (is_array($ticketData)) {
+                $existingTicket = Ticket::where('event_id', $event->id)->first();
+
+                if ($existingTicket) {
+                    $existingTicket->update($ticketData);
+                } else {
+                    $ticketData['event_id'] = $event->id;
+                    Ticket::create($ticketData);
+                }
+            }
+
+            DB::commit();
+
+            return $this->success(
+                new EventResource($event->fresh()),
+                'Event updated successfully'
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $this->error([], 'Failed to update event.' . $e->getMessage(), 500, $e);
         }
-
-        $event->update($validated);
-
-        return $this->success(new EventResource($event->fresh()), 'Event updated successfully');
     }
 
     //delete event
@@ -151,26 +201,5 @@ class EventManageController extends Controller
         $event->save();
 
         return $this->success(new EventResource($event), 'Event status updated successfully');
-    }
-
-    //upcoming events
-    public function upcoming()
-    {
-        $user = auth('api')->user();
-        $now = Carbon::now();
-
-        $events = Event::where('user_id', $user->id)
-            ->where(function ($query) use ($now) {
-                $query->where('start_date', '>', $now->toDateString())
-                    ->orWhere(function ($q) use ($now) {
-                        $q->where('start_date', '=', $now->toDateString())
-                            ->where('start_time', '>=', $now->toTimeString());
-                    });
-            })
-            ->orderBy('start_date')
-            ->orderBy('start_time')
-            ->get();
-
-        return $this->success(EventResource::collection($events), 'Upcoming events fetched successfully');
     }
 }

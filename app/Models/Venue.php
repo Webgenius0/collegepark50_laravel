@@ -24,19 +24,27 @@ class Venue extends Model
     ];
 
     // Relationships
-
+    //user table
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    //venue-details table
     public function detail()
     {
         return $this->hasOne(VenueDetail::class);
     }
 
+    // veune media table
     public function media()
     {
         return $this->hasMany(VenueMedia::class);
+    }
+
+    //venue review table
+    public function reviews()
+    {
+        return $this->hasMany(VenueReview::class);
     }
 }

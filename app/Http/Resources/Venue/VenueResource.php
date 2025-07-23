@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Venue;
 
 use Illuminate\Http\Request;
+use App\Http\Resources\Review\ReviewResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VenueResource extends JsonResource
@@ -32,7 +33,7 @@ class VenueResource extends JsonResource
             // Relations
             'detail' => [
                 'description' => optional($this->detail)->description,
-                'features'    => optional($this->detail)->features ?? [],
+                'features'    => json_decode($this->detail->features) ?: [],
             ],
 
             'media' => $this->media->map(function ($media) {
@@ -42,6 +43,15 @@ class VenueResource extends JsonResource
                     'video_url' => $media->video_url,
                 ];
             }),
+
+            'user' => [
+                'id'     => $this->user->id,
+                'name'   => $this->user->f_name . ' ' . $this->user->l_name,
+                'avatar' => $this->user->avatar,
+                'email' => $this->user->email ?? null,
+            ],
+
+            'reviews' => ReviewResource::collection($this->whenLoaded('reviews')),
         ];
     }
 }

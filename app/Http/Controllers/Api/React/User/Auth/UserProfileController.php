@@ -69,7 +69,6 @@ class UserProfileController extends Controller
 
 
             return $this->success(new UserResource($user), 'Profile updated successfully.', 200);
-
         } catch (Exception $e) {
 
             Log::error('Profile Update Error: ' . $e->getMessage());
@@ -77,7 +76,7 @@ class UserProfileController extends Controller
         }
     }
 
-
+    //update location
     public function updateLocation(Request $request)
     {
         try {
@@ -111,7 +110,6 @@ class UserProfileController extends Controller
 
 
             return $this->success($userData, 'Profile updated successfully.', 200);
-
         } catch (Exception $e) {
 
             Log::error('Profile Update Error: ' . $e->getMessage());
@@ -119,7 +117,7 @@ class UserProfileController extends Controller
         }
     }
 
-// update avatar
+    // update avatar
     public function updateAvatar(Request $request)
     {
         try {

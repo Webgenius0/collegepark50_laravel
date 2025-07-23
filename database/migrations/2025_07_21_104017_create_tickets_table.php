@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
 
-            $table->string('ticket_type');
+            $table->string('ticket_name')->nullable();
             $table->text('description')->nullable();
             $table->boolean('show_description')->default(false);
 

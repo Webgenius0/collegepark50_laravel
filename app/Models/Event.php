@@ -47,19 +47,22 @@ class Event extends Model
         return $this->belongsTo(User::class);
     }
 
+    //likable
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
     }
 
 
+    //comment
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable')->whereNull('parent_id');
     }
 
-    public function shares()
+    //tickets
+    public function ticket()
     {
-        return $this->hasMany(PostShare::class);
+        return $this->hasOne(Ticket::class);
     }
 }
