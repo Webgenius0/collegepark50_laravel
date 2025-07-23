@@ -44,12 +44,6 @@ class Post extends Model
     }
 
 
-    //share
-    public function shares()
-    {
-        return $this->hasMany(PostShare::class);
-    }
-
     // post hashtag
     public function hashtags()
     {
