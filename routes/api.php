@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
 use App\Http\Controllers\Api\React\Event\EventCommentController;
 use App\Http\Controllers\Api\React\Event\EventPageController;
+use App\Http\Controllers\Api\React\Notification\NotificationController;
 use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
@@ -145,5 +146,11 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::post('/update/{id}', [EventCommentController::class, 'update']);             // Edit comment
             Route::delete('/delete/{id}', [EventCommentController::class, 'destroy']);  // Delete comment
         });
+
+
     });
+
+
+    Route::get('/my-notifications', [NotificationController::class, 'allNotifications']);
+    Route::post('/read-notification/{id}', [NotificationController::class, 'readNotification']);
 });

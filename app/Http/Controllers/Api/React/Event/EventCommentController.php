@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\React\Event;
 
-use App\Http\Controllers\Controller;
-use App\Models\Comment;
+use Exception;
 use App\Models\Event;
-use App\Notifications\ReplyCommentNotification;
+use App\Models\Comment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\ReplyCommentNotification;
 
 class EventCommentController extends Controller
 {
@@ -17,6 +18,7 @@ class EventCommentController extends Controller
     // Store a new comment
     public function store(Request $request, $eventId)
     {
+        // Validate incoming request
         $validator = Validator::make($request->all(), [
             'comment'    => 'required|string|max:1000',
             'parent_id'  => 'nullable|exists:comments,id',
@@ -26,6 +28,7 @@ class EventCommentController extends Controller
             return $this->error([], $validator->errors()->first(), 422);
         }
 
+        // Find the event
         $event = Event::find($eventId);
         if (!$event) {
             return $this->error([], 'Event not found.', 404);
@@ -33,6 +36,7 @@ class EventCommentController extends Controller
 
         $user = auth()->guard('api')->user();
 
+        // Create the comment
         $comment = new Comment([
             'comment'   => $request->comment,
             'user_id'   => $user->id,
@@ -41,12 +45,14 @@ class EventCommentController extends Controller
 
         $event->comments()->save($comment);
 
+        // Only increment event comment count if it's a top-level comment
         if (!$request->parent_id) {
             $event->increment('comment_count');
         }
 
         $comment->load('user');
 
+        // Prepare response structure
         $response = [
             'id'            => $comment->id,
             'user_id'       => $comment->user->id,
@@ -60,11 +66,17 @@ class EventCommentController extends Controller
             ],
         ];
 
-        if ($request->parent_id) {
-            $parentComment = Comment::find($request->parent_id);
-            if ($parentComment && $parentComment->user_id !== $user->id) {
-                $parentComment->user->notify(new ReplyCommentNotification($user, $comment));
+        // Notify parent comment user if it's a reply
+        try {
+            if ($request->parent_id) {
+                $parentComment = Comment::find($request->parent_id);
+
+                if ($parentComment && $parentComment->user_id !== $user->id) {
+                    $parentComment->user->notify(new ReplyCommentNotification($user, $comment));
+                }
             }
+        } catch (\Exception $e) {
+            Log::error('Reply notification error: ' . $e->getMessage());
         }
 
         return $this->success($response, 'Comment added successfully.', 201);
