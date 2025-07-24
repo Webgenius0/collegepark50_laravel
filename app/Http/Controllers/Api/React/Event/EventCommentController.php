@@ -2,51 +2,49 @@
 
 namespace App\Http\Controllers\Api\React\Event;
 
-use App\Models\Event;
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\Event;
+use App\Notifications\ReplyCommentNotification;
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class EventCommentController extends Controller
 {
     use ApiResponse;
-    // Add comment
+
+    // Store a new comment
     public function store(Request $request, $eventId)
     {
         $validator = Validator::make($request->all(), [
             'comment'    => 'required|string|max:1000',
-            'parent_id'  => 'nullable|exists:comments,id' // For replies
+            'parent_id'  => 'nullable|exists:comments,id',
         ]);
 
         if ($validator->fails()) {
-            return $this->error(['Validation failed'], $validator->errors()->first(), 422);
+            return $this->error([], $validator->errors()->first(), 422);
         }
 
         $event = Event::find($eventId);
-
         if (!$event) {
             return $this->error([], 'Event not found.', 404);
         }
 
-        $user = auth('api')->user();
+        $user = auth()->guard('api')->user();
 
-        // Create comment with morphable relation
         $comment = new Comment([
             'comment'   => $request->comment,
             'user_id'   => $user->id,
             'parent_id' => $request->parent_id,
         ]);
 
-        $event->comments()->save($comment); // attaches commentable_type & commentable_id
+        $event->comments()->save($comment);
 
-        // increment comment count only for root comments
         if (!$request->parent_id) {
             $event->increment('comment_count');
         }
 
-        // Load user for response
         $comment->load('user');
 
         $response = [
@@ -57,27 +55,33 @@ class EventCommentController extends Controller
             'comment_count' => $event->comment_count,
             'user'          => [
                 'id'     => $comment->user->id,
-                'name'   => $comment->user->f_name . ' ' . $comment->user->l_name,
+                'name'   => trim($comment->user->f_name . ' ' . $comment->user->l_name),
                 'avatar' => $comment->user->avatar,
             ],
         ];
 
+        if ($request->parent_id) {
+            $parentComment = Comment::find($request->parent_id);
+            if ($parentComment && $parentComment->user_id !== $user->id) {
+                $parentComment->user->notify(new ReplyCommentNotification($user, $comment));
+            }
+        }
+
         return $this->success($response, 'Comment added successfully.', 201);
     }
 
-    // Get all comments
+    // List all top-level comments with replies
     public function index($eventId)
     {
         $event = Event::find($eventId);
-
         if (!$event) {
             return $this->error([], 'Event not found.', 404);
         }
 
-        $comments = Comment::with(['user', 'replies'])
+        $comments = Comment::with(['user', 'replies.user'])
             ->where('commentable_type', Event::class)
             ->where('commentable_id', $eventId)
-            ->whereNull('parent_id') // Only top-level comments
+            ->whereNull('parent_id')
             ->latest()
             ->get()
             ->map(function ($comment) {
@@ -87,7 +91,7 @@ class EventCommentController extends Controller
                     'created_at' => $comment->created_at->diffForHumans(),
                     'user'       => [
                         'id'     => $comment->user->id,
-                        'name'   => $comment->user->f_name . ' ' . $comment->user->l_name,
+                        'name'   => trim($comment->user->f_name . ' ' . $comment->user->l_name),
                         'avatar' => $comment->user->avatar,
                     ],
                     'replies' => $comment->replies->map(function ($reply) {
@@ -97,7 +101,7 @@ class EventCommentController extends Controller
                             'created_at' => $reply->created_at->diffForHumans(),
                             'user'       => [
                                 'id'     => $reply->user->id,
-                                'name'   => $reply->user->f_name . ' ' . $reply->user->l_name,
+                                'name'   => trim($reply->user->f_name . ' ' . $reply->user->l_name),
                                 'avatar' => $reply->user->avatar,
                             ],
                         ];
@@ -108,7 +112,7 @@ class EventCommentController extends Controller
         return $this->success($comments, 'Event comments with replies retrieved successfully.', 200);
     }
 
-    // Update comment
+    // Update a comment
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -120,19 +124,17 @@ class EventCommentController extends Controller
         }
 
         $comment = Comment::with('user')->find($id);
-
         if (!$comment) {
             return $this->error([], 'Comment not found.', 404);
         }
 
-        if ($comment->user_id !== auth('api')->id()) {
+        if ($comment->user_id !== auth()->guard('api')->id()) {
             return $this->error([], 'Unauthorized to update this comment.', 403);
         }
 
-        $comment->comment = $request->comment;
-        $comment->save();
+        $comment->update(['comment' => $request->comment]);
 
-        $response = [
+        return $this->success([
             'id'        => $comment->id,
             'user_id'   => $comment->user->id,
             'comment'   => $comment->comment,
@@ -142,35 +144,29 @@ class EventCommentController extends Controller
                 'name'   => trim($comment->user->f_name . ' ' . $comment->user->l_name),
                 'avatar' => $comment->user->avatar,
             ],
-        ];
-
-        return $this->success($response, 'Comment updated successfully.', 200);
+        ], 'Comment updated successfully.', 200);
     }
 
-    // Delete comment
+    // Delete a comment
     public function destroy($id)
     {
         $comment = Comment::find($id);
-
         if (!$comment) {
             return $this->error([], 'Comment not found.', 404);
         }
 
-        if ($comment->user_id !== auth('api')->id()) {
+        if ($comment->user_id !== auth()->guard('api')->id()) {
             return $this->error([], 'Unauthorized to delete this comment.', 403);
         }
 
-        $event = null;
-        if ($comment->commentable_type === Event::class) {
-            $event = Event::find($comment->commentable_id);
-        }
-
-        $isRootComment = is_null($comment->parent_id);
+        $isRoot = is_null($comment->parent_id);
+        $event = ($comment->commentable_type === Event::class)
+            ? Event::find($comment->commentable_id)
+            : null;
 
         $comment->delete();
 
-        // Only decrement comment_count if root comment deleted
-        if ($event && $isRootComment && $event->comment_count > 0) {
+        if ($event && $isRoot && $event->comment_count > 0) {
             $event->decrement('comment_count');
         }
 
