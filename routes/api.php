@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\React\Post\PostCommentController;
 use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
 use App\Http\Controllers\Api\React\Event\EventCommentController;
+use App\Http\Controllers\Api\React\Event\EventFilterController;
 use App\Http\Controllers\Api\React\Event\EventPageController;
 use App\Http\Controllers\Api\React\Notification\NotificationController;
 use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
@@ -147,10 +148,13 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::delete('/delete/{id}', [EventCommentController::class, 'destroy']);  // Delete comment
         });
 
-
+        //event filtering by title
+        Route::get('/search', [EventFilterController::class, 'searchByTitle']);
+        Route::get('/filter-by-date', [EventFilterController::class, 'filterByNearbyDates']);
     });
 
-
+    //Notification
     Route::get('/my-notifications', [NotificationController::class, 'allNotifications']);
     Route::post('/read-notification/{id}', [NotificationController::class, 'readNotification']);
+    Route::post('/read-all-notifications', [NotificationController::class, 'readAllNotifications']);
 });

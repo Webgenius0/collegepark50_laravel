@@ -18,13 +18,13 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             HashtagSeeder::class,
             PostSeeder::class,
+            VenueSeeder::class,
+            VenueDetailSeeder::class,
+            VenueReviewSeeder::class,
             EventSeeder::class,
             TicketSeeder::class,
             LikeSeeder::class,
             CommentSeeder::class,
-            VenueSeeder::class,
-            VenueDetailSeeder::class,
-            VenueReviewSeeder::class,
             SettingSeeder::class,
         ]);
     }

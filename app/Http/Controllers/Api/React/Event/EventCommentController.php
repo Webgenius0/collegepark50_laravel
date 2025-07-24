@@ -7,9 +7,10 @@ use App\Models\Event;
 use App\Models\Comment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use App\Notifications\ReplyCommentNotification;
+use App\Notifications\EventReplyCommentNotification;
 
 class EventCommentController extends Controller
 {
@@ -72,10 +73,10 @@ class EventCommentController extends Controller
                 $parentComment = Comment::find($request->parent_id);
 
                 if ($parentComment && $parentComment->user_id !== $user->id) {
-                    $parentComment->user->notify(new ReplyCommentNotification($user, $comment));
+                    $parentComment->user->notify(new EventReplyCommentNotification($user, $comment, $event));
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Reply notification error: ' . $e->getMessage());
         }
 

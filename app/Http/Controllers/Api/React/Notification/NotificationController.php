@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\React\Notification;
 
+use Exception;
 use Carbon\Carbon;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class NotificationController extends Controller
 {
     use ApiResponse;
 
+    // get all notifications
     public function allNotifications()
     {
         try {
@@ -23,31 +25,35 @@ class NotificationController extends Controller
                 return $this->error([], 'User not authenticated.', 401);
             }
 
-            // Fetch all database notifications for the authenticated user
-            $notifications = $user->notifications()->orderBy('created_at', 'desc')->whereNull('read_at')->get();
+            // Fetch unread notifications
+            $notifications = $user->notifications()
+                ->whereNull('read_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-            if ($notifications->isEmpty()) {
-                return $this->success([], 'No notifications found.', 200);
-            }
+            $count = $notifications->count();
 
             $notifications = $notifications->map(function ($notification) {
                 return [
-                    'id' => $notification->id,
-                    'data' => $notification->data,
-                    'read_at' => $notification->read_at,
-                    'created_at' => $notification->created_at->diffForHumans()
+                    'id'         => $notification->id,
+                    'data'       => $notification->data,
+                    'read_at'    => $notification->read_at,
+                    'created_at' => $notification->created_at->diffForHumans(),
                 ];
             });
 
-            return $this->success($notifications, 'Notifications retrieved successfully.', 200);
-        } catch (\Exception $e) {
-
-            Log::info($e->getMessage());
-            return $this->error([], $e->getMessage(), 500);
+            return $this->success([
+                'count'         => $count,
+                'notifications' => $notifications,
+            ], 'Unread notifications retrieved successfully.', 200);
+        } catch (Exception $e) {
+            Log::error('Notification fetch error: ' . $e->getMessage());
+            return $this->error([], 'Something went wrong.', 500);
         }
     }
 
 
+    //mark as read specific notification
     public function readNotification($id)
     {
         try {
@@ -65,10 +71,27 @@ class NotificationController extends Controller
             $notification->markAsRead();
 
             return $this->success([], 'Notification marked as read successfully.', 200);
-        } catch (\Exception $e) {
-
+        } catch (Exception $e) {
             Log::info($e->getMessage());
             return $this->error([], $e->getMessage(), 500);
+        }
+    }
+
+    //mark as read all notification
+    public function readAllNotifications()
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return $this->error([], 'User not authenticated.', 401);
+            }
+
+            $user->unreadNotifications->markAsRead();
+
+            return $this->success([], 'All notifications marked as read successfully.', 200);
+        } catch (Exception $e) {
+            Log::error('Notification mark-all error: ' . $e->getMessage());
+            return $this->error([], 'Something went wrong.', 500);
         }
     }
 }

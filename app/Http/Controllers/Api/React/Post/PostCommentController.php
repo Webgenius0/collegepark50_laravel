@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api\React\Post;
 
+use Exception;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\PostReplyCommentNotification;
 
 class PostCommentController extends Controller
 {
@@ -61,6 +64,19 @@ class PostCommentController extends Controller
                 'avatar' => $comment->user->avatar,
             ],
         ];
+
+        // Notify parent comment user if it's a reply
+        try {
+            if ($request->parent_id) {
+                $parentComment = Comment::find($request->parent_id);
+
+                if ($parentComment && $parentComment->user_id !== $user->id) {
+                    $parentComment->user->notify(new PostReplyCommentNotification($user, $comment, $post));
+                }
+            }
+        } catch (Exception $e) {
+            Log::error('Reply notification error: ' . $e->getMessage());
+        }
 
         return $this->success($response, 'Comment added successfully.', 201);
     }

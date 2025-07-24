@@ -28,7 +28,7 @@ class CommentSeeder extends Seeder
         // Helper function to seed comments for a given model collection and type
         $seedCommentsForModel = function ($models, $type) use ($userIds) {
             foreach ($models as $model) {
-                $commentCount = rand(2, 5);
+                $commentCount = rand(1, 3);
 
                 for ($i = 0; $i < $commentCount; $i++) {
                     $comment = Comment::create([
