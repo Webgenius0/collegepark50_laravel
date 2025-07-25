@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\User\FollowerController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
+use App\Http\Controllers\Api\React\DashboardController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
 use App\Http\Controllers\Api\React\Event\EventManageController;
@@ -157,4 +158,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/my-notifications', [NotificationController::class, 'allNotifications']);
     Route::post('/read-notification/{id}', [NotificationController::class, 'readNotification']);
     Route::post('/read-all-notifications', [NotificationController::class, 'readAllNotifications']);
+
+    //Dashboard routes
+    Route::get('/user-event-stats', [DashboardController::class,'userEventStats']); // user event stats
+    Route::get('/venue-rating-stats', [DashboardController::class,'venueReviewStats']); // venue rating stats
+    Route::get('/event-duration-stats', [DashboardController::class,'eventDurationStats']); // event duration stats
 });
