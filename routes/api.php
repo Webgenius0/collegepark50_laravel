@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\React\Calendar\CalendarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\React\CMS\HomeController;
 use App\Http\Controllers\Api\React\CMS\EventController;
@@ -66,10 +67,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
     Route::delete('/delete-profile', [UserProfileController::class, 'deleteProfile']);
 
-    //user followers routes
-    Route::post('/follow/{id}', [FollowerController::class, 'toggleFollow']);              // Follow or unfollow a user by ID (toggle)
-    Route::get('/user/{id}/followers', [FollowerController::class, 'getFollowers']);       // Get all followers of a user by user ID
-    Route::get('/user/{id}/followings', [FollowerController::class, 'getFollowings']);     // Get all users that a user is following by user ID
+    //user followers and friends routes
+    Route::post('/follow/{id}', [FollowerController::class, 'toggleFollow']);  // Follow or unfollow a user by ID (toggle)
+    Route::get('/followers', [FollowerController::class, 'getFollowers']);    // Get all followers of authenticated user
+    Route::get('/user/{id}/followers', [FollowerController::class, 'getUserFollowers']);   // Get all followers of a user by user ID
+    Route::get('/followings', [FollowerController::class, 'getFollowings']);     // Get all users that a user is following who is authenticated
+    Route::get('/user/{id}/followings', [FollowerController::class, 'getUserFollowings']);    // Get all users that a user is following by user ID
+    Route::get('/friends', [FollowerController::class, 'getFriends']);           // Get auth user friend list
 
 
     //Post routes
@@ -160,7 +164,19 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/read-all-notifications', [NotificationController::class, 'readAllNotifications']);
 
     //Dashboard routes
-    Route::get('/user-event-stats', [DashboardController::class,'userEventStats']); // user event stats
-    Route::get('/venue-rating-stats', [DashboardController::class,'venueReviewStats']); // venue rating stats
-    Route::get('/event-duration-stats', [DashboardController::class,'eventDurationStats']); // event duration stats
+    Route::get('/user-event-stats', [DashboardController::class, 'userEventStats']); // user event stats
+    Route::get('/venue-rating-stats', [DashboardController::class, 'venueReviewStats']); // venue rating stats
+    // Route::get('/event-duration-stats', [DashboardController::class,'eventDurationStats']); // event duration stats
+
+
+    //Event calendar manage
+    Route::prefix('calendar')->group(function () {
+        Route::get('/', [CalendarController::class, 'index']);    //get all events of auth user
+        Route::post('/store', [CalendarController::class, 'store']);   //store event in calenar
+        Route::get('/edit/{id}', [CalendarController::class, 'edit']);  //edit calendar
+        Route::post('/update/{id}', [CalendarController::class, 'update']); //update calendar
+
+        //event filterring
+        Route::get('/filter', [CalendarController::class, 'filter']);
+    });
 });

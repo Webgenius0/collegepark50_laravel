@@ -52,7 +52,6 @@ class NotificationController extends Controller
         }
     }
 
-
     //mark as read specific notification
     public function readNotification($id)
     {
