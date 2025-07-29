@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
+            $table->foreignId('room_id')->nullable()->constrained('rooms')->nullOnDelete();
             $table->text('text')->nullable();
             $table->string('file')->nullable();
-            $table->enum('status', ['sent', 'read' , 'unread'])->default('unread');
+            $table->enum('status', ['sent', 'read', 'unread'])->default('unread');
             $table->timestamps();
             $table->softDeletes();
         });
     }
-
     /**
      * Reverse the migrations.
      */

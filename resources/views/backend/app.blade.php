@@ -21,7 +21,7 @@ $settings = \App\Models\Setting::first();
     <title> @yield('title') </title>
     <!-- Scripts -->
 
-    {{-- @vite(['resources/js/app.js']) --}}
+    @vite(['resources/js/app.js'])
 
 
 

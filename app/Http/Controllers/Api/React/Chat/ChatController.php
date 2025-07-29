@@ -31,8 +31,6 @@ class ChatController extends Controller
             ->where('id', '!=', $authUser->id)
             ->get();
 
-        dd($users);
-
 
         $userWithMessages = $users->map(function ($user) use ($authUser) {
             $lastChat = Chat::where(function ($query) use ($user, $authUser) {
@@ -263,5 +261,27 @@ class ChatController extends Controller
         ];
 
         return response()->json(['success' => true, 'message' => 'Group retrieved successfully.', 'data' => $data, 'code' => 200]);
+    }
+
+
+    public function search(Request $request): JsonResponse
+    {
+        $user_id = Auth::id();
+
+        $keyword = $request->get('keyword');
+        $users = User::select('id', 'f_name', 'l_name', 'email', 'avatar', 'last_activity_at')
+            ->where('id', '!=', $user_id)
+            ->where('f_name', 'LIKE', "%{$keyword}%")->orWhere('l_name', 'LIKE', "%{$keyword}%")->orWhere('email', 'LIKE', "%{$keyword}%")
+            ->get();
+
+        $data = [
+            'users' => $users
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Chat retrieved successfully',
+            'data'    => $data,
+        ], 200);
     }
 }

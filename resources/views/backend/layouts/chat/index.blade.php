@@ -684,7 +684,7 @@
                                 <div class="online-indicator ${onlineStatus}"></div>
                             </div>
                             <div class="user-info">
-                                <div class="user-name">${value.name}</div>
+                                <div class="user-name">${value.f_name}</div>
                                 <div class="user-message">${value.last_chat.short_text}</div>
                             </div>
                             <div class="user-time">${value.last_chat.humanize_date}</div>
@@ -727,7 +727,7 @@
                                 <img alt="avatar" src="${senderAvatar}">
                             </div>
                             <div class="user-info">
-                                <div class="user-name">${value.name}</div>
+                                <div class="user-name">${value.f_name}</div>
                                 <div class="user-message">${value.email}</div>
                             </div>
                         </a>
@@ -750,7 +750,7 @@
                     NProgress.done();
                     $('#ChatContent').empty();
                     $('#ReceiverId').val(receiver_id);
-                    $('#ReceiverName').text(response.data.receiver.name);
+                    $('#ReceiverName').text(response.data.receiver.f_name);
                     $('#ReceiverRoll').text(response.data.receiver.role);
                     $('#RoomId').val(response.data.room.id);
                     window.sessionStorage.setItem('room_id', response.data.room.id);
@@ -912,6 +912,8 @@
         // Laravel Echo for real-time messaging
 
 
+        document.addEventListener('DOMContentLoaded', function() {
+
             Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`).listen('MessageSendEvent', function(e) {
                 toastr.success(e.data.text ?? "New file received");
                 alert('get');
@@ -921,8 +923,6 @@
                 }
                 userList();
             });
-
+        });
     </script>
-
-
 @endpush
