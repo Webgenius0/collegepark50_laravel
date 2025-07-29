@@ -191,4 +191,8 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
   Route::get('/list' , 'list');
   Route::post('/send/{receiver_id}' , 'send');
   Route::get('/conversation/{receiver_id}' , 'conversation');
+  Route::get('room/{receiver_id}' , 'room');
+  Route::get('/search' , 'search');
+  Route::get('/seen/all/{receiver_id}' , 'seedAll');
+  Route::get('/seen/single/{chat_id}' , 'seenSingle');
 });

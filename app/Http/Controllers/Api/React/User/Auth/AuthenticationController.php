@@ -125,6 +125,8 @@ class AuthenticationController extends Controller
     */
     public function login(LoginRequest $request)
     {
+
+        dd($request->all());
         try {
 
             $validatedData = $request->validated();
