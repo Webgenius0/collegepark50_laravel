@@ -14,6 +14,8 @@ class User extends Authenticatable implements JWTSubject
 
     use HasFactory, Notifiable, Billable;
 
+    protected $guard_name = ['web' , 'api'];
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -48,7 +50,8 @@ class User extends Authenticatable implements JWTSubject
         'latitude',
         'longitude',
         'get_notification',
-        'remember_token'
+        'remember_token',
+        'last_activity_at'
     ];
 
     protected $hidden = [
@@ -71,10 +74,50 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    protected $appends = [
+        'role' ,
+        'is_online'
+    ];
+
+
+    public function getIsOnlineAttribute()
+    {
+        return $this->last_activity_at > now()->subMinutes(5);
+    }
+
+
+
+    public function senders()
+    {
+        return $this->hasMany(Chat::class , 'sender_id');
+    }
+
+    public function receivers()
+    {
+        return $this->hasMany(Chat::class , 'receiver_id');
+    }
+
+    public function roomsAsUserOne()
+    {
+        return $this->hasMany(Room::class , 'user_one_id');
+    }
+
+    public function roomsAsUserTwo()
+    {
+        return $this->hasMany(Room::class , 'user_two_id');
+    }
+
+    public function allRooms()
+    {
+        return Room::where('user_one_id' , $this->id)->orWhere('user_two_id' , $this->id);
+    }
+
     public function getNameAttribute(): string
     {
         return trim("{$this->f_name} {$this->l_name}");
     }
+
+
 
     //posts
     public function posts()
