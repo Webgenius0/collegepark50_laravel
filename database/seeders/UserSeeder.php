@@ -2,17 +2,16 @@
 
 namespace Database\Seeders;
 
-
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        DB::table('users')->insert([
-
+        // Manually inserted users
+        $manualUsers = [
             [
                 'f_name' => 'Sarah',
                 'l_name' => 'Wilson',
@@ -20,6 +19,7 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'password' => Hash::make('12345678'),
                 'is_otp_verified' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'f_name' => 'John',
@@ -28,6 +28,7 @@ class UserSeeder extends Seeder
                 'role' => 'user',
                 'password' => Hash::make('12345678'),
                 'is_otp_verified' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'f_name' => 'Jane',
@@ -36,6 +37,7 @@ class UserSeeder extends Seeder
                 'role' => 'dj',
                 'password' => Hash::make('12345678'),
                 'is_otp_verified' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'f_name' => 'Mike',
@@ -44,6 +46,7 @@ class UserSeeder extends Seeder
                 'role' => 'promoter',
                 'password' => Hash::make('12345678'),
                 'is_otp_verified' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'f_name' => 'Emily',
@@ -52,6 +55,7 @@ class UserSeeder extends Seeder
                 'role' => 'artist',
                 'password' => Hash::make('12345678'),
                 'is_otp_verified' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'f_name' => 'Robert',
@@ -60,8 +64,16 @@ class UserSeeder extends Seeder
                 'role' => 'venue',
                 'password' => Hash::make('12345678'),
                 'is_otp_verified' => true,
+                'email_verified_at' => now(),
             ],
+        ];
 
-        ]);
+        // Insert manual users
+        foreach ($manualUsers as $userData) {
+            User::create($userData);
+        }
+
+        // Generate 100 random users using the factory for tasting
+        User::factory(100)->create();
     }
 }

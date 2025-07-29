@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Event;
 use App\Models\Calendar;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
@@ -19,6 +20,7 @@ class CalendarSeeder extends Seeder
     {
         DB::transaction(function () {
             $userIds = User::pluck('id');
+            $eventIds = Event::pluck('id');
 
             if ($userIds->isEmpty()) {
                 $this->command->warn('No users found. Please seed users first.');
@@ -39,7 +41,7 @@ class CalendarSeeder extends Seeder
 
                     Calendar::create([
                         'user_id'     => $userIds->random(),
-                        'event_id'    => rand(1, 20),
+                        'event_id'    => $eventIds->random(),
                         'title'       => 'Practice Event ' . Str::random(5),
                         'description' => 'Random generated event.',
                         'all_day'     => false,

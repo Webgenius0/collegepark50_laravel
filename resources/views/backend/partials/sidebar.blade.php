@@ -71,6 +71,7 @@
 
                 <h3>User and Chat Manage</h3>
 
+                {{-- user, event, venue, promoter list --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
                         href="{{ route('admin.user.index') }}">
@@ -84,6 +85,30 @@
                 </li>
 
                 <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
+                        href="{{ route('admin.user.index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path d="M4 22V10l8-6 8 6v12h-5v-6h-6v6H4zM12 4.8 6 9v11h2v-6h8v6h2V9l-6-4.2z" />
+                        </svg>
+                        <span class="side-menu__label">Venue</span>
+                    </a>
+                </li>
+
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
+                        href="{{ route('admin.user.index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2
+                            2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0
+                            16H5V10h14v10zm0-12H5V6h14v2z" />
+                        </svg>
+                        <span class="side-menu__label">Event</span>
+                    </a>
+                </li>
+
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}"
                         href="{{ route('admin.chat.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -93,11 +118,11 @@
                         </svg>
                         <span class="side-menu__label">Chat System</span>
                     </a>
-                </li>
+                </li> --}}
 
 
 
-                <li class="slide">
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('dynamic_page') ? 'has-link' : '' }}"
                         href="{{ route('admin.dynamic_page.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -107,10 +132,10 @@
                         </svg>
                         <span class="side-menu__label">Dynamic Page</span>
                     </a>
-                </li>
+                </li> --}}
 
 
-                <li class="slide">
+                {{-- <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
                         href="{{ route('admin.faq.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -120,7 +145,7 @@
                         </svg>
                         <span class="side-menu__label">FAQ</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <h3>CMS</h3>
 
