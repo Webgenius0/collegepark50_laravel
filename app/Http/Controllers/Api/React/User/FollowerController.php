@@ -39,15 +39,15 @@ class FollowerController extends Controller
             // Follow
             $authUser->followings()->attach($id);
             $message = 'Followed successfully.';
-        }
 
-        // Send notification to the user being followed
-        try {
-            if ($userToFollow->id !== $authUser->id) {
-                $userToFollow->notify(new FollowNotification($authUser));
+            // Send notification to the user being followed
+            try {
+                if ($userToFollow->id !== $authUser->id) {
+                    $userToFollow->notify(new FollowNotification($authUser));
+                }
+            } catch (Exception $e) {
+                Log::error('Follow notification error: ' . $e->getMessage());
             }
-        } catch (Exception $e) {
-            Log::error('Follow notification error: ' . $e->getMessage());
         }
 
         return $this->success([], $message);
