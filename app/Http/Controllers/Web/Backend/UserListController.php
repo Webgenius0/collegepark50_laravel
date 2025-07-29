@@ -14,79 +14,30 @@ class UserListController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::select('id', 'name', 'email', 'phone_number', 'avatar', 'created_at','status')
-                        ->where('role', '!=', 'admin')
-                        ->latest();
+            $query = User::select('id', 'f_name', 'l_name', 'email', 'role', 'profession', 'address', 'country', 'city', 'created_at')
+                ->where('role', '!=', 'admin');
 
-            return DataTables::of($data)
+            // Filter by role if selected
+            if ($request->has('role') && $request->role !== 'all') {
+                $query->where('role', $request->role);
+            }
+
+            return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('avatar', function ($data) {
-                    if ($data->avatar) {
-                        $url = asset($data->avatar);
-                        return '<img src="' . $url . '" alt="avatar" width="50px" height="50px">';
-                    } else {
-                        return '---';
-                    }
+                ->addColumn('name', fn($row) => $row->f_name . ' ' . $row->l_name)
+                ->addColumn('email', fn($row) => $row->email ?? '---')
+                ->addColumn('role', function ($row) {
+                    return '<span class=" text-capitalize">' . $row->role . '</span>';
                 })
-                ->addColumn('action', function ($data) {
-                    return '<div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                              <a href="#" onclick="showDeleteConfirm(' . $data->id . ')" type="button" class="btn btn-danger text-white" title="Delete">
-                              <i class="bi bi-trash"></i>
-                            </a>
-                            </div>';
-                })
-                ->addColumn('name', function ($data) {
-                    return $data->name ?? '---';
-                })
-                ->addColumn('email', function ($data) {
-                    return $data->email ?? '---';
-                })
-                ->addColumn('phone', function ($data) {
-                    return $data->phone ?? '---';
-                })
-
-                ->addColumn('created_at', function ($data) {
-                    return $data->created_at ? $data->created_at->format('Y-m-d') : '---';
-                })
-                ->rawColumns(['avatar', 'name', 'email', 'phone', 'created_at', 'action'])
+                ->addColumn('profession', fn($row) => $row->profession ?? '---')
+                ->addColumn('address', fn($row) => $row->address ?? '---')
+                ->addColumn('country', fn($row) => $row->country ?? '---')
+                ->addColumn('city', fn($row) => $row->city ?? '---')
+                ->addColumn('created_at', fn($row) => optional($row->created_at)->format('Y-m-d'))
+                ->rawColumns(['role'])
                 ->make(true);
         }
+
         return view("backend.layouts.user.index");
     }
-
-        public function status(int $id): JsonResponse {
-            $data = User::findOrFail($id);
-            $data->status = $data->status === 'active' ? 'inactive' : 'active';
-            $data->save();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Status changed successfully!',
-            ]);
-        }
-
-
-        public function destroy(int $id): JsonResponse {
-            $data = User::findOrFail($id);
-            if (empty($data)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found.',
-                ], 404);
-            }
-
-            if ($data->avatar) {
-                Helper::deleteImage($data->avatar);
-            }
-
-            $data->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'User deleted successfully!',
-            ], 200);
-        }
-
-
-
 }

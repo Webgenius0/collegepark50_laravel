@@ -1,188 +1,191 @@
 @extends('backend.app', ['title' => 'Users'])
 
 @push('styles')
-<link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />
+    <link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
-<!--app-content open-->
-<div class="app-content main-content mt-0">
-    <div class="side-app">
+    <!--app-content open-->
+    <div class="app-content main-content mt-0">
+        <div class="side-app">
 
-        <!-- CONTAINER -->
-        <div class="main-container container-fluid">
+            <!-- CONTAINER -->
+            <div class="main-container container-fluid">
 
-            <!-- PAGE-HEADER -->
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Users</h1>
+                <!-- PAGE-HEADER -->
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Users</h1>
+                    </div>
+                    <div class="ms-auto pageheader-btn">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Users</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Index</li>
+                        </ol>
+                    </div>
                 </div>
-                <div class="ms-auto pageheader-btn">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="javascript:void(0);">Users</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Index</li>
-                    </ol>
-                </div>
-            </div>
-            <!-- PAGE-HEADER END -->
+                <!-- PAGE-HEADER END -->
 
-            <!-- ROW-4 -->
-            <div class="row">
-                <div class="col-12 col-sm-12">
-                    <div class="card product-sales-main">
-                        <div class="card-header border-bottom">
-                            <h3 class="card-title mb-0">User List</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="">
-                                <table class="table text-nowrap mb-0 table-bordered" id="datatable">
-                                    <thead>
-                                        <tr>
-                                            <th class="bg-transparent border-bottom-0 wp-5">ID</th>
-                                            <th class="bg-transparent border-bottom-0 wp-20">Name</th>
-                                            <th class="bg-transparent border-bottom-0 wp-20">Email</th>
-                                            <th class="bg-transparent border-bottom-0 wp-15">Phone</th>
+                <!-- ROW-4 -->
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <div class="card product-sales-main">
 
-                                            <th class="bg-transparent border-bottom-0 wp-15">Join Date</th>
-                                            <th class="bg-transparent border-bottom-0 wp-10">Delete User</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mb-0">User List</h3>
+
+                                <div>
+                                    <select id="roleFilter" class="form-select">
+                                        <option value="all">All</option>
+                                        <option value="user">User</option>
+                                        <option value="venue">Venue</option>
+                                        <option value="promoter">Promoter</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <div class="card-body">
+                                <div class="table-reponsive">
+                                    <table class="table text-nowrap mb-0 table-bordered" id="datatable">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Profession</th>
+                                                <th>Address</th>
+                                                <th>Country</th>
+                                                <th>City</th>
+                                                <th>Joined At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div><!-- COL END -->
+                </div>
             </div>
-            <!-- ROW-4 END -->
-
         </div>
     </div>
-</div>
-<!-- CONTAINER CLOSED -->
+    <!-- CONTAINER CLOSED -->
 @endsection
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
+    <script>
+        $(document).ready(function() {
 
-        $.ajaxSetup({
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            }
-        });
-        if (!$.fn.DataTable.isDataTable('#datatable')) {
-            let dTable = $('#datatable').DataTable({
-                order: [],
-                lengthMenu: [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, "All"]
-                ],
-                processing: true,
-                responsive: true,
-                serverSide: true,
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                }
+            });
+            if (!$.fn.DataTable.isDataTable('#datatable')) {
+                let dTable = $('#datatable').DataTable({
+                    order: [],
+                    lengthMenu: [
+                        [10, 25, 50, 100, -1],
+                        [10, 25, 50, 100, "All"]
+                    ],
+                    processing: true,
+                    responsive: true,
+                    serverSide: true,
 
-                language: {
-                    processing: `<div class="text-center">
+                    language: {
+                        processing: `<div class="text-center">
                         <img src="{{ asset('default/loader.gif') }}" alt="Loader" style="width: 50px;">
                         </div>`
-                },
+                    },
 
-                scroller: {
-                    loadingIndicator: false
-                },
-                pagingType: "full_numbers",
-                dom: "<'row justify-content-between table-topbar'<'col-md-4 col-sm-3'l><'col-md-5 col-sm-5 px-0'f>>tipr",
-                ajax: {
-                    url: "{{ route('admin.user.index') }}",
-                    type: "GET",
-                },
+                    scroller: {
+                        loadingIndicator: false
+                    },
+                    pagingType: "full_numbers",
+                    dom: "<'row justify-content-between table-topbar'<'col-md-4 col-sm-3'l><'col-md-5 col-sm-5 px-0'f>>tipr",
 
-                columns: [
-                            {
-                                data: 'DT_RowIndex',
-                                name: 'DT_RowIndex',
-                                orderable: false,
-                                searchable: false
-                            },
-                            {
-                                data: 'name',
-                                name: 'name',
-                                orderable: true,
-                                searchable: true
-                            },
-                            {
-                                data: 'email',
-                                name: 'email',
-                                orderable: true,
-                                searchable: true
-                            },
-                            {
-                                data: 'phone_number',
-                                name: 'phone_number',
-                                orderable: true,
-                                searchable: true
-                            },
+                    ajax: {
+                        url: "{{ route('admin.user.index') }}",
+                        type: "GET",
+                        data: function(d) {
+                            d.role = $('#roleFilter').val();
+                        }
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'email',
+                            name: 'email'
+                        },
+                        {
+                            data: 'role',
+                            name: 'role',
+                            render: function(data, type, row) {
+                                let badgeClass = 'badge-secondary';
 
+                                switch (data) {
+                                    case 'user':
+                                        badgeClass = 'bg-blue-500 text-white';
+                                        break;
+                                    case 'venue':
+                                        badgeClass = 'bg-green-500 text-white';
+                                        break;
+                                    case 'promoter':
+                                        badgeClass = 'bg-yellow-500 text-black';
+                                        break;
+                                }
 
-                            {
-                                data: 'created_at',
-                                name: 'created_at',
-                                orderable: true,
-                                searchable: false
-                            },
-                            {
-                                data: 'action',
-                                name: 'action',
-                                orderable: false,
-                                searchable: false
+                                return `<span class="badge ${badgeClass} text-capitalize">${data}</span>`;
                             }
-                        ],
+                        },
+                        {
+                            data: 'profession',
+                            name: 'profession',
+                            render: function(data, type, row) {
+                                return data && data.length > 12 ? data.substring(0, 12) + '...' :
+                                    data;
+                            }
+                        },
+                        {
+                            data: 'address',
+                            name: 'address',
+                            render: function(data, type, row) {
+                                return data && data.length > 12 ? data.substring(0, 12) + '...' :
+                                    data;
+                            }
+                        },
+                        {
+                            data: 'country',
+                            name: 'country'
+                        },
+                        {
+                            data: 'city',
+                            name: 'city'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                    ],
+                });
 
-            });
-        }
-    });
 
-
-    function showDeleteConfirm(id) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure you want to delete this record?',
-            text: 'If you delete this, it will be gone forever. The user all data will be deleted!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                deleteItem(id);
+                // This is the missing piece
+                $('#roleFilter').on('change', function() {
+                    dTable.ajax.reload();
+                });
             }
         });
-    }
-
-    // Delete Button
-    function deleteItem(id) {
-        NProgress.start();
-        let url = "{{ route('admin.user.destroy', ':id') }}";
-        let csrfToken = '{{ csrf_token() }}';
-        $.ajax({
-            type: "DELETE",
-            url: url.replace(':id', id),
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            },
-            success: function(resp) {
-                NProgress.done();
-                toastr.success(resp.message);
-                $('#datatable').DataTable().ajax.reload();
-            },
-            error: function(error) {
-                NProgress.done();
-                toastr.error(error.message);
-            }
-        });
-    }
-</script>
+    </script>
 @endpush

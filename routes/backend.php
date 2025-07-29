@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\Backend\CMS\EventController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\CMS\HomeController;
 use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
+use App\Http\Controllers\Web\Backend\EventListController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -23,7 +24,7 @@ use App\Http\Controllers\Web\Backend\Settings\DynamicPageController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\Settings\SocialSettingController;
 use App\Http\Controllers\Web\Backend\SpecializeController;
-
+use App\Http\Controllers\Web\Backend\VenueListController;
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -89,6 +90,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     });
 });
 
+//users, events, venues, promoters list
+Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
+Route::get('/event-list', [EventListController::class, 'index'])->name('admin.event.index');
+Route::get('/venue-list', [VenueListController::class, 'index'])->name('admin.venue.index');
+
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/business-profile/pending', [BusinessProfileController::class, 'pendingProfiles'])->name('admin.business_profile.pending');
@@ -139,15 +145,6 @@ Route::controller(ChatManageController::class)->prefix('chat')->name('admin.chat
 });
 
 
-
-
-
-
-
-
-
-Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
-Route::delete('/user-list/delete/{id}', [UserListController::class, 'destroy'])->name('admin.user.destroy');
 
 
 Route::controller(FaqController::class)->group(function () {
