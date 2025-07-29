@@ -23,6 +23,12 @@ class Venue extends Model
         'status',
     ];
 
+    protected $casts = [
+        'service_start_time' => 'datetime:H:i:s',
+        'service_end_time' => 'datetime:H:i:s',
+    ];
+
+
     // Relationships
     //user table
     public function user()

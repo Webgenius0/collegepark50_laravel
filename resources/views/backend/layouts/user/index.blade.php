@@ -40,6 +40,7 @@
                                         <option value="user">User</option>
                                         <option value="venue">Venue</option>
                                         <option value="promoter">Promoter</option>
+                                        <option value="artist">Artist</option>
                                     </select>
                                 </div>
                             </div>
@@ -131,23 +132,6 @@
                         {
                             data: 'role',
                             name: 'role',
-                            render: function(data, type, row) {
-                                let badgeClass = 'badge-secondary';
-
-                                switch (data) {
-                                    case 'user':
-                                        badgeClass = 'bg-blue-500 text-white';
-                                        break;
-                                    case 'venue':
-                                        badgeClass = 'bg-green-500 text-white';
-                                        break;
-                                    case 'promoter':
-                                        badgeClass = 'bg-yellow-500 text-black';
-                                        break;
-                                }
-
-                                return `<span class="badge ${badgeClass} text-capitalize">${data}</span>`;
-                            }
                         },
                         {
                             data: 'profession',

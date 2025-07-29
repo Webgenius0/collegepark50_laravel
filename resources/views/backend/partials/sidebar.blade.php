@@ -80,31 +80,43 @@
                             <path
                                 d="M12 2a5 5 0 1 1-5 5 5 5 0 0 1 5-5zm0 14c-4.4 0-8 2.2-8 5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1c0-2.8-3.6-5-8-5z" />
                         </svg>
-                        <span class="side-menu__label">User List</span>
+                        <span class="side-menu__label">Users List</span>
                     </a>
                 </li>
 
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
-                        href="{{ route('admin.user.index') }}">
+                        href="{{ route('admin.venue.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             class="side-menu__icon" viewBox="0 0 24 24">
                             <path d="M4 22V10l8-6 8 6v12h-5v-6h-6v6H4zM12 4.8 6 9v11h2v-6h8v6h2V9l-6-4.2z" />
                         </svg>
-                        <span class="side-menu__label">Venue</span>
+                        <span class="side-menu__label">Venues</span>
                     </a>
                 </li>
 
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
-                        href="{{ route('admin.user.index') }}">
+                        href="{{ route('admin.event.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             class="side-menu__icon" viewBox="0 0 24 24">
                             <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2
                             2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0
                             16H5V10h14v10zm0-12H5V6h14v2z" />
                         </svg>
-                        <span class="side-menu__label">Event</span>
+                        <span class="side-menu__label">Events</span>
+                    </a>
+                </li>
+
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
+                        href="{{ route('admin.post.index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="side-menu__icon" viewBox="0 0 24 24">
+                            <path
+                                d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm1 3v2h14V7H5zm0 4v2h10v-2H5zm0 4v2h8v-2H5z" />
+                        </svg>
+                        <span class="side-menu__label">Posts</span>
                     </a>
                 </li>
 
@@ -155,7 +167,7 @@
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             class="side-menu__icon" viewBox="0 0 24 24">
-                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                            <path d=" M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                         </svg>
                         <span class="side-menu__label">Home Page</span><i class="angle fa fa-angle-right"></i>
                     </a>

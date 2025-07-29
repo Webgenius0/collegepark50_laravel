@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\CMS\HomeController;
 use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
 use App\Http\Controllers\Web\Backend\EventListController;
+use App\Http\Controllers\Web\Backend\PostListController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -94,6 +95,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
 Route::get('/event-list', [EventListController::class, 'index'])->name('admin.event.index');
 Route::get('/venue-list', [VenueListController::class, 'index'])->name('admin.venue.index');
+Route::get('/post-list', [PostListController::class, 'index'])->name('admin.post.index');
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
