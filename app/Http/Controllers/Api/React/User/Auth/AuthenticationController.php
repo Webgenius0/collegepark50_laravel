@@ -8,14 +8,15 @@ use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Mail\RegisterOtpMail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Auth\OtpVerifyRequest;
 use App\Http\Requests\Auth\UserRegisterRequest;
 
@@ -28,6 +29,8 @@ class AuthenticationController extends Controller
     */
     public function register(UserRegisterRequest $request)
     {
+        DB::beginTransaction();
+
         try {
 
             $validatedData = $request->validated();
@@ -47,8 +50,9 @@ class AuthenticationController extends Controller
 
             $fullName = $user->f_name . ' ' . $user->l_name;
 
-            Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
+            // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
 
+            DB::commit();
             return $this->success(
                 [
                     'message' => 'OTP has been sent to your email. Please verify to complete registration.',
@@ -60,9 +64,8 @@ class AuthenticationController extends Controller
                 'OTP Sent successfully.',
                 201,
             );
-
         } catch (Exception $e) {
-
+            DB::rollBack();
             Log::info($e->getMessage());
             return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
         }
@@ -111,7 +114,6 @@ class AuthenticationController extends Controller
             ];
 
             return $this->success($userData, 'Otp verified successfully. You are now registered.', 200);
-
         } catch (Exception $e) {
 
             Log::error($e->getMessage());
@@ -154,7 +156,6 @@ class AuthenticationController extends Controller
             ];
 
             return $this->success($userData, 'Successfully logged in!.', 200);
-
         } catch (Exception $e) {
 
             Log::error($e->getMessage());
@@ -200,7 +201,6 @@ class AuthenticationController extends Controller
             ];
 
             return $this->success($userData, 'User role updated successfully.', 200);
-
         } catch (Exception $e) {
 
             Log::info($e->getMessage());
@@ -218,7 +218,6 @@ class AuthenticationController extends Controller
 
             auth('api')->logout();
             return $this->success([], 'Successfully logged out.', 200);
-
         } catch (Exception $e) {
 
             Log::info($e->getMessage());
