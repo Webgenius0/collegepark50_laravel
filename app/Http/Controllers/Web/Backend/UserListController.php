@@ -14,28 +14,41 @@ class UserListController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = User::select('id', 'f_name', 'l_name', 'email', 'role', 'profession', 'address', 'country', 'city', 'created_at')
-                ->where('role', '!=', 'admin');
+            $query = User::where('role', '!=', 'admin');
 
-            // Filter by role if selected
+            // Apply filter BEFORE ->get()
             if ($request->has('role') && $request->role !== 'all') {
                 $query->where('role', $request->role);
             }
 
-            return DataTables::of($query)
+            $users = $query->get(); // now run the query
+
+            return DataTables::of($users)
                 ->addIndexColumn()
                 ->addColumn('name', fn($row) => $row->f_name . ' ' . $row->l_name)
                 ->addColumn('email', fn($row) => $row->email ?? '---')
-                ->addColumn('role', function ($row) {
-                    return '<span class=" text-capitalize">' . $row->role . '</span>';
-                })
                 ->addColumn('profession', fn($row) => $row->profession ?? '---')
-                ->addColumn('address', fn($row) => $row->address ?? '---')
-                ->addColumn('country', fn($row) => $row->country ?? '---')
+                ->addColumn('address', function ($item) {
+                    return strlen($item->address) > 20 ? substr($item->address, 0, 20) . '...' : $item->address;
+                })
+                ->addColumn('country', fn($item) => $item->country ?? '---')
                 ->addColumn('city', fn($row) => $row->city ?? '---')
                 ->addColumn('created_at', fn($row) => optional($row->created_at)->format('Y-m-d'))
+                ->addColumn('role', function ($item) {
+                    $role = $item->role;
+                    $colors = [
+                        'user' => 'success',
+                        'dj' => 'warning',
+                        'promoter' => 'info',
+                        'artist' => 'danger',
+                        'venue' => 'primary',
+                    ];
+                    $label = ucfirst(str_replace('_', ' ', $role));
+                    $badgeClass = $colors[$role] ?? 'secondary';
+                    return '<span class="badge bg-' . $badgeClass . '">' . $label . '</span>';
+                })
                 ->rawColumns(['role'])
-                ->make(true);
+                ->make();
         }
 
         return view("backend.layouts.user.index");

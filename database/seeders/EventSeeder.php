@@ -36,9 +36,9 @@ class EventSeeder extends Seeder
                 'title'            => fake()->sentence(3),
                 'description'      => fake()->paragraphs(rand(1, 3), true),
                 'start_date'       => $startDate->format('Y-m-d'),
-                'start_time'       => fake()->time('H:i'),
+                'start_time'       => fake()->time('H:i:s'),
                 'end_date'         => $endDate->format('Y-m-d'),
-                'end_time'         => fake()->time('H:i'),
+                'end_time'         => fake()->time('H:i:s'),
                 'time_zone'        => collect($timeZones)->random(),
                 'all_day_event'    => rand(0, 1),
                 'banner'           => null, // or use a placeholder image if needed
