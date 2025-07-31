@@ -1,29 +1,31 @@
 <?php
 
-use App\Http\Controllers\Api\React\Calendar\CalendarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\React\CMS\HomeController;
+use App\Http\Controllers\Api\React\Chat\ChatController;
 use App\Http\Controllers\Api\React\CMS\EventController;
+use App\Http\Controllers\Api\React\DashboardController;
 use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Venue\VenueController;
 use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\User\FollowerController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
+
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
-use App\Http\Controllers\Api\React\DashboardController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
+use App\Http\Controllers\Api\React\Event\EventPageController;
+use App\Http\Controllers\Api\React\Venue\VenuePageController;
 use App\Http\Controllers\Api\React\Post\PostCommentController;
+use App\Http\Controllers\Api\React\Calendar\CalendarController;
+use App\Http\Controllers\Api\React\Event\EventFilterController;
 use App\Http\Controllers\Api\React\Event\EventManageController;
 use App\Http\Controllers\Api\React\Venue\VenueReviewController;
 use App\Http\Controllers\Api\React\Event\EventCommentController;
-use App\Http\Controllers\Api\React\Event\EventFilterController;
-use App\Http\Controllers\Api\React\Event\EventPageController;
-use App\Http\Controllers\Api\React\Notification\NotificationController;
 use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
 use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
-use App\Http\Controllers\Api\React\Venue\VenuePageController;
+use App\Http\Controllers\Api\React\Notification\NotificationController;
 
 //health-check
 Route::get("/check", function () {
@@ -179,4 +181,18 @@ Route::group(['middleware' => 'auth:api'], function () {
         //event filterring
         Route::get('/filter', [CalendarController::class, 'filter']);
     });
+
+
+
+});
+
+
+Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth/chat')->group(function () {
+  Route::get('/list' , 'list');
+  Route::post('/send/{receiver_id}' , 'send');
+  Route::get('/conversation/{receiver_id}' , 'conversation');
+  Route::get('room/{receiver_id}' , 'room');
+  Route::get('/search' , 'search');
+  Route::get('/seen/all/{receiver_id}' , 'seedAll');
+  Route::get('/seen/single/{chat_id}' , 'seenSingle');
 });

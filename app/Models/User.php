@@ -76,6 +76,30 @@ class User extends Authenticatable implements JWTSubject
         return trim("{$this->f_name} {$this->l_name}");
     }
 
+    public function senders() {
+        return $this->hasMany(Chat::class, 'sender_id');
+    }
+
+    public function receivers() {
+        return $this->hasMany(Chat::class, 'receiver_id');
+    }
+
+    public function roomsAsUserOne()
+    {
+        return $this->hasMany(Room::class, 'user_one_id');
+    }
+
+    public function roomsAsUserTwo()
+    {
+        return $this->hasMany(Room::class, 'user_two_id');
+    }
+
+    public function allRooms()
+    {
+        return Room::where('user_one_id', $this->id)->orWhere('user_two_id', $this->id);
+    }
+
+
     //posts
     public function posts()
     {

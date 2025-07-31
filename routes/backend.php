@@ -3,18 +3,24 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\Backend\FaqController;
+use App\Http\Controllers\Web\Backend\ChatController;
 use App\Http\Controllers\Web\Backend\CategoryController;
+use App\Http\Controllers\Web\Backend\CMS\HomeController;
 use App\Http\Controllers\Web\Backend\UserListController;
+use App\Http\Controllers\Web\Backend\CMS\EventController;
 use App\Http\Controllers\Web\Backend\DashboardController;
+use App\Http\Controllers\Web\Backend\ChatManageController;
+use App\Http\Controllers\Web\Backend\SpecializeController;
+use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\TestimonialController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
+use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
 use App\Http\Controllers\Web\Backend\BusinessProfileController;
 use App\Http\Controllers\Web\Backend\ChatManageController;
 use App\Http\Controllers\Web\Backend\CMS\EventController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\CMS\HomeController;
 use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
-use App\Http\Controllers\Web\Backend\EventListController;
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -24,7 +30,7 @@ use App\Http\Controllers\Web\Backend\Settings\DynamicPageController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\Settings\SocialSettingController;
 use App\Http\Controllers\Web\Backend\SpecializeController;
-use App\Http\Controllers\Web\Backend\VenueListController;
+
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -225,4 +231,20 @@ Route::controller(DynamicPageController::class)->group(function () {
     Route::put('/dynamic-page/update/{id}', 'update')->name('admin.dynamic_page.update');
     Route::post('/dynamic-page/status/{id}', 'status')->name('admin.dynamic_page.status');
     Route::delete('/dynamic-page/destroy/{id}', 'destroy')->name('admin.dynamic_page.destroy');
+});
+
+
+/*
+* Chating Route
+*/
+
+Route::controller(ChatController::class)->prefix('chat')->name('admin.chat.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/list', 'list')->name('list');
+    Route::post('/send/{receiver_id}', 'send')->name('send');
+    Route::get('/conversation/{receiver_id}', 'conversation')->name('conversation');
+    Route::get('/room/{receiver_id}', 'room');
+    Route::get('/search', 'search')->name('search');
+    Route::get('/seen/all/{receiver_id}', 'seenAll');
+    Route::get('/seen/single/{chat_id}', 'seenSingle');
 });

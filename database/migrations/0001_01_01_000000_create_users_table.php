@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('avatar')->nullable();
+            $table->timestamp('last_activity_at')->nullable();
 
             $table->string('otp')->nullable();
             $table->boolean('is_otp_verified')->default(false);
