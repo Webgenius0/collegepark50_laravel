@@ -6,26 +6,19 @@ use App\Http\Controllers\Web\Backend\FaqController;
 use App\Http\Controllers\Web\Backend\ChatController;
 use App\Http\Controllers\Web\Backend\CategoryController;
 use App\Http\Controllers\Web\Backend\CMS\HomeController;
+use App\Http\Controllers\Web\Backend\PostListController;
 use App\Http\Controllers\Web\Backend\UserListController;
 use App\Http\Controllers\Web\Backend\CMS\EventController;
 use App\Http\Controllers\Web\Backend\DashboardController;
+use App\Http\Controllers\Web\Backend\EventListController;
+use App\Http\Controllers\Web\Backend\VenueListController;
 use App\Http\Controllers\Web\Backend\ChatManageController;
 use App\Http\Controllers\Web\Backend\SpecializeController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\TestimonialController;
+use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
-use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
 use App\Http\Controllers\Web\Backend\BusinessProfileController;
-use App\Http\Controllers\Web\Backend\ChatManageController;
-use App\Http\Controllers\Web\Backend\CMS\EventController;
-use App\Http\Controllers\Web\Backend\CMS\FeatureController;
-use App\Http\Controllers\Web\Backend\CMS\HomeController;
-use App\Http\Controllers\Web\Backend\CMS\NewsletterController;
-<<<<<<< HEAD
-=======
-use App\Http\Controllers\Web\Backend\EventListController;
-use App\Http\Controllers\Web\Backend\PostListController;
->>>>>>> 387878b18ee97a5d9253cd260829366814b49840
 use App\Http\Controllers\Web\Backend\Settings\SocialController;
 use App\Http\Controllers\Web\Backend\Settings\StripeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -34,7 +27,6 @@ use App\Http\Controllers\Web\Backend\Settings\FirebaseController;
 use App\Http\Controllers\Web\Backend\Settings\DynamicPageController;
 use App\Http\Controllers\Web\Backend\Settings\MailSettingController;
 use App\Http\Controllers\Web\Backend\Settings\SocialSettingController;
-use App\Http\Controllers\Web\Backend\SpecializeController;
 
 
 Route::middleware(['auth', 'admin'])->group(function () {
