@@ -56,7 +56,7 @@ class EventFilterController extends Controller
             });
 
             return $this->success($events, 'Events retrieved successfully.', 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Search error: ' . $e->getMessage());
             return $this->error([], 'Something went wrong.', 500);
         }

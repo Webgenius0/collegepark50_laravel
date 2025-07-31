@@ -12,9 +12,11 @@ use App\Traits\ApiResponse;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Post\PostResource;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\PostCreateNotification;
 
 class PostController extends Controller
 {
@@ -44,6 +46,13 @@ class PostController extends Controller
                 'user_id' => $user->id,
                 'content' => $request->input('content'),
             ]);
+
+            // Notify user when post is created
+            try {
+                $user->notify(new PostCreateNotification($post));
+            } catch (Exception $e) {
+                Log::error('Notification error: ' . $e->getMessage());
+            }
 
             // Upload Images (if any)
             if ($request->hasFile('images')) {
