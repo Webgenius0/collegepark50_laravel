@@ -39,7 +39,7 @@ class ResetPasswordController extends Controller
                 return $this->error([], 'User not found.', 404);
             }
 
-            $otp = rand(100000, 999999);
+            $otp = rand(1000, 9999);
 
             $user->update([
                 'otp'            => $otp,
@@ -65,7 +65,7 @@ class ResetPasswordController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
-            'otp'   => 'required|digits:6',
+            'otp'   => 'required|digits:4',
         ]);
 
         if ($validator->fails()) {
