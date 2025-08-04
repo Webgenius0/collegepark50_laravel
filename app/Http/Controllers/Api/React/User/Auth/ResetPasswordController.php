@@ -178,7 +178,7 @@ class ResetPasswordController extends Controller
                 }
             }
 
-            $otp = rand(100000, 999999);
+            $otp = rand(1000, 9999);
             $otpExpiresAt = now()->addMinutes(5);
 
             $user->update([
