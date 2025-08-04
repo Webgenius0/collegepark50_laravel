@@ -21,8 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
      ->withBroadcasting(
         __DIR__.'/../routes/channels.php',
-        ['prefix' => 'api', 'middleware' => ['auth:api']],
+        ['prefix' => 'api', 'middleware' => ['jwt.verify']]
     )
+
+
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->appendToGroup('web', [

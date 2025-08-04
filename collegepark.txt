@@ -15,3 +15,23 @@ Database Credencials :  sdf
 new one
 
 //
+
+
+In our last conversation please stay on this desing and i have neeed some changes in the projects section
+
+
+in this section Live Demo button text should be see more and when click this i need to show the project detials in a separate page , page url should be related on the project title
+
+
+In this project details page i need to show a slider where a porject have 5+ photos in a slider and some project speacefic ddeatisl featus and exceptra information like start date etc , here i need to add a button for live demo
+
+
+
+In the preview button pleae add a popup , that should be showing the project images  5 or more what ever , In the pop up add a cross button in the top so that there will be cancel
+
+
+
+Please remove the banner image , please some real time animation desing that is releted to coding , software implementation , system like this
+
+
+

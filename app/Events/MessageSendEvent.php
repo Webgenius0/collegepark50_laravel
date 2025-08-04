@@ -17,7 +17,9 @@ class MessageSendEvent
     public function __construct($data)
     {
         $this->data = $data;
+
     }
+
 
     public function broadcastOn(): array {
         return [
@@ -26,4 +28,7 @@ class MessageSendEvent
             new PrivateChannel("chat-sender.{$this->data->sender_id}")
         ];
     }
+
+
+
 }
