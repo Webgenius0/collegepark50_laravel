@@ -91,6 +91,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
             Route::post('/update', [NewsletterController::class, 'update'])->name('update');
         });
     });
+
+    //privacy and policy
 });
 
 //users, events, venues, promoters list

@@ -277,6 +277,10 @@
                     </a>
 
                     <ul class="slide-menu">
+                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">Privacy Policy</a>
+                        </li>
+                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">Terms or Services</a>
+                        </li>
                         <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a>
                         </li>
                         <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a>
