@@ -36,6 +36,7 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/register', [AuthenticationController::class, 'register']);
+    Route::post('/resend-register-otp', [AuthenticationController::class, 'resendRegisterOtp']);
     Route::post('/register-otp-verify', [AuthenticationController::class, 'RegistrationVerifyOtp']);
 
     // Password Reset

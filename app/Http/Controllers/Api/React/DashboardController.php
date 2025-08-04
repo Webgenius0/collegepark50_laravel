@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\React;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Post;
 use App\Models\Event;
 use App\Models\Venue;
 use App\Models\VenueReview;
@@ -33,7 +34,15 @@ class DashboardController extends Controller
             $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
             $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
 
-            $lastMonthCount = Event::where('user_id', $user->id)
+            $lastMonthEventCount = Event::where('user_id', $user->id)
+                ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
+                ->count();
+
+
+            //Total posts
+            $totalPosts = Post::where('user_id', $user->id)->count();
+            //last month post count
+            $lastMonthPostCount = Post::where('user_id', $user->id)
                 ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
                 ->count();
 
@@ -53,11 +62,17 @@ class DashboardController extends Controller
                 $nextEventInDays = (int) $now->diffInDays(Carbon::parse($nextEvent->start_date));
             }
 
+            //Total completed event
+            $completedEvent = Event::where('user_id', $user->id)->where('status', 'completed')->count();
+
             return $this->success([
                 'total_events' => $totalEvents,
-                'last_month_events' => $lastMonthCount,
+                'last_month_events' => $lastMonthEventCount,
+                'total_post' => $totalPosts,
+                'last_month_posts' => $lastMonthPostCount,
                 'upcoming_events_count' => $upcomingEventsCount,
                 'next_event_in_days' => $nextEventInDays,
+                'completed_event'=> $completedEvent,
             ], 'User event stats fetched successfully.');
         } catch (Exception $e) {
             return $this->error([], 'Failed to fetch stats. ' . $e->getMessage(), 500);
