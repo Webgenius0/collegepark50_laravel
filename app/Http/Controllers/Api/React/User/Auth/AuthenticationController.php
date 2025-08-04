@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Auth\OtpVerifyRequest;
@@ -28,47 +29,47 @@ class AuthenticationController extends Controller
     */
     public function register(UserRegisterRequest $request)
     {
-        DB::beginTransaction();
-
         try {
-
             $validatedData = $request->validated();
 
-            $otp = rand(100000, 999999);
+            $otp = rand(1000, 9999);
             $otpExpiresAt = Carbon::now()->addMinutes(5);
 
-            $user = User::create([
-                'f_name' => $validatedData['f_name'],
-                'l_name' => $validatedData['l_name'],
-                'email' => $validatedData['email'],
-                'password' => Hash::make($validatedData['password']),
+            $email = $validatedData['email'];
+            $f_name = $validatedData['f_name'];
+            $l_name = $validatedData['l_name'];
+
+            // Add OTP + expiry to the cached data
+            $cacheData = array_merge($validatedData, [
                 'otp' => $otp,
                 'otp_expires_at' => $otpExpiresAt,
-                'is_otp_verified' => false,
             ]);
 
-            $fullName = $user->f_name . ' ' . $user->l_name;
+            // Store in cache
+            Cache::put("register_otp_{$email}", $otp, 300); // 5 minutes
+            Cache::put("register_data_{$email}", $cacheData, 300); // 5 minutes
 
-            // Mail::to($user->email)->send(new RegisterOtpMail($otp, $fullName));
+            // Send mail here if needed
+            // $fullName = $f_name . ' ' . $l_name;
+            // Mail::to($email)->send(new RegisterOtpMail($otp, $fullName));
 
-            DB::commit();
             return $this->success(
                 [
                     'message' => 'OTP has been sent to your email. Please verify to complete registration.',
-                    'f_name' => $user->f_name,
-                    'l_name' => $user->l_name,
-                    'email' => $user->email,
-                    'otp' => $user->otp,
+                    'f_name' => $f_name,
+                    'l_name' => $l_name,
+                    'email' => $email,
+                    'otp' => $otp,
                 ],
                 'OTP Sent successfully.',
-                201,
+                201
             );
         } catch (Exception $e) {
-            DB::rollBack();
-            Log::info($e->getMessage());
+            Log::error($e->getMessage());
             return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
         }
     }
+
 
     /*
     ** Verify Register Otp
@@ -76,31 +77,45 @@ class AuthenticationController extends Controller
     public function RegistrationVerifyOtp(OtpVerifyRequest $request)
     {
         try {
-
             $validatedData = $request->validated();
+            $email = $validatedData['email'];
+            $otp = $validatedData['otp'];
 
-            $user = User::where('email', $validatedData['email'])->first();
+            $cachedOtp = Cache::get("register_otp_{$email}");
+            $cachedData = Cache::get("register_data_{$email}");
 
-            if (!$user) {
-                return $this->error([], 'User not found', 404);
+            if (!$cachedOtp || !$cachedData) {
+                return $this->error([], 'OTP has expired or registration data not found.', 410);
             }
 
-            if ($user->otp !== $validatedData['otp']) {
+            if ($otp != $cachedOtp) {
                 return $this->error([], 'Your OTP is invalid.', 403);
             }
 
-            if (Carbon::now()->gt($user->otp_expires_at)) {
-                return $this->error([], 'OTP has expired', 410);
+            if (Carbon::now()->gt(Carbon::parse($cachedData['otp_expires_at']))) {
+                return $this->error([], 'OTP has expired.', 410);
             }
 
-            $user->update([
+            // Check if user already exists
+            if (User::where('email', $email)->exists()) {
+                return $this->error([], 'Email already registered.', 409);
+            }
+
+            // Save user to database
+            $user = User::create([
+                'f_name' => $cachedData['f_name'],
+                'l_name' => $cachedData['l_name'],
+                'email' => $cachedData['email'],
+                'password' => Hash::make($cachedData['password']),
+                'is_otp_verified' => true,
                 'email_verified_at' => Carbon::now(),
-                'is_otp_verified'   => true,
-                'otp'               => null,
-                'otp_expires_at'    => null,
             ]);
 
             $token = auth('api')->login($user);
+
+            // Clear cache after successful registration
+            Cache::forget("register_otp_{$email}");
+            Cache::forget("register_data_{$email}");
 
             $userData = [
                 'id' => $user->id,
@@ -114,11 +129,11 @@ class AuthenticationController extends Controller
 
             return $this->success($userData, 'Otp verified successfully. You are now registered.', 200);
         } catch (Exception $e) {
-
             Log::error($e->getMessage());
             return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
         }
     }
+
 
 
     /*

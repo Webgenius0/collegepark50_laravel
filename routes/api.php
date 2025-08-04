@@ -10,7 +10,10 @@ use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Venue\VenueController;
 use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\User\FollowerController;
+<<<<<<< HEAD
 
+=======
+>>>>>>> aca7af62994e962e5fa1e1701d38a19e6b28e6bf
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
@@ -71,35 +74,35 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/delete-profile', [UserProfileController::class, 'deleteProfile']);
 
     //user followers and friends routes
-    Route::post('/follow/{id}', [FollowerController::class, 'toggleFollow']);  // Follow or unfollow a user by ID (toggle)
-    Route::get('/followers', [FollowerController::class, 'getFollowers']);    // Get all followers of authenticated user
-    Route::get('/user/{id}/followers', [FollowerController::class, 'getUserFollowers']);   // Get all followers of a user by user ID
-    Route::get('/followings', [FollowerController::class, 'getFollowings']);     // Get all users that a user is following who is authenticated
-    Route::get('/user/{id}/followings', [FollowerController::class, 'getUserFollowings']);    // Get all users that a user is following by user ID
-    Route::get('/friends', [FollowerController::class, 'getFriends']);           // Get auth user friend list
+    Route::post('/follow/{id}', [FollowerController::class, 'toggleFollow']); // Follow or unfollow a user by ID (toggle)
+    Route::get('/followers', [FollowerController::class, 'getFollowers']); // Get all followers of authenticated user
+    Route::get('/user/{id}/followers', [FollowerController::class, 'getUserFollowers']); // Get all followers of a user by user ID
+    Route::get('/followings', [FollowerController::class, 'getFollowings']); // Get all users that a user is following who is authenticated
+    Route::get('/user/{id}/followings', [FollowerController::class, 'getUserFollowings']); // Get all users that a user is following by user ID
+    Route::get('/friends', [FollowerController::class, 'getFriends']); // Get auth user friend list
 
 
     //Post routes
     Route::group(['prefix' => 'post'], function () {
-        Route::post('/store', [PostController::class, 'store']);    // Create new post
-        Route::get('/index', [PostController::class, 'index']);       // Fetch all posts of auth user
-        Route::get('/all', [PostController::class, 'getAllPosts']);       // Fetch all posts of other users
-        Route::get('/show/{id}', [PostController::class, 'show']);       // Single post view
+        Route::post('/store', [PostController::class, 'store']); // Create new post
+        Route::get('/index', [PostController::class, 'index']);  // Fetch all posts of auth user
+        Route::get('/all', [PostController::class, 'getAllPosts']); // Fetch all posts of other users
+        Route::get('/show/{id}', [PostController::class, 'show']); // Single post view
         Route::delete('/delete/{id}', [PostController::class, 'destroy']); // Delete post
         Route::get('/tag/{tag}', [PostController::class, 'postsByTag']); // Get posts by hashtag
         Route::post('/update/{id}', [PostController::class, 'update']); // Update post
 
         //post list/unlike
         Route::group(['prefix' => 'like'], function () {
-            Route::post('/{post}', [PostLikeController::class, 'toggleLike']);        // Like/Unlike a post
-            Route::get('/index/{postId}', [PostLikeController::class, 'index']);           // Get all likes
+            Route::post('/{post}', [PostLikeController::class, 'toggleLike']); // Like/Unlike a post
+            Route::get('/index/{postId}', [PostLikeController::class, 'index']); // Get all likes
         });
 
         // Comment-reply routes
         Route::group(['prefix' => 'comment'], function () {
-            Route::post('/store/{postId}', [PostCommentController::class, 'store']);         // Add comment
-            Route::get('/list/{postId}', [PostCommentController::class, 'index']);         // Get all comments
-            Route::post('/update/{id}', [PostCommentController::class, 'update']);             // Edit comment
+            Route::post('/store/{postId}', [PostCommentController::class, 'store']); // Add comment
+            Route::get('/list/{postId}', [PostCommentController::class, 'index']); // Get all comments
+            Route::post('/update/{id}', [PostCommentController::class, 'update']); // Edit comment
             Route::delete('/delete/{id}', [PostCommentController::class, 'destroy']);  // Delete comment
         });
     });
@@ -107,21 +110,21 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Venue routes
     Route::prefix('venue')->group(function () {
         //venue page route according to prototype
-        Route::get('/', [VenuePageController::class, 'allVenue']);  // List all events
-        Route::get('/details/{id}', [VenuePageController::class, 'venueDetails']);  // get a single venue with detials by id
+        Route::get('/', [VenuePageController::class, 'allVenue']); // List all events
+        Route::get('/details/{id}', [VenuePageController::class, 'venueDetails']); // get a single venue with detials by id
 
         //venue manage
-        Route::post('/store', [VenueController::class, 'store']);           // Store a new venue
-        Route::get('/edit/{id}', [VenueController::class, 'edit']);    // Get a venue for editing
-        Route::post('/update/{id}', [VenueController::class, 'update']);       // Update a venue
+        Route::post('/store', [VenueController::class, 'store']); // Store a new venue
+        Route::get('/edit/{id}', [VenueController::class, 'edit']); // Get a venue for editing
+        Route::post('/update/{id}', [VenueController::class, 'update']); // Update a venue
         Route::patch('/status/{id}', [VenueController::class, 'status']); // Update status only
-        Route::delete('/delete/{id}', [VenueController::class, 'destroy']);   // Delete a venue
+        Route::delete('/delete/{id}', [VenueController::class, 'destroy']); // Delete a venue
 
         //venue review/feedback
         Route::prefix('reviews')->group(function () {
-            Route::get('/{venue_id}', [VenueReviewController::class, 'index']);     // Get all reviews for a venue
-            Route::post('/{venue_id}', [VenueReviewController::class, 'store']);    // Add or update review for a venue
-            Route::delete('/delete/{id}', [VenueReviewController::class, 'destroy']);  // Delete a review
+            Route::get('/{venue_id}', [VenueReviewController::class, 'index']); // Get all reviews for a venue
+            Route::post('/{venue_id}', [VenueReviewController::class, 'store']); // Add or update review for a venue
+            Route::delete('/delete/{id}', [VenueReviewController::class, 'destroy']); // Delete a review
         });
     });
 
@@ -135,8 +138,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/gallery', [EventPageController::class, 'eventGallery']); //Get event's images
 
         //event manage
-        Route::post('/store', [EventManageController::class, 'store']);       // Create a new event
-        Route::get('/show/{id}', [EventManageController::class, 'show']);     // Get a specific event
+        Route::post('/store', [EventManageController::class, 'store']); // Create a new event
+        Route::get('/show/{id}', [EventManageController::class, 'show']); // Get a specific event
         Route::post('/update/{id}', [EventManageController::class, 'update']); // Update an event
         Route::delete('/delete/{id}', [EventManageController::class, 'destroy']); // Delete an event
         Route::post('/change-status/{id}', [EventManageController::class, 'changeStatus']); // Update event status
@@ -144,27 +147,27 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //event list/unlike
         Route::group(['prefix' => 'like'], function () {
-            Route::post('/{event}', [EventLikeController::class, 'toggleLike']);        // Like/Unlike an event
-            Route::get('/index/{eventId}', [EventLikeController::class, 'index']);           // Get all likes
+            Route::post('/{event}', [EventLikeController::class, 'toggleLike']); // Like/Unlike an event
+            Route::get('/index/{eventId}', [EventLikeController::class, 'index']); // Get all likes
         });
 
         // Comment-reply routes
         Route::group(['prefix' => 'comment'], function () {
-            Route::post('/store/{eventId}', [EventCommentController::class, 'store']);         // Add comment
-            Route::get('/list/{eventId}', [EventCommentController::class, 'index']);         // Get all comments
-            Route::post('/update/{id}', [EventCommentController::class, 'update']);             // Edit comment
+            Route::post('/store/{eventId}', [EventCommentController::class, 'store']); // Add comment
+            Route::get('/list/{eventId}', [EventCommentController::class, 'index']); // Get all comments
+            Route::post('/update/{id}', [EventCommentController::class, 'update']); // Edit comment
             Route::delete('/delete/{id}', [EventCommentController::class, 'destroy']);  // Delete comment
         });
 
         //event filtering by title
-        Route::get('/search', [EventFilterController::class, 'searchByTitle']);
-        Route::get('/filter-by-date', [EventFilterController::class, 'filterByNearbyDates']);
+        Route::get('/search', [EventFilterController::class, 'searchByTitle']); // search event by event and venue title
+        Route::get('/filter-by-date', [EventFilterController::class, 'filterByNearbyDates']); // search event by date
     });
 
     //Notification
-    Route::get('/my-notifications', [NotificationController::class, 'allNotifications']);
-    Route::post('/read-notification/{id}', [NotificationController::class, 'readNotification']);
-    Route::post('/read-all-notifications', [NotificationController::class, 'readAllNotifications']);
+    Route::get('/my-notifications', [NotificationController::class, 'allNotifications']); //get all notification
+    Route::post('/read-notification/{id}', [NotificationController::class, 'readNotification']); //mark as read single notification
+    Route::post('/read-all-notifications', [NotificationController::class, 'readAllNotifications']); //mark as read all notification
 
     //Dashboard routes
     Route::get('/user-event-stats', [DashboardController::class, 'userEventStats']); // user event stats
@@ -174,13 +177,13 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     //Event calendar manage
     Route::prefix('calendar')->group(function () {
-        Route::get('/', [CalendarController::class, 'index']);    //get all events of auth user
-        Route::post('/store', [CalendarController::class, 'store']);   //store event in calenar
-        Route::get('/edit/{id}', [CalendarController::class, 'edit']);  //edit calendar
+        Route::get('/', [CalendarController::class, 'index']); //get all events of auth user
+        Route::post('/store', [CalendarController::class, 'store']); //store event in calenar
+        Route::get('/edit/{id}', [CalendarController::class, 'edit']); //edit calendar
         Route::post('/update/{id}', [CalendarController::class, 'update']); //update calendar
 
-        //event filterring
-        Route::get('/filter', [CalendarController::class, 'filter']);
+        //Event filterring
+        Route::get('/filter', [CalendarController::class, 'filter']); //event filtering e.g day, week, month, date
     });
 });
 
@@ -193,10 +196,13 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
     Route::get('/search', 'search');
     Route::get('/seen/all/{receiver_id}', 'seedAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
+<<<<<<< HEAD
 
 
 
 
+=======
+>>>>>>> aca7af62994e962e5fa1e1701d38a19e6b28e6bf
 });
 
 

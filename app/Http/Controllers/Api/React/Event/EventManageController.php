@@ -9,9 +9,11 @@ use App\Models\Ticket;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventRequest;
 use App\Http\Resources\Event\EventResource;
+use App\Notifications\EventCreateNotification;
 
 class EventManageController extends Controller
 {
@@ -41,6 +43,13 @@ class EventManageController extends Controller
 
             // Create Event
             $event = Event::create($validated);
+
+            // Notify user when event is created
+            try {
+                $user->notify(new EventCreateNotification($event));
+            } catch (Exception $e) {
+                Log::error('Notification error: ' . $e->getMessage());
+            }
 
             // Ticket handling
             $ticketData = $request->input('ticket');

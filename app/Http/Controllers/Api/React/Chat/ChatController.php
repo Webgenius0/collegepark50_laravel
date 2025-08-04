@@ -17,8 +17,6 @@ class ChatController extends Controller
 {
     public function list(): JsonResponse
     {
-
-
         $authUser = Auth::guard('api')->user();
 
         $users = User::select('id', 'f_name', 'l_name', 'email', 'avatar', 'last_activity_at')

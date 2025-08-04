@@ -34,11 +34,22 @@ class NotificationController extends Controller
             $count = $notifications->count();
 
             $notifications = $notifications->map(function ($notification) {
+                $typeMap = [
+                    'App\\Notifications\\PostCreateNotification' => 'post',
+                    'App\\Notifications\\EventCreateNotification' => 'event',
+                    'App\\Notifications\\EventReplyCommentNotification' => 'event_comment_reply',
+                    'App\\Notifications\\FollowNotification' => 'follow',
+                    'App\\Notifications\\PostReplyCommentNotification' => 'post_comment_reply',
+                ];
+
+                $typeLabel = $typeMap[$notification->type] ?? 'unknown';
+
                 return [
-                    'id'         => $notification->id,
-                    'data'       => $notification->data,
-                    'read_at'    => $notification->read_at,
-                    'created_at' => $notification->created_at->diffForHumans(),
+                    'id'          => $notification->id,
+                    'data'        => $notification->data,
+                    'type'        => $typeLabel,
+                    'read_at'     => $notification->read_at,
+                    'created_at'  => $notification->created_at->diffForHumans(),
                 ];
             });
 
