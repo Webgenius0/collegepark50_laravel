@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
-        channels: __DIR__ . '/../routes/channels.php',
+        channels: __DIR__.'/../routes/channels.php',
 
 
         health: '/up',
@@ -19,16 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware(['web', 'auth', 'admin'])->prefix('admin')->group(base_path('routes/backend.php'));
         }
     )
-    ->withBroadcasting(
-        __DIR__ . '/../routes/channels.php',
+     ->withBroadcasting(
+        __DIR__.'/../routes/channels.php',
         ['prefix' => 'api', 'middleware' => ['auth:api']],
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->validateCsrfTokens(except: [
-            '/stripe/webhook',
-            'api/*',
-        ]);
-
 
         $middleware->appendToGroup('web', [
             // CorsMiddleware::class, // for CORS
