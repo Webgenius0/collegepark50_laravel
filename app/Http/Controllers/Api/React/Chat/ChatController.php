@@ -66,6 +66,10 @@ class ChatController extends Controller
     }
 
 
+    /* Send a message to a user
+     * @param Request $request
+     * @param int $receiver_id
+     */
     public function send(Request $request, $receiver_id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -74,7 +78,7 @@ class ChatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()->first()], 400);
+            return response()->json(['message' => $validator->errors()->first()], 422);
         }
 
         $sender_id = Auth::guard('api')->id();
@@ -85,12 +89,12 @@ class ChatController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found or cannot chat with your self', 'data' => [],  'code' => 200]);
         }
 
+        //Find Existing Room (or Create New)
         $room = Room::where(function ($query) use ($receiver_id, $sender_id) {
             $query->where('user_one_id', $receiver_id)->where('user_two_id', $sender_id);
         })->orWhere(function ($query) use ($receiver_id, $sender_id) {
             $query->where('user_one_id', $sender_id)->where('user_two_id', $receiver_id);
         })->first();
-
 
         if (!$room) {
             $room = Room::create([

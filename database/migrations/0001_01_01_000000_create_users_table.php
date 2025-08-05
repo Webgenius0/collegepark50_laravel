@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expire_at')->nullable();
 
-            $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'admin'])->default('user');
+            $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'admin'])->nullable();
 
             $table->string('profession', 255)->nullable();
             $table->string('gender', 50)->nullable();
