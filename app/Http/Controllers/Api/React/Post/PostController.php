@@ -116,7 +116,7 @@ class PostController extends Controller
             }
 
             $posts = $user->posts()
-                ->with(['user', 'images', 'videos', 'hashtags', 'comments', 'shares'])
+                ->with(['user', 'images', 'videos', 'hashtags', 'comments'])
                 ->latest()
                 ->get();
 
@@ -144,7 +144,7 @@ class PostController extends Controller
             $perPage = $request->input('per_page', 10);
 
             // Get all posts with relationships, paginated
-            $posts = Post::with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user', 'shares'])
+            $posts = Post::with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user'])
                 ->latest()
                 ->paginate($perPage);
 
@@ -171,7 +171,7 @@ class PostController extends Controller
     public function show($id)
     {
         try {
-            $post = Post::with(['user', 'images', 'videos', 'hashtags', 'comments', 'shares'])
+            $post = Post::with(['user', 'images', 'videos', 'hashtags', 'comments'])
                 ->find($id);
 
             if (!$post) {
@@ -194,7 +194,7 @@ class PostController extends Controller
         DB::beginTransaction();
 
         try {
-            $post = Post::with(['images', 'videos', 'hashtags', 'likes', 'comments', 'shares'])->find($id);
+            $post = Post::with(['images', 'videos', 'hashtags', 'likes', 'comments'])->find($id);
 
             if (!$post) {
                 return $this->error([], 'Post not found.', 404);
@@ -240,8 +240,14 @@ class PostController extends Controller
     }
 
     //get posts by tag
-    public function postsByTag($tag)
+    public function postsByTag(Request $request)
     {
+        $tag = $request->query('tag');
+
+        if (!$tag) {
+            return $this->error([], 'Tag is required.', 422);
+        }
+
         $hashtag = Hashtag::where('tag', '#' . $tag)->first();
 
         if (!$hashtag) {
@@ -249,7 +255,7 @@ class PostController extends Controller
         }
 
         $posts = $hashtag->posts()
-            ->with(['images', 'videos', 'hashtags', 'likes', 'comments', 'shares'])
+            ->with(['images', 'videos', 'hashtags', 'likes', 'comments'])
             ->latest()
             ->paginate(10);
 
@@ -260,13 +266,14 @@ class PostController extends Controller
         );
     }
 
+
     //update post
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
 
         try {
-            $post = Post::with(['images', 'videos', 'hashtags', 'likes', 'comments', 'shares'])->find($id);
+            $post = Post::with(['images', 'videos', 'hashtags', 'likes', 'comments'])->find($id);
 
             if (!$post) {
                 return $this->error([], 'Post not found.', 404);

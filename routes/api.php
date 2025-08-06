@@ -85,7 +85,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/all', [PostController::class, 'getAllPosts']); // Fetch all posts of other users
         Route::get('/show/{id}', [PostController::class, 'show']); // Single post view
         Route::delete('/delete/{id}', [PostController::class, 'destroy']); // Delete post
-        Route::get('/tag/{tag}', [PostController::class, 'postsByTag']); // Get posts by hashtag
+        Route::get('/by-tag', [PostController::class, 'postsByTag']); // Get posts by hashtag
         Route::post('/update/{id}', [PostController::class, 'update']); // Update post
 
         //post list/unlike
