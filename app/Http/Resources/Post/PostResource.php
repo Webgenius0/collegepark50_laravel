@@ -26,9 +26,11 @@ class PostResource extends JsonResource
             'comment_count' => $this->comment_count,
             'share_count' => $this->share_count,
 
-            // Media
-            'images' => $this->images->map(fn($img) => asset($img->image_path)),
-            'videos' => $this->videos->map(fn($vid) => asset($vid->video_path)),
+            // Merged media list (images + videos)
+            'media' => collect()
+                ->merge($this->images->map(fn($img) => asset($img->image_path)))
+                ->merge($this->videos->map(fn($vid) => asset($vid->video_path)))
+                ->values(),
 
             // Hashtags
             'hashtags' => $this->hashtags->pluck('tag'),
