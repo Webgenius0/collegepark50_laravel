@@ -62,7 +62,7 @@ class PostController extends Controller
 
                     if (str_starts_with($mimeType, 'image/')) {
                         // Check extension & size for images
-                        if (!in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif']) || $file->getSize() > 5120 * 1024) {
+                        if (!in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif', 'webp']) || $file->getSize() > 5120 * 1024) {
                             continue; // skip invalid image
                         }
 

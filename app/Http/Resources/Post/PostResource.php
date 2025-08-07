@@ -18,8 +18,8 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
 
-            // Core content
-            'content' => $this->content,
+            // Core content with hashtags removed
+            'content' => trim(preg_replace('/#\w+/', '', $this->content)),
 
             // Counts
             'like_count' => $this->like_count,
