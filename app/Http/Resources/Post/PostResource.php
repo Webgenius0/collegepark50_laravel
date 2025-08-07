@@ -19,6 +19,7 @@ class PostResource extends JsonResource
             'user_id' => $this->user_id,
 
             // Core content with hashtags removed
+            // This regex removes hashtags from the content
             'content' => trim(preg_replace('/#\w+/', '', $this->content)),
 
             // Counts
