@@ -38,33 +38,6 @@
 
 
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('specialize') ? 'has-link' : '' }}"
-                        href="{{ route('admin.specialize.index') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24"
-                            fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M10 2h4a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v2H3V8a2 2 0 0 1 2-2h3V4a2 2 0 0 1 2-2zm4 4V4h-4v2h4zm7 4v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10h18zm-2 2H5v8h14v-8z" />
-                        </svg>
-                        <span class="side-menu__label">Specialize</span>
-                    </a>
-                </li>
-
-
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('category') ? 'has-link' : '' }}"
-                        href="{{ route('admin.category.index') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24"
-                            fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M20.59 13.41l-7.59 7.59c-.36.36-.86.59-1.41.59s-1.05-.23-1.41-.59l-7.59-7.59c-.36-.36-.59-.86-.59-1.41s.23-1.05.59-1.41l7.59-7.59c.36-.36.86-.59 1.41-.59s1.05.23 1.41.59l7.59 7.59c.36.36.59.86.59 1.41s-.23 1.05-.59 1.41zM12 4.41L4.41 12 12 19.59 19.59 12 12 4.41z" />
-                            <circle cx="12" cy="12" r="2" />
-                        </svg>
-                        <span class="side-menu__label">Job Category</span>
-                    </a>
-                </li>
-
-
-                <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('chat') ? 'has-link' : '' }}"
                         href="{{ route('admin.chat.index') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24"

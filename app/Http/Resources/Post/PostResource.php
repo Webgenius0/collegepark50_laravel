@@ -46,7 +46,6 @@ class PostResource extends JsonResource
                 'name'   => $this->user->f_name . ' ' . $this->user->l_name,
                 'avatar' => $this->user->avatar,
             ],
-
         ];
     }
 }

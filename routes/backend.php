@@ -110,34 +110,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 
-
-
-
-Route::middleware(['auth:web'])->group(function () {
-
-    Route::get('category', [CategoryController::class, 'index'])->name('admin.category.index');
-    Route::get('category/create', [CategoryController::class, 'create'])->name('admin.category.create');
-    Route::post('category/store', [CategoryController::class, 'store'])->name('admin.category.store');
-    Route::get('category/edit/{id}', [CategoryController::class, 'edit'])->name('admin.category.edit');
-    Route::put('category/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
-    Route::delete('category/delete/{id}', [CategoryController::class, 'destroy'])->name('admin.category.destroy');
-    Route::post('/category/status/{id}', [CategoryController::class, 'status'])->name('admin.category.status');
-});
-
-
-Route::middleware(['auth:web'])->group(function () {
-
-    Route::get('specialize', [SpecializeController::class, 'index'])->name('admin.specialize.index');
-    Route::get('specialize/create', [SpecializeController::class, 'create'])->name('admin.specialize.create');
-    Route::post('specialize/store', [SpecializeController::class, 'store'])->name('admin.specialize.store');
-    Route::get('specialize/edit/{id}', [SpecializeController::class, 'edit'])->name('admin.specialize.edit');
-    Route::put('specialize/update/{id}', [SpecializeController::class, 'update'])->name('admin.specialize.update');
-    Route::delete('specialize/delete/{id}', [SpecializeController::class, 'destroy'])->name('admin.specialize.destroy');
-    Route::post('/specialize/status/{id}', [SpecializeController::class, 'status'])->name('admin.specialize.status');
-});
-
-
-
 Route::controller(ChatManageController::class)->prefix('chat')->name('admin.chat.')->group(function () {
 
     Route::get('/', 'index')->name('index');
