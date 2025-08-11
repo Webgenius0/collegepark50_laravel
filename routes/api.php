@@ -100,6 +100,10 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::get('/list/{postId}', [PostCommentController::class, 'index']); // Get all comments
             Route::post('/update/{id}', [PostCommentController::class, 'update']); // Edit comment
             Route::delete('/delete/{id}', [PostCommentController::class, 'destroy']);  // Delete comment
+
+            // Reply-specific routes
+            Route::post('/update-reply/{replyId}', [PostCommentController::class, 'updateReply']); // Edit reply
+            Route::delete('/delete-reply/{replyId}', [PostCommentController::class, 'deleteReply']); // Delete reply
         });
     });
 

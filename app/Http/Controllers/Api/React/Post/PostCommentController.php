@@ -163,6 +163,58 @@ class PostCommentController extends Controller
         return $this->success($response, 'Comment updated successfully.', 200);
     }
 
+    // Update reply
+    public function updateReply(Request $request, $replyId)
+    {
+        $validator = Validator::make($request->all(), [
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error([], $validator->errors()->first(), 422);
+        }
+
+        $reply = Comment::with(['user', 'parent.user'])->find($replyId);
+
+        if (!$reply) {
+            return $this->error([], 'Reply not found.', 404);
+        }
+
+        if ($reply->user_id !== auth('api')->id()) {
+            return $this->error([], 'Unauthorized to update this reply.', 403);
+        }
+
+        if (is_null($reply->parent_id)) {
+            return $this->error([], 'This comment is not a reply.', 400);
+        }
+
+        $reply->comment = $request->comment;
+        $reply->save();
+
+        $response = [
+            'id'        => $reply->id,
+            'user_id'   => $reply->user->id,
+            'comment'   => $reply->comment,
+            'parent_id' => $reply->parent_id,
+            'user'      => [
+                'id'     => $reply->user->id,
+                'name'   => trim($reply->user->f_name . ' ' . $reply->user->l_name),
+                'avatar' => $reply->user->avatar,
+            ],
+            'parent'    => $reply->parent ? [
+                'id'     => $reply->parent->id,
+                'comment' => $reply->parent->comment,
+                'user'   => [
+                    'id'     => $reply->parent->user->id,
+                    'name'   => trim($reply->parent->user->f_name . ' ' . $reply->parent->user->l_name),
+                    'avatar' => $reply->parent->user->avatar,
+                ],
+            ] : null,
+        ];
+
+        return $this->success($response, 'Reply updated successfully.', 200);
+    }
+
     // Delete comment
     public function destroy($id)
     {
@@ -191,5 +243,27 @@ class PostCommentController extends Controller
         }
 
         return $this->success([], 'Comment deleted successfully.', 200);
+    }
+
+    // Delete reply
+    public function deleteReply($replyId)
+    {
+        $reply = Comment::find($replyId);
+
+        if (!$reply) {
+            return $this->error([], 'Reply not found.', 404);
+        }
+
+        if ($reply->user_id !== auth('api')->id()) {
+            return $this->error([], 'Unauthorized to delete this reply.', 403);
+        }
+
+        if (is_null($reply->parent_id)) {
+            return $this->error([], 'This comment is not a reply.', 400);
+        }
+
+        $reply->delete();
+
+        return $this->success([], 'Reply deleted successfully.', 200);
     }
 }
