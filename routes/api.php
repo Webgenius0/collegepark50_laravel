@@ -41,6 +41,7 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/register', [AuthenticationController::class, 'register']);
+    Route::post('/resend-register-otp', [AuthenticationController::class, 'resendRegisterOtp']);
     Route::post('/register-otp-verify', [AuthenticationController::class, 'RegistrationVerifyOtp']);
 
     // Password Reset
@@ -89,7 +90,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/all', [PostController::class, 'getAllPosts']); // Fetch all posts of other users
         Route::get('/show/{id}', [PostController::class, 'show']); // Single post view
         Route::delete('/delete/{id}', [PostController::class, 'destroy']); // Delete post
-        Route::get('/tag/{tag}', [PostController::class, 'postsByTag']); // Get posts by hashtag
+        Route::get('/by-tag', [PostController::class, 'postsByTag']); // Get posts by hashtag
         Route::post('/update/{id}', [PostController::class, 'update']); // Update post
 
         //post list/unlike
@@ -104,6 +105,10 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::get('/list/{postId}', [PostCommentController::class, 'index']); // Get all comments
             Route::post('/update/{id}', [PostCommentController::class, 'update']); // Edit comment
             Route::delete('/delete/{id}', [PostCommentController::class, 'destroy']);  // Delete comment
+
+            // Reply-specific routes
+            Route::post('/update-reply/{replyId}', [PostCommentController::class, 'updateReply']); // Edit reply
+            Route::delete('/delete-reply/{replyId}', [PostCommentController::class, 'deleteReply']); // Delete reply
         });
     });
 

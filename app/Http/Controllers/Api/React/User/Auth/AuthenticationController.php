@@ -49,7 +49,7 @@ class AuthenticationController extends Controller
             Cache::put("register_otp_{$email}", $otp, 300); // 5 minutes
             Cache::put("register_data_{$email}", $cacheData, 300); // 5 minutes
 
-            // Send mail here if needed
+            // Send mail
             // $fullName = $f_name . ' ' . $l_name;
             // Mail::to($email)->send(new RegisterOtpMail($otp, $fullName));
 
@@ -69,6 +69,57 @@ class AuthenticationController extends Controller
             return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
         }
     }
+
+
+    /*
+    ** Resend otp for registration
+    */
+    public function resendRegisterOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = $request->email;
+
+        // Check if cached registration data exists
+        $cachedData = Cache::get("register_data_{$email}");
+
+        if (!$cachedData) {
+            return $this->error([], 'No registration data found. Please register again.', 404);
+        }
+
+        try {
+            $otp = rand(1000, 9999);
+            $otpExpiresAt = Carbon::now()->addMinutes(5);
+
+            // Update OTP in cached registration data
+            $cachedData['otp'] = $otp;
+            $cachedData['otp_expires_at'] = $otpExpiresAt;
+
+            // Save updated cache
+            Cache::put("register_otp_{$email}", $otp, 300);
+            Cache::put("register_data_{$email}", $cachedData, 300);
+
+            // Send mail
+            // $fullName = $cachedData['f_name'] . ' ' . $cachedData['l_name'];
+            // Mail::to($email)->send(new RegisterOtpMail($otp, $fullName));
+
+            return $this->success(
+                [
+                    'message' => 'A new OTP has been sent to your email address.',
+                    'email' => $email,
+                    'otp' => $otp,
+                ],
+                'OTP resent successfully.',
+                200
+            );
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
+        }
+    }
+
 
 
     /*

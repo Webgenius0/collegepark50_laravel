@@ -171,14 +171,14 @@ class ResetPasswordController extends Controller
 
             if ($user->otp_expires_at) {
                 $lastSent = $user->otp_expires_at->subMinutes(5);
-                $secondsSinceLast = $lastSent->diffInSeconds(now());
+                $secondsSinceLast = (int) $lastSent->diffInSeconds(now());
                 if ($secondsSinceLast < 60) {
                     $secondsLeft = 60 - $secondsSinceLast;
                     return $this->error([], 'Please wait ' . $secondsLeft . ' sec before requesting a new OTP.', 429);
                 }
             }
 
-            $otp = rand(100000, 999999);
+            $otp = rand(1000, 9999);
             $otpExpiresAt = now()->addMinutes(5);
 
             $user->update([

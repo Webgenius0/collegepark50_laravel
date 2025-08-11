@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 
 
 Route::get('/',function (){
@@ -95,6 +96,11 @@ Route::get('/run-storage-link', function () {
         ], 500);
     }
 });
+
+
+//Social login test routes
+Route::get('social-login/{provider}',[SocialLoginController::class,'RedirectToProvider'])->name('social.login');
+Route::get('social-login/{provider}/callback',[SocialLoginController::class,'HandleProviderCallback']);
 
 
 

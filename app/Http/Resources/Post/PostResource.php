@@ -18,17 +18,20 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
 
-            // Core content
-            'content' => $this->content,
+            // Core content with hashtags removed
+            // This regex removes hashtags from the content
+            'content' => trim(preg_replace('/#\w+/', '', $this->content)),
 
             // Counts
             'like_count' => $this->like_count,
             'comment_count' => $this->comment_count,
             'share_count' => $this->share_count,
 
-            // Media
-            'images' => $this->images->map(fn($img) => asset($img->image_path)),
-            'videos' => $this->videos->map(fn($vid) => asset($vid->video_path)),
+            // Merged media list (images + videos)
+            'media' => collect()
+                ->merge($this->images->map(fn($img) => asset($img->image_path)))
+                ->merge($this->videos->map(fn($vid) => asset($vid->video_path)))
+                ->values(),
 
             // Hashtags
             'hashtags' => $this->hashtags->pluck('tag'),
@@ -43,7 +46,6 @@ class PostResource extends JsonResource
                 'name'   => $this->user->f_name . ' ' . $this->user->l_name,
                 'avatar' => $this->user->avatar,
             ],
-
         ];
     }
 }
