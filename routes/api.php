@@ -10,10 +10,6 @@ use App\Http\Controllers\Api\React\Post\PostController;
 use App\Http\Controllers\Api\React\Venue\VenueController;
 use App\Http\Controllers\Api\React\Post\PostLikeController;
 use App\Http\Controllers\Api\React\User\FollowerController;
-<<<<<<< HEAD
-
-=======
->>>>>>> aca7af62994e962e5fa1e1701d38a19e6b28e6bf
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
 use App\Http\Controllers\Api\React\Event\EventLikeController;
@@ -201,13 +197,6 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
     Route::get('/search', 'search');
     Route::get('/seen/all/{receiver_id}', 'seedAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
-<<<<<<< HEAD
-
-
-
-
-=======
->>>>>>> aca7af62994e962e5fa1e1701d38a19e6b28e6bf
 });
 
 
