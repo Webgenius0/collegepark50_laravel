@@ -8,7 +8,7 @@ class VenueRequest extends FormRequest
 {
     public function authorize()
     {
-        return auth('api')->check();
+        return true;
     }
 
     public function rules()
@@ -19,8 +19,8 @@ class VenueRequest extends FormRequest
             'location'            => 'required|string|max:255',
             'latitude'            => 'nullable|numeric|between:-90,90',
             'longitude'           => 'nullable|numeric|between:-180,180',
-            'service_start_time'  => 'nullable|date_format:H:i',
-            'service_end_time'    => 'nullable|date_format:H:i|after_or_equal:service_start_time',
+            'service_start_time'  => 'nullable',
+            'service_end_time'    => 'nullable|after_or_equal:service_start_time',
             'ticket_price'        => 'nullable|numeric|min:0',
             'phone'               => 'nullable|string|max:20',
             'email'               => 'nullable|email|max:50',
@@ -36,16 +36,6 @@ class VenueRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'title.required'  => 'Venue title is required.',
-            'capacity.required' => 'Capacity is required and must be a positive number.',
-            'service_end_time.after_or_equal' => 'End time must be after or equal to the start time.',
-            // 'images.*' => 'Image can not ',
-            // 'media.*.video_url.url' => 'Each video URL must be a valid URL.',
-        ];
-    }
 
     protected function prepareForValidation()
     {

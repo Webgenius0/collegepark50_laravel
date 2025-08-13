@@ -73,7 +73,7 @@ class PostController extends Controller
                         ]);
                     } elseif (str_starts_with($mimeType, 'video/')) {
                         // Check extension & size for videos
-                        if (!in_array($file->extension(), ['mp4', 'mov', 'avi']) || $file->getSize() > 51200 * 1024) {
+                        if (!in_array($file->extension(), ['mp4', 'mov', 'avi', 'gif']) || $file->getSize() > 51200 * 1024) {
                             continue; // skip invalid video
                         }
 

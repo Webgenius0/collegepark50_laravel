@@ -113,13 +113,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/', [VenuePageController::class, 'allVenue']); // List all events
         Route::get('/details/{id}', [VenuePageController::class, 'venueDetails']); // get a single venue with detials by id
 
-        //venue manage
-        Route::post('/store', [VenueController::class, 'store']); // Store a new venue
-        Route::get('/edit/{id}', [VenueController::class, 'edit']); // Get a venue for editing
-        Route::post('/update/{id}', [VenueController::class, 'update']); // Update a venue
-        Route::patch('/status/{id}', [VenueController::class, 'status']); // Update status only
-        Route::delete('/delete/{id}', [VenueController::class, 'destroy']); // Delete a venue
-
         //venue review/feedback
         Route::prefix('reviews')->group(function () {
             Route::get('/{venue_id}', [VenueReviewController::class, 'index']); // Get all reviews for a venue

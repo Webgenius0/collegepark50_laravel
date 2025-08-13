@@ -1,76 +1,88 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\Venue;
+namespace App\Http\Controllers\Web\Backend;
 
 use Exception;
 use App\Models\Venue;
 use App\Helper\Helper;
 use App\Models\VenueMedia;
 use App\Models\VenueDetail;
-use App\Traits\ApiResponse;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Venue\VenueResource;
 use App\Http\Requests\Venue\VenueRequest;
 
-class VenueController extends Controller
+class VenueManageController extends Controller
 {
-    use ApiResponse;
-
-    //get all venues of auth user
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            $user = auth('api')->user();
+        if ($request->ajax()) {
+            $venues = Venue::latest()->get();
 
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
+            return DataTables::of($venues)
+                ->addIndexColumn()
+                // ->addColumn('title', fn($item) => $item->title)
+                ->addColumn('title', function ($item) {
+                    return strlen($item->title) > 15 ? substr($item->title, 0, 15) . '...' : $item->title;
+                })
+                ->addColumn('capacity', fn($item) => $item->capacity)
+                ->addColumn('location', function ($item) {
+                    return strlen($item->location) > 20 ? substr($item->location, 0, 20) . '...' : $item->location;
+                })
 
-            $venues = $user->venues()
-                ->with(['detail', 'media', 'reviews'])
-                ->latest()
-                ->get();
-            // $users = Venue::with(['detail','media','media'])->wh
+                ->addColumn('service_start_time', fn($item) => optional($item->service_start_time)->format('h:i A'))
+                ->addColumn('service_end_time', fn($item) => optional($item->service_end_time)->format('h:i A'))
 
-            return $this->success(
-                VenueResource::collection($venues),
-                'User venues retrieved successfully.',
-                200
-            );
-        } catch (Exception $e) {
-            return $this->error([], 'Failed to fetch venues. ' . $e->getMessage(), 500);
+
+                ->addColumn('ticket_price', fn($item) => $item->ticket_price)
+                ->addColumn('phone', fn($item) => $item->phone ?? '---')
+                ->addColumn('email', fn($item) => $item->email ?? '---')
+
+                ->addColumn('status', function ($item) {
+                    $checked = $item->status == 1 ? 'checked' : '';
+
+                    return '<div class="form-check form-switch" style="display: flex; justify-content: center; align-items: center;">
+                             <input onclick="showStatusChangeAlert(' . $item->id . ')"
+                    type="checkbox"
+                    class="form-check-input"
+                    role="switch"
+                    style="cursor: pointer; width: 40px; height: 20px;"
+                    ' . $checked . '>
+                         </div>';
+                })
+
+
+                ->addColumn('action', function ($item) {
+                    return '<div class="d-flex justify-content-start align-items-center gap-1">
+                   <button type="button"
+                            class="btn btn-primary btn-sm editVenue"
+                            data-id="' . $item->id . '">
+                        <i class="fe fe-edit"></i>
+                    </button>
+
+                    <button type="button" onclick="showDeleteConfirm(' . $item->id . ')" class="btn btn-danger btn-sm">
+                        <i class="fe fe-trash"></i>
+                    </button>
+                </div>';
+                })
+
+                ->rawColumns(['title', 'status', 'action'])
+                ->make();
         }
-    }
 
+        return view("backend.layouts.venue.index");
+    }
     //store venue
     public function store(VenueRequest $request)
     {
+        $validated_data = $request->validated();
         DB::beginTransaction();
 
         try {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
-
             // 1. Create Venue (main table)
-            $venue = Venue::create([
-                'user_id'            => $user->id,
-                'title'              => $request->title,
-                'capacity'           => $request->capacity,
-                'location'           => $request->location,
-                'latitude'           => $request->latitude,
-                'longitude'          => $request->longitude,
-                'service_start_time' => $request->service_start_time,
-                'service_end_time'   => $request->service_end_time,
-                'ticket_price'       => $request->ticket_price,
-                'phone'              => $request->phone,
-                'email'              => $request->email,
-                'status'             => 0,
-            ]);
+            $venue = Venue::create($validated_data);
 
             // 2. Add Venue Details (description & features)
             VenueDetail::create([
@@ -102,19 +114,17 @@ class VenueController extends Controller
                 }
             }
 
-
             DB::commit();
-
-            return $this->success(
-                new VenueResource(
-                    $venue->load(['detail', 'media'])
-                ),
-                'Venue created successfully.',
-                201
-            );
+            return response()->json([
+                'success' => true,
+                'message' => 'Venue added successfully!',
+            ], 200);
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->error([], 'Failed to create venue. ' . $e->getMessage(), 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating venue!',
+            ], 200);
         }
     }
 
@@ -122,28 +132,17 @@ class VenueController extends Controller
     public function edit($id)
     {
         try {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
-
             $venue = Venue::with(['detail', 'media'])
                 ->where('id', $id)
-                ->where('user_id', $user->id)
                 ->first();
 
             if (!$venue) {
-                return $this->error([], 'Venue not found or unauthorized.', 404);
+                return response()->json(['success' => false, 'message' => 'Venue not found.'], 404);
             }
 
-            return $this->success(
-                new VenueResource($venue),
-                'Venue fetched successfully.',
-                200
-            );
+            return response()->json(['success' => false, 'data' => $venue]);
         } catch (Exception $e) {
-            return $this->error([], 'Failed to fetch venue. ' . $e->getMessage(), 500);
+            return back()->with('message', 'Failed to fetch venue. ' . $e->getMessage());
         }
     }
 
@@ -153,18 +152,11 @@ class VenueController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
-
             $venue = Venue::where('id', $id)
-                ->where('user_id', $user->id)
                 ->first();
 
             if (!$venue) {
-                return $this->error([], 'Venue not found or unauthorized.', 404);
+                return back()->with('t-error', 'Venue not found.');
             }
 
             // Update venue
@@ -229,14 +221,17 @@ class VenueController extends Controller
 
             DB::commit();
 
-            return $this->success(
-                new VenueResource($venue->load(['detail', 'media'])),
-                'Venue updated successfully.',
-                200
-            );
+            return response()->json([
+                'success' => true,
+                'message' => 'Venue updated successfully.'
+            ]);
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->error([], 'Failed to update venue. ' . $e->getMessage(), 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while updating the venue.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -246,17 +241,7 @@ class VenueController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
-
-            $venue = Venue::with(['detail', 'media'])->where('id', $id)->where('user_id', $user->id)->first();
-
-            if (!$venue) {
-                return $this->error([], 'Venue not found or unauthorized.', 404);
-            }
+            $venue = Venue::with(['detail', 'media'])->where('id', $id)->first();
 
             // Delete media files from storage
             foreach ($venue->media as $media) {
@@ -275,34 +260,39 @@ class VenueController extends Controller
 
             DB::commit();
 
-            return $this->success([], 'Venue deleted successfully.', 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Venue deleted successfully.'
+            ], 200);
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->error([], 'Failed to delete venue. ' . $e->getMessage(), 500);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete venue. ' . $e->getMessage()
+            ], 500);
         }
     }
 
     //toggle venue status
     public function status($id)
     {
-        $user = auth('api')->user();
-
-        if (!$user) {
-            return $this->error([], 'Unauthorized user.', 401);
-        }
-
         $venue = Venue::find($id);
 
         if (!$venue) {
-            return $this->error([], 'Venue not found.', 404);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Item not found.',
+            ]);
         }
 
         // Toggle status
         $venue->status = $venue->status == 0 ? 1 : 0;
         $venue->save();
 
-        $statusText = $venue->status ? 'activated' : 'deactivated';
-
-        return $this->success([], "Venue $statusText successfully.", 200);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status Changed successfully!',
+        ]);
     }
 }

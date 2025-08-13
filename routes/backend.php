@@ -4,16 +4,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\Backend\FaqController;
 use App\Http\Controllers\Web\Backend\ChatController;
-use App\Http\Controllers\Web\Backend\CategoryController;
 use App\Http\Controllers\Web\Backend\CMS\HomeController;
 use App\Http\Controllers\Web\Backend\PostListController;
 use App\Http\Controllers\Web\Backend\UserListController;
 use App\Http\Controllers\Web\Backend\CMS\EventController;
 use App\Http\Controllers\Web\Backend\DashboardController;
 use App\Http\Controllers\Web\Backend\EventListController;
-use App\Http\Controllers\Web\Backend\VenueListController;
+use App\Http\Controllers\Web\Backend\VenueManageController;
 use App\Http\Controllers\Web\Backend\ChatManageController;
-use App\Http\Controllers\Web\Backend\SpecializeController;
 use App\Http\Controllers\Web\Backend\CMS\FeatureController;
 use App\Http\Controllers\Web\Backend\TestimonialController;
 use App\Http\Controllers\Api\React\CMS\NewsletterController;
@@ -31,6 +29,9 @@ use App\Http\Controllers\Web\Backend\Settings\SocialSettingController;
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Dashboard data for charts
+    Route::get('dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
 
     // cms management
     Route::prefix('cms')->name('cms.')->group(function () {
@@ -92,14 +93,22 @@ Route::middleware(['auth', 'admin'])->group(function () {
         });
     });
 
-    //privacy and policy
+    //users, events, venues, promoters list
+    Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
+    Route::get('/event-list', [EventListController::class, 'index'])->name('admin.event.index');
+    Route::get('/post-list', [PostListController::class, 'index'])->name('admin.post.index');
+
+    //venue manage
+    Route::controller(VenueManageController::class)->prefix('venue')->name('admin.venue.')->group(function () {
+        Route::get('/', 'index')->name('index'); // List all venues
+        Route::post('/store', 'store')->name('store'); // Store a new venue
+        Route::get('/edit/{id}', 'edit')->name('edit'); // Get a venue for editing
+        Route::post('/update/{id}', 'update')->name('update'); // Update a venue
+        Route::post('/status/{id}', 'status')->name('status'); // Update status only
+        Route::delete('/delete/{id}', 'destroy')->name('destroy'); // Delete a venue
+    });
 });
 
-//users, events, venues, promoters list
-Route::get('/user-list', [UserListController::class, 'index'])->name('admin.user.index');
-Route::get('/event-list', [EventListController::class, 'index'])->name('admin.event.index');
-Route::get('/venue-list', [VenueListController::class, 'index'])->name('admin.venue.index');
-Route::get('/post-list', [PostListController::class, 'index'])->name('admin.post.index');
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

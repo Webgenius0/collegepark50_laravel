@@ -9,7 +9,6 @@ class Venue extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id',
         'title',
         'capacity',
         'location',
@@ -30,12 +29,6 @@ class Venue extends Model
 
 
     // Relationships
-    //user table
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     //venue-details table
     public function detail()
     {

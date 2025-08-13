@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('venues', function (Blueprint $table) {
             $table->id();
 
-            //user id
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-
             $table->string('title', 200);
             $table->unsignedInteger('capacity');
             $table->string('location', 255); // e.g. street/city/state

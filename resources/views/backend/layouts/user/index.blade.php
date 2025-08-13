@@ -8,10 +8,8 @@
     <!--app-content open-->
     <div class="app-content main-content mt-0">
         <div class="side-app">
-
             <!-- CONTAINER -->
             <div class="main-container container-fluid">
-
                 <!-- PAGE-HEADER -->
                 <div class="page-header">
                     <div>
@@ -35,9 +33,10 @@
                                 <h3 class="card-title mb-0">User List</h3>
 
                                 <div>
-                                    <select id="roleFilter" class="form-select">
+                                    <select id="roleFilter" class="form-select px-5">
                                         <option value="all">All</option>
                                         <option value="user">User</option>
+                                        <option value="dj">DJ</option>
                                         <option value="venue">Venue</option>
                                         <option value="promoter">Promoter</option>
                                         <option value="artist">Artist</option>

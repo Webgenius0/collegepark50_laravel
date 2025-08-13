@@ -14,16 +14,8 @@ class VenueSeeder extends Seeder
      */
     public function run()
     {
-        $userIds = User::pluck('id');
-
-        if ($userIds->isEmpty()) {
-            $this->command->warn('No users found. Please seed users first.');
-            return;
-        }
-
         for ($i = 0; $i < 10; $i++) {
             Venue::create([
-                'user_id'            => $userIds->random(),
                 'title'              => fake()->company(),
                 'capacity'           => rand(50, 1000),
                 'location'           => fake()->address(),
