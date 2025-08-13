@@ -67,8 +67,6 @@ class ChatController extends Controller
         ], 200);
     }
 
-
-
     public function search(Request $request): JsonResponse
     {
         $user_id = Auth::id();
@@ -277,5 +275,40 @@ class ChatController extends Controller
         ];
 
         return response()->json(['success' => true, 'message' => 'Group retrieved successfully', 'data' => $data, 'code' => 200]);
+    }
+
+    //delete conversation
+    public function deleteConversation($receiver_id): JsonResponse
+    {
+        $sender_id = Auth::id();
+
+        // Find the room between these two users
+        $room = Room::where(function ($query) use ($receiver_id, $sender_id) {
+            $query->where('user_one_id', $sender_id)->where('user_two_id', $receiver_id);
+        })->orWhere(function ($query) use ($receiver_id, $sender_id) {
+            $query->where('user_one_id', $receiver_id)->where('user_two_id', $sender_id);
+        })->first();
+
+        if (!$room) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Conversation not found',
+                'data'    => [],
+                'code'    => 404
+            ]);
+        }
+
+        // Soft delete all messages in this room
+        Chat::where('room_id', $room->id)->delete();
+
+        // Delete the room itself
+        $room->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversation deleted successfully',
+            'data'    => [],
+            'code'    => 200
+        ]);
     }
 }

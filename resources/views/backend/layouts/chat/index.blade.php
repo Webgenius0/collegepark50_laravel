@@ -17,6 +17,7 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
         }
 
         /* Sidebar */
@@ -33,7 +34,6 @@
             background: #394329;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
 
 
         .sidebar-header h3 {
@@ -109,7 +109,10 @@
             flex: 1;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            /* scrollbar-color: rgba(14, 7, 7, 0.966) transparent; */
+            scrollbar-color: #3498db4d transparent;
+            max-height: calc(100vh - 150px);
+            padding-right: 5px;
         }
 
         .user-item {
@@ -287,6 +290,53 @@
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
+        /* Tooltrip */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            display: none;
+            /* hidden by default */
+            position: absolute;
+            top: 120%;
+            /* show under button */
+            left: 50%;
+            transform: translateX(-80%);
+            background: #333;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 999;
+            cursor: pointer;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #333 transparent;
+        }
+
+        .tooltip-text.show {
+            display: block;
+        }
+
+
+        .main-content-body-chat {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+
         /* Chat Messages */
         .chat-messages {
             flex: 1;
@@ -294,8 +344,8 @@
             padding: 20px;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             scrollbar-width: thin;
-            scrollbar-color: rgba(52, 152, 219, 0.3) transparent;
-            max-height: 500px;
+            scrollbar-color: #3498db4d transparent;
+            max-height: 635px;
         }
 
         .message {
@@ -388,12 +438,16 @@
 
         /* Chat Input */
         .chat-input {
+            position: sticky;
             padding: 20px 25px;
             background: white;
             border-top: 1px solid #dee2e6;
             display: flex;
             align-items: center;
             gap: 15px;
+            border-left: 1px solid #3498db4d !important;
+            bottom: 0;
+            z-index: 10;
         }
 
         .input-container {
@@ -599,7 +653,7 @@
                         </div>
 
                         <!-- Chat Box -->
-                        <div class="main-content-body main-content-body-chat h-100 d-none" id="ChatBox">
+                        <div class="main-content-body main-content-body-chat d-none" id="ChatBox">
                             <!-- Chat Header -->
                             <div class="chat-header">
                                 <div class="chat-header-avatar" id="ReceiverImage">
@@ -614,9 +668,13 @@
                                     <button class="action-btn" onclick="formClear()">
                                         <i class="bi bi-arrow-clockwise"></i>
                                     </button>
-                                    <button class="action-btn">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
+
+                                    <div class="tooltip-container">
+                                        <button class="action-btn" id="deleteBtn">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <span class="tooltip-text" id="deleteTooltip" onclick="confirmDeleteConversation($('#ReceiverId').val());">Delete Conversation</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -905,15 +963,54 @@
         userList();
 
 
+        //delete conversation tooltrip
+        document.getElementById('deleteBtn').addEventListener('click', function(e) {
+            e.stopPropagation(); // stop from closing instantly
+            let tooltip = document.getElementById('deleteTooltip');
 
+            // Toggle tooltip
+            tooltip.classList.toggle('show');
+        });
 
+        // Hide tooltip when clicking anywhere else
+        document.addEventListener('click', function() {
+            document.getElementById('deleteTooltip').classList.remove('show');
+        });
+
+        // Click tooltip → SweetAlert
+        function confirmDeleteConversation(receiverId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will delete the entire conversation!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/chat/conversation/delete/${receiverId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Deleted!', data.message, 'success');
+                                userList();
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        });
+                }
+            });
+        }
 
 
         // Laravel Echo for real-time messaging
-
-
         document.addEventListener('DOMContentLoaded', function() {
-
             Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`).listen('MessageSendEvent', function(e) {
                 toastr.success(e.data.text ?? "New file received");
                 alert('get');

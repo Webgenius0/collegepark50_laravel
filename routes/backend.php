@@ -228,4 +228,5 @@ Route::controller(ChatController::class)->prefix('chat')->name('admin.chat.')->g
     Route::get('/search', 'search')->name('search');
     Route::get('/seen/all/{receiver_id}', 'seenAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
+    Route::delete('/conversation/delete/{receiver_id}', 'deleteConversation');
 });
