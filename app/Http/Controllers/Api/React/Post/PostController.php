@@ -122,7 +122,7 @@ class PostController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'content' => ['nullable', 'string'],
-                'media.*' => ['nullable', 'file', 'max:51200'],
+                // 'media.*' => ['nullable', 'file', 'max:51200'],
             ]);
 
             if ($validator->fails()) {
