@@ -3,12 +3,16 @@
 namespace App\Helper;
 
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
 
 class Helper
 {
-    public static function uploadImage($file, $folder)
+    public static function uploadImage(Request $request ,$file, $folder)
     {
+
+        dd($request->all());
         if (!$file->isValid()) {
             return null;
         }
