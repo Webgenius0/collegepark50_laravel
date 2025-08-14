@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CommentSeeder::class,
             SettingSeeder::class,
             CalendarSeeder::class,
+            RoomSeeder::class,
         ]);
     }
 }

@@ -62,9 +62,9 @@ class PostController extends Controller
 
                     if (str_starts_with($mimeType, 'image/')) {
                         // Check extension & size for images
-                        if (!in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif', 'webp']) || $file->getSize() > 5120 * 1024) {
-                            continue; // skip invalid image
-                        }
+                        // if (!in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif', 'webp']) || $file->getSize() > 5120 * 1024) {
+                        //     continue; // skip invalid image
+                        // }
 
                         $imagePath = Helper::uploadImage($file, 'posts/images');
                         PostImage::create([
@@ -73,9 +73,9 @@ class PostController extends Controller
                         ]);
                     } elseif (str_starts_with($mimeType, 'video/')) {
                         // Check extension & size for videos
-                        if (!in_array($file->extension(), ['mp4', 'mov', 'avi', 'gif']) || $file->getSize() > 51200 * 1024) {
-                            continue; // skip invalid video
-                        }
+                        // if (!in_array($file->extension(), ['mp4', 'mov', 'avi', 'gif']) || $file->getSize() > 51200 * 1024) {
+                        //     continue; // skip invalid video
+                        // }
 
                         $videoPath = Helper::fileUpload($file, 'posts/videos', 'post-video-' . Str::random(8));
                         PostVideo::create([

@@ -143,7 +143,7 @@ class ChatController extends Controller
     public function send($receiver_id, Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'text' => 'nullable|string|max:255',
+            'text' => 'nullable|string|max:1000',
             'file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 

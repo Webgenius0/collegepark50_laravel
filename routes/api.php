@@ -189,4 +189,5 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
     Route::get('/search', 'search');
     Route::get('/seen/all/{receiver_id}', 'seedAll');
     Route::get('/seen/single/{chat_id}', 'seenSingle');
+    Route::delete('/delete/{receiver_id}', 'deleteChat');
 });

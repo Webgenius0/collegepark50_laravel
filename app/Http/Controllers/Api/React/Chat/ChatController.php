@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
 {
+
+    /**
+     * List all users with their last chat messages
+     */
     public function list(): JsonResponse
     {
         $authUser = Auth::guard('api')->user();
@@ -66,9 +70,8 @@ class ChatController extends Controller
     }
 
 
-    /* Send a message to a user
-     * @param Request $request
-     * @param int $receiver_id
+    /*
+    * Send a message to a user
      */
     public function send(Request $request, $receiver_id): JsonResponse
     {
@@ -137,6 +140,9 @@ class ChatController extends Controller
         ]);
     }
 
+    /**
+     * Get conversation with a specific user
+     */
     public function conversation($receiver_id): JsonResponse
     {
         $sender_id = Auth::guard('api')->id();
@@ -188,6 +194,10 @@ class ChatController extends Controller
         ]);
     }
 
+
+    /**
+     * Mark all messages in a conversation as seen
+     */
     public function seenAll($receiver_id): JsonResponse
     {
         $sender_id = Auth::guard('api')->id();
@@ -213,6 +223,9 @@ class ChatController extends Controller
     }
 
 
+    /**
+     * Mark a single chat message as seen
+     */
     public function seenSingle($chat_id): JsonResponse
     {
         $sender_id = Auth::guard('api')->id();
@@ -232,7 +245,9 @@ class ChatController extends Controller
         ]);
     }
 
-
+    /**
+     * Get or create a chat room with a specific user
+     */
     public function room($receiver_id)
     {
         $sender_id  = Auth::guard('api')->id();
@@ -266,6 +281,9 @@ class ChatController extends Controller
     }
 
 
+    /**
+     * Search users by keyword
+     */
     public function search(Request $request): JsonResponse
     {
         $user_id = Auth::id();
@@ -285,5 +303,43 @@ class ChatController extends Controller
             'message' => 'Chat retrieved successfully',
             'data'    => $data,
         ], 200);
+    }
+
+
+    /**
+     * Delete chat with a specific user
+     */
+    public function deleteChat($receiver_id): JsonResponse
+    {
+        $sender_id = Auth::guard('api')->id();
+
+        // Find the room between these two users
+        $room = Room::where(function ($query) use ($receiver_id, $sender_id) {
+            $query->where('user_one_id', $sender_id)->where('user_two_id', $receiver_id);
+        })->orWhere(function ($query) use ($receiver_id, $sender_id) {
+            $query->where('user_one_id', $receiver_id)->where('user_two_id', $sender_id);
+        })->first();
+
+        if (!$room) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Conversation not found',
+                'data'    => [],
+                'code'    => 404
+            ]);
+        }
+
+        // Soft delete all messages in this room
+        Chat::where('room_id', $room->id)->delete();
+
+        // Delete the room itself
+        $room->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversation deleted successfully',
+            'data'    => [],
+            'code'    => 200
+        ]);
     }
 }

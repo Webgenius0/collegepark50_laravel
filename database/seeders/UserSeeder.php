@@ -74,6 +74,6 @@ class UserSeeder extends Seeder
         }
 
         // Generate 100 random users using the factory for tasting
-        User::factory(100)->create();
+        User::factory(50)->create();
     }
 }

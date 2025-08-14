@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('room_id')->nullable()->constrained('rooms')->nullOnDelete();
+            $table->foreignId('room_id')->nullable()->constrained('rooms')->onDelete('cascade');
             $table->text('text')->nullable();
             $table->string('file')->nullable();
             $table->enum('status', ['sent', 'read', 'unread'])->default('unread');
