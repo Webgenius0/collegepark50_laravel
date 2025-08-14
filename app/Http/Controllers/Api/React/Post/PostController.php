@@ -150,15 +150,15 @@ class PostController extends Controller
                     $mimeType = $file->getMimeType();
 
                     if (str_starts_with($mimeType, 'image/')) {
-                        // Upload using Helper::uploadImage()
-                        $imagePath = Helper::uploadImage($file, 'posts/images');
+                        // Use Helper::fileUpload() for images
+                        $imagePath = Helper::fileUpload($file, 'posts/images', 'post-image-' . Str::random(8));
                         PostImage::create([
                             'post_id' => $post->id,
                             'image_path' => $imagePath,
                         ]);
                     } elseif (str_starts_with($mimeType, 'video/')) {
-                        // Upload videos using same uploadImage method
-                        $videoPath = Helper::uploadImage($file, 'posts/videos');
+                        // Use Helper::fileUpload() for videos
+                        $videoPath = Helper::fileUpload($file, 'posts/videos', 'post-video-' . Str::random(8));
                         PostVideo::create([
                             'post_id' => $post->id,
                             'video_path' => $videoPath,
@@ -166,6 +166,7 @@ class PostController extends Controller
                     }
                 }
             }
+
 
             // Hashtag Extraction & Sync
             if ($request->filled('content')) {

@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class Helper
 {
-    public static function uploadImage(Request $request ,$file, $folder)
+    public static function uploadImage($file, $folder)
     {
 
-        dd($request->all());
         if (!$file->isValid()) {
             return null;
         }
