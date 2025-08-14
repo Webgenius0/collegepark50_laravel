@@ -16,6 +16,9 @@ use App\Http\Requests\Venue\VenueRequest;
 
 class VenueManageController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -74,7 +77,10 @@ class VenueManageController extends Controller
 
         return view("backend.layouts.venue.index");
     }
-    //store venue
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(VenueRequest $request)
     {
         $validated_data = $request->validated();
@@ -123,32 +129,36 @@ class VenueManageController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating venue!',
-            ], 200);
+                'message' => 'Validation Error',
+                'error' => $e->getMessage()
+            ], 422);
         }
     }
 
-    //edit venue
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit($id)
     {
         try {
-            $venue = Venue::with(['detail', 'media'])
-                ->where('id', $id)
-                ->first();
+            $venue = Venue::with(['detail', 'media'])->find($id);
 
             if (!$venue) {
                 return response()->json(['success' => false, 'message' => 'Venue not found.'], 404);
             }
 
-            return response()->json(['success' => false, 'data' => $venue]);
+            return response()->json(['success' => true, 'data' => $venue]);
         } catch (Exception $e) {
-            return back()->with('message', 'Failed to fetch venue. ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to fetch venue. ' . $e->getMessage()]);
         }
     }
 
-    //update venue
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(VenueRequest $request, $id)
     {
+        $validated_data = $request->validated();
         DB::beginTransaction();
 
         try {
@@ -160,18 +170,7 @@ class VenueManageController extends Controller
             }
 
             // Update venue
-            $venue->update([
-                'title'              => $request->title,
-                'capacity'           => $request->capacity,
-                'location'           => $request->location,
-                'latitude'           => $request->latitude,
-                'longitude'          => $request->longitude,
-                'service_start_time' => $request->service_start_time,
-                'service_end_time'   => $request->service_end_time,
-                'ticket_price'       => $request->ticket_price,
-                'phone'              => $request->phone,
-                'email'              => $request->email,
-            ]);
+            $venue->update($validated_data);
 
             // Update venue details
             $venue->detail()->updateOrCreate(
@@ -222,20 +221,22 @@ class VenueManageController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Venue updated successfully.'
-            ]);
+                'status' => true,
+                'message' => 'Venue added successfully!',
+            ], 200);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while updating the venue.',
                 'error' => $e->getMessage()
-            ], 500);
+            ], 422);
         }
     }
 
-    //delete venue
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -274,7 +275,9 @@ class VenueManageController extends Controller
         }
     }
 
-    //toggle venue status
+    /**
+     * Toggle the status of the specified resource.
+     */
     public function status($id)
     {
         $venue = Venue::find($id);

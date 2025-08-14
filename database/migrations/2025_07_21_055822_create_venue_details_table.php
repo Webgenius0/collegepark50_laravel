@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('venue_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
-            $table->json('features')->nullable();
+            $table->text('features')->nullable();
             $table->timestamps();
         });
     }

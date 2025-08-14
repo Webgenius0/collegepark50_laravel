@@ -20,15 +20,7 @@ class VenueDetailSeeder extends Seeder
             VenueDetail::create([
                 'venue_id'   => $venue->id,
                 'description' => fake()->paragraphs(rand(2, 4), true),
-                'features'   => json_encode([
-                    'Parking',
-                    'WiFi',
-                    'Air Conditioning',
-                    'Sound System',
-                    'Lighting',
-                    'Stage',
-                    'Outdoor Area',
-                ]),
+                'features'   => "Parking, WiFi, Air Conditioning, Sound System, Lighting, Stage, Outdoor Area",
             ]);
         }
     }

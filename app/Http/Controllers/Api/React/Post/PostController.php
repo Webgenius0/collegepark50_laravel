@@ -48,6 +48,11 @@ class PostController extends Controller
                 'content' => $request->input('content'),
             ]);
 
+            $is_like = $posts->map(function ($post) use ($user) {
+                $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
+                return $post;
+            });
+
             // Notify user when post is created
             try {
                 $user->notify(new PostCreateNotification($post));
@@ -114,7 +119,6 @@ class PostController extends Controller
     }
 
 
-
     //get all posts of auth user
     public function index()
     {
@@ -130,6 +134,11 @@ class PostController extends Controller
                 ->with(['user', 'images', 'videos', 'hashtags', 'comments'])
                 ->latest()
                 ->get();
+
+            $is_like = $posts->map(function ($post) use ($user) {
+                $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
+                return $post;
+            });
 
             return $this->success(PostResource::collection($posts), 'User posts retrieved successfully.', 200);
         } catch (Exception $e) {
@@ -154,6 +163,12 @@ class PostController extends Controller
             $posts = Post::with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user'])
                 ->latest()
                 ->paginate($perPage);
+
+
+            $is_like = $posts->map(function ($post) use ($user) {
+                $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
+                return $post;
+            });
 
             // Return paginated data with PostResource
             return $this->success(

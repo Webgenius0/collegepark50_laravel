@@ -41,15 +41,8 @@ class VenuePageController extends Controller
     public function venueDetails($id)
     {
         try {
-            $user = auth('api')->user();
-
-            if (!$user) {
-                return $this->error([], 'Unauthorized user.', 401);
-            }
-
             $venue = Venue::with(['detail', 'media', 'reviews'])
-                ->where('id', $id)
-                ->first();
+                ->find($id);
 
             if (!$venue) {
                 return $this->error([], 'Venue not found.', 404);

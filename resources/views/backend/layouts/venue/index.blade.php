@@ -72,7 +72,7 @@
 
                     <div class="modal-header">
                         <h5 class="modal-title" id="venueModalLabel">Create Venue</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
                     </div>
 
                     <div class="modal-body">
@@ -96,51 +96,56 @@
                             {{-- Map Picker --}}
                             <div class="col-md-12 mt-3">
                                 <label class="form-label">Pick Location on Map</label>
-                                <input id="pac-input" class="form-control mb-2" type="text"
-                                    placeholder="Search location">
-                                <div id="map" style="height: 300px; width: 100%;"></div>
+                                <div class="input-group mb-2">
+                                    {{-- <input id="search-box" class="form-control" type="text"
+                                        placeholder="Search location..."> --}}
+                                    {{-- <button class="btn btn-primary" type="button" id="search-button">
+                                        <i class="fas fa-search"></i>
+                                    </button> --}}
+                                </div>
+                                <div id="map" style="height: 250px; width: 100%;"></div>
                             </div>
 
                             {{-- Location --}}
-                            <div class="col-md-6">
-                                <label class="form-label">Location</label>
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label">Location Address</label>
                                 <input type="text" class="form-control" name="location" id="venue_location"
-                                    placeholder="Venue Location">
+                                    placeholder="Venue Location" readonly>
                                 <span class="text-danger error-text location_error"></span>
                             </div>
 
                             {{-- Latitude --}}
-                            <div class="col-md-3">
+                            <div class="col-md-3 mt-3">
                                 <label class="form-label">Latitude</label>
                                 <input type="text" class="form-control" name="latitude" id="venue_latitude"
-                                    placeholder="Latitude">
+                                    placeholder="Latitude" readonly>
                                 <span class="text-danger error-text latitude_error"></span>
                             </div>
 
                             {{-- Longitude --}}
-                            {{-- <div class="col-md-3">
+                            <div class="col-md-3 mt-3">
                                 <label class="form-label">Longitude</label>
                                 <input type="text" class="form-control" name="longitude" id="venue_longitude"
-                                    placeholder="Longitude">
+                                    placeholder="Longitude" readonly>
                                 <span class="text-danger error-text longitude_error"></span>
-                            </div> --}}
+                            </div>
 
                             {{-- Service Start Time --}}
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Service Start Time</label>
                                 <input type="time" class="form-control" name="service_start_time" id="venue_start_time">
                                 <span class="text-danger error-text service_start_time_error"></span>
                             </div>
 
                             {{-- Service End Time --}}
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Service End Time</label>
                                 <input type="time" class="form-control" name="service_end_time" id="venue_end_time">
                                 <span class="text-danger error-text service_end_time_error"></span>
                             </div>
 
                             {{-- Ticket Price --}}
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Ticket Price</label>
                                 <input type="number" class="form-control" name="ticket_price" id="venue_ticket_price"
                                     placeholder="Ticket Price">
@@ -207,66 +212,146 @@
     </div>
 @endsection
 
+@push('styles')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        #map {
+            height: 300px;
+        }
 
+        .leaflet-control-geocoder-form input {
+            width: 200px;
+        }
+    </style>
+@endpush
 
 @push('scripts')
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoHvP1E73opwpU6NSQ3Qy4wjq2wTdGbvg&libraries=places&callback=initMap">
-    </script>
-
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        //init gogole map
-        let map, marker;
+        // Global variables
+        let map, marker, geocoder;
 
-        function initMap() {
-            const defaultLocation = {
-                lat: 23.8103,
-                lng: 90.4125
-            }; // Dhaka default
+        // Function to initialize the map
+        function initializeMap() {
+            // Default to Dhaka coordinates
+            const defaultLocation = [23.8103, 90.4125];
 
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: defaultLocation,
-                zoom: 13,
+            // Initialize map
+            map = L.map('map').setView(defaultLocation, 13);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add marker
+            marker = L.marker(defaultLocation, {
+                draggable: true
+            }).addTo(map);
+
+            // Initialize geocoder
+            geocoder = L.Control.Geocoder.nominatim();
+
+            // Add search control
+            L.Control.geocoder({
+                defaultMarkGeocode: false,
+                geocoder: geocoder,
+                position: 'topright',
+                placeholder: 'Search location...',
+                errorMessage: 'Location not found.'
+            }).on('markgeocode', function(e) {
+                const {
+                    center,
+                    name
+                } = e.geocode;
+                updateLocation(center.lat, center.lng, name);
+            }).addTo(map);
+
+            // Handle marker drag
+            marker.on('dragend', function() {
+                const position = marker.getLatLng();
+                reverseGeocode(position.lat, position.lng);
             });
 
-            marker = new google.maps.Marker({
-                position: defaultLocation,
-                map: map,
-                draggable: true,
+            // Handle click on map
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                reverseGeocode(e.latlng.lat, e.latlng.lng);
             });
 
-            // Update lat/lng when marker dragged
-            marker.addListener('dragend', function() {
-                updateLatLng(marker.getPosition());
+            // Handle search box
+            $('#search-button').click(function() {
+                const query = $('#search-box').val();
+                if (query) {
+                    geocoder.geocode(query, function(results) {
+                        if (results && results.length > 0) {
+                            const {
+                                center,
+                                name
+                            } = results[0];
+                            updateLocation(center.lat, center.lng, name);
+                        } else {
+                            toastr.error('Location not found');
+                        }
+                    });
+                }
             });
 
-            // Update marker when clicking on map
-            map.addListener("click", (event) => {
-                marker.setPosition(event.latLng);
-                updateLatLng(event.latLng);
-            });
-
-            // Autocomplete search
-            const input = document.getElementById("pac-input");
-            const autocomplete = new google.maps.places.Autocomplete(input);
-            autocomplete.bindTo("bounds", map);
-
-            autocomplete.addListener("place_changed", () => {
-                const place = autocomplete.getPlace();
-                if (!place.geometry || !place.geometry.location) return;
-
-                map.setCenter(place.geometry.location);
-                map.setZoom(15);
-                marker.setPosition(place.geometry.location);
-                updateLatLng(place.geometry.location);
+            // Also trigger search on Enter key
+            $('#search-box').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#search-button').click();
+                }
             });
         }
 
-        function updateLatLng(location) {
-            $('#venue_latitude').val(location.lat());
-            $('#venue_longitude').val(location.lng());
+        // Update location fields
+        function updateLocation(lat, lng, address) {
+            $('#venue_latitude').val(lat);
+            $('#venue_longitude').val(lng);
+            $('#venue_location').val(address || '');
+
+            // Move marker and center map
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 15);
         }
+
+        // Reverse geocode coordinates to get address
+        function reverseGeocode(lat, lng) {
+            geocoder.reverse({
+                    lat: lat,
+                    lng: lng
+                },
+                map.getZoom(),
+                function(results) {
+                    if (results && results.length > 0) {
+                        updateLocation(lat, lng, results[0].name);
+                    } else {
+                        updateLocation(lat, lng, '');
+                    }
+                }
+            );
+        }
+
+        // When modal opens
+        $('#venueModal').on('shown.bs.modal', function() {
+            // Initialize map if not already done
+            if (!map) {
+                initializeMap();
+            } else {
+                // Reset map view if already initialized
+                setTimeout(function() {
+                    map.invalidateSize();
+                    if (marker) {
+                        map.setView(marker.getLatLng(), map.getZoom());
+                    }
+                }, 300);
+            }
+        });
+
 
         //document ready functionq
         $(document).ready(function() {
@@ -335,34 +420,81 @@
                 ]
             });
 
-            // Open modal
+
+            // Open modal for new venue
             $('#addVenueBtn').click(function() {
                 $('#venueModalLabel').text('Create Venue');
                 $('#venueForm')[0].reset();
                 $('#venueID').val('');
                 $('.error-text').text('');
-                $('#venue_images').dropify().clearElement();
-                $('#venue_videos').dropify().clearElement();
                 $('#venueModal').modal('show');
-
-                // Resize and center map when modal opens
-                setTimeout(() => {
-                    google.maps.event.trigger(map, "resize");
-                    map.setCenter(marker.getPosition());
-                }, 300);
             });
 
+
             // Submit form
+            // $('#venueForm').on('submit', function(e) {
+            //     e.preventDefault();
+            //     var formData = new FormData(this);
+            //     var id = $('#venueID').val();
+            //     var url = id ?
+            //         "{{ route('admin.venue.update', ':id') }}".replace(':id', id) :
+            //         "{{ route('admin.venue.store') }}";
+
+            //     if (id) {
+            //         formData.append('_method', 'POST'); // may need PUT/PATCH depending on your route
+            //     }
+
+            //     $.ajax({
+            //         url: url,
+            //         type: 'POST',
+            //         data: formData,
+            //         contentType: false,
+            //         processData: false,
+            //         beforeSend: function() {
+            //             $('span.error-text').text('');
+            //             $('#venueSubmitBtn').prop('disabled', true).html('Processing...');
+            //         },
+            //         success: function(response) {
+            //             if (response.status) {
+            //                 $.each(response.error, function(prefix, val) {
+            //                     $('span.' + prefix + '_error').text(val[0]);
+            //                 });
+            //             } else {
+            //                 $('#venueModal').modal('hide');
+            //                 $('#venueForm')[0].reset();
+            //                 $('#venue_images').dropify().clearElement();
+            //                 $('#venue_videos').dropify().clearElement();
+            //                 NProgress.done();
+            //                 // Reload the DataTable
+            //                 toastr.success(response.message);
+            //                 $('#datatable').DataTable().ajax.reload();
+            //             }
+            //             $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
+            //         },
+            //         error: function(xhr) {
+            //             $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
+            //             if (xhr.status === 422) {
+            //                 $.each(xhr.responseJSON.errors, function(prefix, val) {
+            //                     prefix = prefix.replace(/\./g, '_');
+            //                     $('span.' + prefix + '_error').text(val[0]);
+            //                 });
+            //             } else {
+            //                 toastr.error('Something went wrong. Please try again.');
+            //             }
+            //         }
+            //     });
+            // });
+
             $('#venueForm').on('submit', function(e) {
                 e.preventDefault();
-                var formData = new FormData(this);
-                var id = $('#venueID').val();
-                var url = id ?
+                let formData = new FormData(this);
+                let id = $('#venueID').val();
+                let url = id ?
                     "{{ route('admin.venue.update', ':id') }}".replace(':id', id) :
                     "{{ route('admin.venue.store') }}";
 
                 if (id) {
-                    formData.append('_method', 'POST'); // may need PUT/PATCH depending on your route
+                    formData.append('_method', 'POST');
                 }
 
                 $.ajax({
@@ -376,20 +508,24 @@
                         $('#venueSubmitBtn').prop('disabled', true).html('Processing...');
                     },
                     success: function(response) {
-                        if (response.status === 0) {
-                            $.each(response.error, function(prefix, val) {
+                        if (response.status == 0) {
+                            $.each(response.errors, function(prefix, val) {
                                 $('span.' + prefix + '_error').text(val[0]);
                             });
+
                         } else {
                             $('#venueModal').modal('hide');
                             $('#venueForm')[0].reset();
                             $('#venue_images').dropify().clearElement();
                             $('#venue_videos').dropify().clearElement();
-                            dTable.ajax.reload(null, false);
+
+                            $('#datatable').DataTable().ajax.reload();
+
                             toastr.success(response.message);
                         }
                         $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
                     },
+
                     error: function(xhr) {
                         $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
                         if (xhr.status === 422) {
@@ -398,14 +534,59 @@
                                 $('span.' + prefix + '_error').text(val[0]);
                             });
                         } else {
-                            toastr.error('Something went wrong. Please try again.');
+                            toastr.error(xhr.responseJSON.message ||
+                                'Something went wrong. Please try again.');
                         }
                     }
                 });
             });
 
 
-            // Edit Venue
+            $('#itemForm').on('submit', function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                var id = $('#itemID').val();
+                var url = id ? "{{ route('cms.feature.items.update', ':id') }}".replace(':id', id) :
+                    "{{ route('cms.feature.items.store') }}";
+                var method = id ? 'POST' : 'POST'; // Keep as POST for both create and update
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function() {
+                        $(document).find('span.error-text').text('');
+                        $('#submitBtn').prop('disabled', true).html('Processing...');
+                    },
+                    success: function(response) {
+                        if (response.status == 0) {
+                            $.each(response.error, function(prefix, val) {
+                                $('span.' + prefix + '_error').text(val[0]);
+                            });
+                        } else {
+                            $('#itemModal').modal('hide');
+                            $('#itemForm')[0].reset();
+                            // Reset dropify after successful submission
+                            $('.dropify').dropify('destroy');
+                            $('#item_image').attr('data-default-file',
+                                "{{ asset('default/placeholder-image.avif') }}").dropify();
+                            // $('#datatable').DataTable().ajax.reload();
+                            window.location.reload(); // Reload the page to reflect changes
+                            toastr.success(response.message);
+                        }
+                        $('#submitBtn').prop('disabled', false).html('Save changes');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#submitBtn').prop('disabled', false).html('Save changes');
+                        toastr.error('Something went wrong. Please try again.');
+                    }
+                });
+            });
+
+
+            // Edit Venue - Load existing data
             $(document).on('click', '.editVenue', function() {
                 var id = $(this).data('id');
                 var url = "{{ route('admin.venue.edit', ':id') }}".replace(':id', id);
@@ -425,16 +606,16 @@
                     $('#venue_ticket_price').val(response.data.ticket_price);
                     $('#venue_phone').val(response.data.phone);
                     $('#venue_email').val(response.data.email);
-                    $('#venue_description').val(response.data.description);
-                    $('#venue_features').val(response.data.features);
+                    $('#venue_description').val(response.data.detail.description);
+                    $('#venue_features').val(response.data.detail.features);
 
                     // Reset and set Dropify for images
                     let imageInput = $('#venue_images').dropify();
                     imageInput = imageInput.data('dropify');
                     imageInput.resetPreview();
                     imageInput.clearElement();
-                    if (response.data.images && response.data.images.length > 0) {
-                        imageInput.settings.defaultFile = response.data.images[
+                    if (response.data.images && response.data.media.image_url.length > 0) {
+                        imageInput.settings.defaultFile = response.data.media.image_url[
                             0]; // show first image only
                         imageInput.destroy();
                         imageInput.init();
@@ -445,14 +626,25 @@
                     videoInput = videoInput.data('dropify');
                     videoInput.resetPreview();
                     videoInput.clearElement();
-                    if (response.data.videos && response.data.videos.length > 0) {
-                        videoInput.settings.defaultFile = response.data.videos[
+                    if (response.data.media.video_url && response.data.media.video_url.length > 0) {
+                        videoInput.settings.defaultFile = response.data.media.video_url[
                             0]; // show first video only
                         videoInput.destroy();
                         videoInput.init();
                     }
 
-                    $('#venueModal').modal('show');
+                    // Set map position
+                    if (response.data.latitude && response.data.longitude) {
+                        const lat = parseFloat(response.data.latitude);
+                        const lng = parseFloat(response.data.longitude);
+
+                        // Update after modal is shown
+                        $('#venueModal').modal('show').on('shown.bs.modal', function() {
+                            updateLocation(lat, lng, response.data.location);
+                        });
+                    } else {
+                        $('#venueModal').modal('show');
+                    }
                 });
             });
         });

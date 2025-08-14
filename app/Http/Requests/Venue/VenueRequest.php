@@ -27,8 +27,8 @@ class VenueRequest extends FormRequest
 
             // Nested detail
             'description'         => 'nullable|string',
-            'features'            => 'nullable|array',
-            'features.*'          => 'string|max:100',
+            'features'            => 'nullable',
+            'features.*'          => 'string|max:1000',
 
             // Media—uploading URLs for simplicity
             'images.*'   => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',

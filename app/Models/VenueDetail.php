@@ -12,11 +12,7 @@ class VenueDetail extends Model
     protected $fillable = [
         'venue_id',
         'description',
-        'features', // stored as JSON
-    ];
-
-    protected $casts = [
-        'features' => 'array',
+        'features'
     ];
 
     // Relationship

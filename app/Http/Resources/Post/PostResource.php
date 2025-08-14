@@ -26,6 +26,7 @@ class PostResource extends JsonResource
             'like_count' => $this->like_count,
             'comment_count' => $this->comment_count,
             'share_count' => $this->share_count,
+            'is_liked' => $this->is_liked ?? false,
 
             // Merged media list (images + videos)
             'media' => collect()
