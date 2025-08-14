@@ -25,9 +25,98 @@ class PostController extends Controller
     /*store post
      * Create a new post with content, images, videos, and hashtags.
      */
+    // public function store(Request $request)
+    // {
+    //     // dd($request->all());
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'content' => ['nullable', 'string'],
+    //             'media.*' => ['nullable', 'file', 'max:51200'],
+    //         ]);
+
+    //         if ($validator->fails()) {
+    //             return $this->error(['Validation failed'], $validator->errors()->first(), 422);
+    //         }
+
+    //         $user = auth('api')->user();
+
+    //         // Create post
+    //         $post = Post::create([
+    //             'user_id' => $user->id,
+    //             'content' => $request->input('content'),
+    //         ]);
+
+    //         // Notify user when post is created
+    //         try {
+    //             $user->notify(new PostCreateNotification($post));
+    //         } catch (Exception $e) {
+    //             Log::error('Notification error: ' . $e->getMessage());
+    //         }
+
+    //         // Upload media files (image/video mixed)
+    //         if ($request->hasFile('media')) {
+    //             foreach ($request->file('media') as $file) {
+    //                 $mimeType = $file->getMimeType();
+
+    //                 if (str_starts_with($mimeType, 'image/')) {
+    //                     // Check extension & size for images
+    //                     // if (!in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif', 'webp']) || $file->getSize() > 5120 * 1024) {
+    //                     //     continue; // skip invalid image
+    //                     // }
+
+    //                     $imagePath = Helper::uploadImage($file, 'posts/images');
+    //                     PostImage::create([
+    //                         'post_id' => $post->id,
+    //                         'image_path' => $imagePath,
+    //                     ]);
+    //                 } elseif (str_starts_with($mimeType, 'video/')) {
+    //                     // Check extension & size for videos
+    //                     // if (!in_array($file->extension(), ['mp4', 'mov', 'avi', 'gif']) || $file->getSize() > 51200 * 1024) {
+    //                     //     continue; // skip invalid video
+    //                     // }
+
+    //                     $videoPath = Helper::fileUpload($file, 'posts/videos', 'post-video-' . Str::random(8));
+    //                     PostVideo::create([
+    //                         'post_id' => $post->id,
+    //                         'video_path' => $videoPath,
+    //                     ]);
+    //                 } else {
+    //                     continue; // skip other files
+    //                 }
+    //             }
+    //         }
+
+    //         // Hashtag Extraction & Sync
+    //         if ($request->filled('content')) {
+    //             preg_match_all('/#(\w+)/', $request->input('content'), $matches);
+
+    //             if (!empty($matches[1])) {
+    //                 $tagIds = [];
+
+    //                 foreach ($matches[1] as $tag) {
+    //                     $hashtag = Hashtag::firstOrCreate(['tag' => '#' . $tag]);
+    //                     $tagIds[] = $hashtag->id;
+    //                 }
+
+    //                 $post->hashtags()->sync($tagIds);
+    //             }
+    //         }
+
+    //         DB::commit();
+
+    //         return $this->success(new PostResource($post->load(['images', 'videos', 'hashtags'])), 'Post created successfully.', 201);
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return $this->error([], 'Failed to create post. ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+
+
     public function store(Request $request)
     {
-        // dd($request->all());
         DB::beginTransaction();
 
         try {
@@ -61,29 +150,19 @@ class PostController extends Controller
                     $mimeType = $file->getMimeType();
 
                     if (str_starts_with($mimeType, 'image/')) {
-                        // Check extension & size for images
-                        // if (!in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif', 'webp']) || $file->getSize() > 5120 * 1024) {
-                        //     continue; // skip invalid image
-                        // }
-
+                        // Upload using Helper::uploadImage()
                         $imagePath = Helper::uploadImage($file, 'posts/images');
                         PostImage::create([
                             'post_id' => $post->id,
                             'image_path' => $imagePath,
                         ]);
                     } elseif (str_starts_with($mimeType, 'video/')) {
-                        // Check extension & size for videos
-                        // if (!in_array($file->extension(), ['mp4', 'mov', 'avi', 'gif']) || $file->getSize() > 51200 * 1024) {
-                        //     continue; // skip invalid video
-                        // }
-
-                        $videoPath = Helper::fileUpload($file, 'posts/videos', 'post-video-' . Str::random(8));
+                        // Upload videos using same uploadImage method
+                        $videoPath = Helper::uploadImage($file, 'posts/videos');
                         PostVideo::create([
                             'post_id' => $post->id,
                             'video_path' => $videoPath,
                         ]);
-                    } else {
-                        continue; // skip other files
                     }
                 }
             }
@@ -112,6 +191,7 @@ class PostController extends Controller
             return $this->error([], 'Failed to create post. ' . $e->getMessage(), 500);
         }
     }
+
 
     //get all posts of auth user
     public function index()
