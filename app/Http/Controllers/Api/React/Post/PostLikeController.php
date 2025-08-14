@@ -45,7 +45,7 @@ class PostLikeController extends Controller
                     'name'   => $user->f_name . ' ' . $user->l_name,
                     'avatar' => $user->avatar,
                 ],
-            ], 'Unliked successfully.', 200);
+            ], 'Disliked successfully.', 200);
         } else {
             // Like the post
             Like::create([
