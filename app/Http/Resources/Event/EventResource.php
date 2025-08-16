@@ -25,7 +25,9 @@ class EventResource extends JsonResource
             'end_time'       => $this->end_time?->toTimeString(),
             'time_zone'      => $this->time_zone,
             'all_day_event'  => $this->all_day_event,
-            'banner_url'     => $this->banner,
+            // 'banner_url'     => $this->banner,
+            'banner_url' => $this->banner ? url($this->banner) : null,
+
             'tags' => json_decode($this->tags) ?: [],
 
 
