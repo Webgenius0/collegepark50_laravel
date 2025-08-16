@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Web\Backend;
+
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Post;
@@ -9,6 +10,9 @@ use App\Models\Venue;
 
 class DashboardController extends Controller
 {
+    /**
+     * Display the dashboard view.
+     */
     public function index()
     {
         $user = auth()->user();
@@ -45,6 +49,23 @@ class DashboardController extends Controller
                 return [$item->date => $item->count];
             });
 
+        // Event status pie chart data
+        $eventStatuses = Event::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->status => $item->count];
+            });
+
+        // New events creation line chart (by date)
+        $newEventCreations = Event::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->date => $item->count];
+            });
+
         //return JSON response with user role data
         return response()->json([
             //user roles
@@ -58,6 +79,17 @@ class DashboardController extends Controller
 
             //new user registrations
             'new_user_registrations' => $newUserRegistrations,
+
+            //event counts
+            'event_statuses' => [
+                'going_live' => $eventStatuses['going_live'] ?? 0,
+                'pending'    => $eventStatuses['pending'] ?? 0,
+                'postponed'  => $eventStatuses['postponed'] ?? 0,
+                'cancelled'  => $eventStatuses['cancelled'] ?? 0,
+                'completed'  => $eventStatuses['completed'] ?? 0,
+            ],
+            //new event creations
+            'new_event_creations' => $newEventCreations,
         ]);
     }
 }

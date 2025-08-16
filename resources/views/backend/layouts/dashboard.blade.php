@@ -9,8 +9,6 @@
 
             <!-- CONTAINER -->
             <div class="main-container container-fluid">
-
-
                 <!-- PAGE-HEADER -->
                 <div class="page-header">
                     <div>
@@ -148,6 +146,33 @@
                     </div>
                 </div>
                 <!-- ROW-2 END -->
+
+                {{-- ROW-3 start --}}
+                <div class="row">
+                    <!-- New Events Creation Line Chart -->
+                    <div class="col-sm-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header border-bottom">
+                                <h3 class="card-title">New Events Over Time</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="event-linechart" style="width: 100%; height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Event Status Pie Chart -->
+                    <div class="col-sm-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header border-bottom">
+                                <h3 class="card-title">Event Status Distribution</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="event-piechart" style="width: 100%; height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{-- ROW-3 end --}}
             </div>
         </div>
     </div>
@@ -183,6 +208,8 @@
                         // Payment Charts
                         drawUserPieChart(data.user_roles);
                         drawNewUserRegistrationLineChart(data.new_user_registrations);
+                        drawEventPieChart(data.event_statuses);
+                        drawNewEventLineChart(data.new_event_creations);
                     })
                     .catch(error => {
                         console.error('Error fetching data:', error);
@@ -264,6 +291,84 @@
                     }
                 };
                 const chart = new ApexCharts(document.querySelector("#user-linechart"), options);
+                chart.render();
+            }
+
+            // Event Status Pie Chart
+            function drawEventPieChart(pieData) {
+                var chartData = [
+                    ['Status', 'Count'],
+                    ['Going Live', pieData.going_live],
+                    ['Pending', pieData.pending],
+                    ['Postponed', pieData.postponed],
+                    ['Cancelled', pieData.cancelled],
+                    ['Completed', pieData.completed],
+                ];
+                var data = google.visualization.arrayToDataTable(chartData);
+
+                var options = {
+                    pieHole: 0.4,
+                    colors: ['#00BFFF', '#FFA500', '#FF6347', '#808080', '#32CD32'], // Color variant
+                    chartArea: {
+                        width: '90%',
+                        height: '80%'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('event-piechart'));
+                chart.draw(data, options);
+            }
+
+            // New Event Creation Line Chart
+            function drawNewEventLineChart(lineData) {
+                const categories = Object.keys(lineData);
+                const counts = Object.values(lineData);
+
+                const options = {
+                    series: [{
+                        name: "New Events",
+                        data: counts,
+                        color: '#FF4500'
+                    }],
+                    chart: {
+                        height: 350,
+                        type: 'line',
+                        zoom: {
+                            enabled: false
+                        },
+                        toolbar: {
+                            show: true
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 2
+                    },
+                    title: {
+                        text: 'New Events Over Time',
+                        align: 'center'
+                    },
+                    xaxis: {
+                        categories: categories
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Number of Events'
+                        }
+                    },
+                    tooltip: {
+                        shared: true,
+                        intersect: false
+                    }
+                };
+
+                const chart = new ApexCharts(document.querySelector("#event-linechart"), options);
                 chart.render();
             }
         });

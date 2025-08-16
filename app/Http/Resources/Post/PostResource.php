@@ -38,8 +38,8 @@ class PostResource extends JsonResource
             'hashtags' => $this->hashtags->pluck('tag'),
 
             // Timestamps
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at->format('d-M-Y h:i A'),
+            'updated_at' => $this->updated_at->format('d-M-Y h:i A'),
 
             // user info
             'user' => [
