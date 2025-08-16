@@ -87,7 +87,7 @@
 
                             {{-- Capacity --}}
                             <div class="col-md-6">
-                                <label class="form-label">Capacity</label>
+                                <label class="form-label">Seat Capacity</label>
                                 <input type="number" class="form-control" name="capacity" id="venue_capacity"
                                     placeholder="Capacity">
                                 <span class="text-danger error-text capacity_error"></span>
@@ -96,13 +96,6 @@
                             {{-- Map Picker --}}
                             <div class="col-md-12 mt-3">
                                 <label class="form-label">Pick Location on Map</label>
-                                <div class="input-group mb-2">
-                                    {{-- <input id="search-box" class="form-control" type="text"
-                                        placeholder="Search location..."> --}}
-                                    {{-- <button class="btn btn-primary" type="button" id="search-button">
-                                        <i class="fas fa-search"></i>
-                                    </button> --}}
-                                </div>
                                 <div id="map" style="height: 250px; width: 100%;"></div>
                             </div>
 
@@ -425,66 +418,15 @@
             $('#addVenueBtn').click(function() {
                 $('#venueModalLabel').text('Create Venue');
                 $('#venueForm')[0].reset();
+                $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
+                $('#venue_images').dropify().clearElement();
+                $('#venue_videos').dropify().clearElement();
                 $('#venueID').val('');
                 $('.error-text').text('');
                 $('#venueModal').modal('show');
             });
 
-
-            // Submit form
-            // $('#venueForm').on('submit', function(e) {
-            //     e.preventDefault();
-            //     var formData = new FormData(this);
-            //     var id = $('#venueID').val();
-            //     var url = id ?
-            //         "{{ route('admin.venue.update', ':id') }}".replace(':id', id) :
-            //         "{{ route('admin.venue.store') }}";
-
-            //     if (id) {
-            //         formData.append('_method', 'POST'); // may need PUT/PATCH depending on your route
-            //     }
-
-            //     $.ajax({
-            //         url: url,
-            //         type: 'POST',
-            //         data: formData,
-            //         contentType: false,
-            //         processData: false,
-            //         beforeSend: function() {
-            //             $('span.error-text').text('');
-            //             $('#venueSubmitBtn').prop('disabled', true).html('Processing...');
-            //         },
-            //         success: function(response) {
-            //             if (response.status) {
-            //                 $.each(response.error, function(prefix, val) {
-            //                     $('span.' + prefix + '_error').text(val[0]);
-            //                 });
-            //             } else {
-            //                 $('#venueModal').modal('hide');
-            //                 $('#venueForm')[0].reset();
-            //                 $('#venue_images').dropify().clearElement();
-            //                 $('#venue_videos').dropify().clearElement();
-            //                 NProgress.done();
-            //                 // Reload the DataTable
-            //                 toastr.success(response.message);
-            //                 $('#datatable').DataTable().ajax.reload();
-            //             }
-            //             $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
-            //         },
-            //         error: function(xhr) {
-            //             $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
-            //             if (xhr.status === 422) {
-            //                 $.each(xhr.responseJSON.errors, function(prefix, val) {
-            //                     prefix = prefix.replace(/\./g, '_');
-            //                     $('span.' + prefix + '_error').text(val[0]);
-            //                 });
-            //             } else {
-            //                 toastr.error('Something went wrong. Please try again.');
-            //             }
-            //         }
-            //     });
-            // });
-
+            // Handle form submission
             $('#venueForm').on('submit', function(e) {
                 e.preventDefault();
                 let formData = new FormData(this);
@@ -516,15 +458,25 @@
                         } else {
                             $('#venueModal').modal('hide');
                             $('#venueForm')[0].reset();
-                            $('#venue_images').dropify().clearElement();
-                            $('#venue_videos').dropify().clearElement();
 
-                            $('#datatable').DataTable().ajax.reload();
+                            let imageInput = $('#venue_images').data('dropify');
+                            if (imageInput) {
+                                imageInput.resetPreview();
+                                imageInput.clearElement();
+                            }
+
+                            let videoInput = $('#venue_videos').data('dropify');
+                            if (videoInput) {
+                                videoInput.resetPreview();
+                                videoInput.clearElement();
+                            }
 
                             toastr.success(response.message);
+                            $('#datatable').DataTable().ajax.reload();
                         }
                         $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
                     },
+
 
                     error: function(xhr) {
                         $('#venueSubmitBtn').prop('disabled', false).html('Save changes');
@@ -537,50 +489,6 @@
                             toastr.error(xhr.responseJSON.message ||
                                 'Something went wrong. Please try again.');
                         }
-                    }
-                });
-            });
-
-
-            $('#itemForm').on('submit', function(e) {
-                e.preventDefault();
-                var formData = new FormData(this);
-                var id = $('#itemID').val();
-                var url = id ? "{{ route('cms.feature.items.update', ':id') }}".replace(':id', id) :
-                    "{{ route('cms.feature.items.store') }}";
-                var method = id ? 'POST' : 'POST'; // Keep as POST for both create and update
-
-                $.ajax({
-                    url: url,
-                    type: method,
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function() {
-                        $(document).find('span.error-text').text('');
-                        $('#submitBtn').prop('disabled', true).html('Processing...');
-                    },
-                    success: function(response) {
-                        if (response.status == 0) {
-                            $.each(response.error, function(prefix, val) {
-                                $('span.' + prefix + '_error').text(val[0]);
-                            });
-                        } else {
-                            $('#itemModal').modal('hide');
-                            $('#itemForm')[0].reset();
-                            // Reset dropify after successful submission
-                            $('.dropify').dropify('destroy');
-                            $('#item_image').attr('data-default-file',
-                                "{{ asset('default/placeholder-image.avif') }}").dropify();
-                            // $('#datatable').DataTable().ajax.reload();
-                            window.location.reload(); // Reload the page to reflect changes
-                            toastr.success(response.message);
-                        }
-                        $('#submitBtn').prop('disabled', false).html('Save changes');
-                    },
-                    error: function(xhr, status, error) {
-                        $('#submitBtn').prop('disabled', false).html('Save changes');
-                        toastr.error('Something went wrong. Please try again.');
                     }
                 });
             });
@@ -609,29 +517,44 @@
                     $('#venue_description').val(response.data.detail.description);
                     $('#venue_features').val(response.data.detail.features);
 
-                    // Reset and set Dropify for images
+                    // ধরো তোমার base url আছে (Laravel এ asset() ব্যবহার করলে কাজ করবে)
+                    let baseUrl = "{{ asset('') }}"; // এটি "/" সহ return করবে
+
+                    // Reset Dropify for images
                     let imageInput = $('#venue_images').dropify();
                     imageInput = imageInput.data('dropify');
                     imageInput.resetPreview();
                     imageInput.clearElement();
-                    if (response.data.images && response.data.media.image_url.length > 0) {
-                        imageInput.settings.defaultFile = response.data.media.image_url[
-                            0]; // show first image only
+
+                    // collect all image urls
+                    let imageFiles = response.data.media
+                        .filter(m => m.image_url !== null)
+                        .map(m => baseUrl + m.image_url);
+
+                    // শুধু প্রথম image preview দেখাবো
+                    if (imageFiles.length > 0) {
+                        imageInput.settings.defaultFile = imageFiles[0];
                         imageInput.destroy();
                         imageInput.init();
                     }
 
-                    // Reset and set Dropify for videos
+                    // Reset Dropify for videos
                     let videoInput = $('#venue_videos').dropify();
                     videoInput = videoInput.data('dropify');
                     videoInput.resetPreview();
                     videoInput.clearElement();
-                    if (response.data.media.video_url && response.data.media.video_url.length > 0) {
-                        videoInput.settings.defaultFile = response.data.media.video_url[
-                            0]; // show first video only
+
+                    // collect all video urls
+                    let videoFiles = response.data.media
+                        .filter(m => m.video_url !== null)
+                        .map(m => baseUrl + m.video_url);
+
+                    if (videoFiles.length > 0) {
+                        videoInput.settings.defaultFile = videoFiles[0];
                         videoInput.destroy();
                         videoInput.init();
                     }
+
 
                     // Set map position
                     if (response.data.latitude && response.data.longitude) {

@@ -48,11 +48,6 @@ class PostController extends Controller
                 'content' => $request->input('content'),
             ]);
 
-            $is_like = $posts->map(function ($post) use ($user) {
-                $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
-                return $post;
-            });
-
             // Notify user when post is created
             try {
                 $user->notify(new PostCreateNotification($post));

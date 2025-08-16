@@ -24,6 +24,7 @@
                 <li>
                     <h3>Menu</h3>
                 </li>
+                {{-- dashboard --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('dashboard') ? 'has-link' : '' }}"
                         href="{{ route('dashboard') }}">
@@ -36,7 +37,7 @@
                     </a>
                 </li>
 
-
+                {{-- chat --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('chat') ? 'has-link' : '' }}"
                         href="{{ route('admin.chat.index') }}">
@@ -49,12 +50,6 @@
                         <span class="side-menu__label">Chat</span>
                     </a>
                 </li>
-
-
-
-
-
-
 
                 <h3>User and Chat Manage</h3>
 
@@ -71,6 +66,7 @@
                     </a>
                 </li>
 
+                {{-- venues list --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
                         href="{{ route('admin.venue.index') }}">
@@ -82,6 +78,7 @@
                     </a>
                 </li>
 
+                {{-- Events lists --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
                         href="{{ route('admin.event.index') }}">
@@ -95,6 +92,7 @@
                     </a>
                 </li>
 
+                {{-- posts list --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('user') ? 'has-link' : '' }}"
                         href="{{ route('admin.post.index') }}">
@@ -106,45 +104,6 @@
                         <span class="side-menu__label">Posts</span>
                     </a>
                 </li>
-
-                {{-- <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}"
-                        href="{{ route('admin.chat.index') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            class="side-menu__icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 2a5 5 0 1 1-5 5 5 5 0 0 1 5-5zm0 14c-4.4 0-8 2.2-8 5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1c0-2.8-3.6-5-8-5z" />
-                        </svg>
-                        <span class="side-menu__label">Chat System</span>
-                    </a>
-                </li> --}}
-
-
-
-                {{-- <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('dynamic_page') ? 'has-link' : '' }}"
-                        href="{{ route('admin.dynamic_page.index') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            class="side-menu__icon" viewBox="0 0 16 16">
-                            <path
-                                d="M8 1a7 7 0 1 0 7 7A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1-5.5 5.5A5.507 5.507 0 0 1 8 2.5zm-.25 4.75a.75.75 0 1 1 1.5 0v1a.75.75 0 0 1-1.5 0v-1zm.25 4.25a.75.75 0 1 1 0-1.5h.002a.75.75 0 1 1 0 1.5H8z" />
-                        </svg>
-                        <span class="side-menu__label">Dynamic Page</span>
-                    </a>
-                </li> --}}
-
-
-                {{-- <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
-                        href="{{ route('admin.faq.index') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            class="side-menu__icon" viewBox="0 0 16 16">
-                            <path
-                                d="M8 1a7 7 0 1 0 7 7A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1-5.5 5.5A5.507 5.507 0 0 1 8 2.5zm-.25 4.75a.75.75 0 1 1 1.5 0v1a.75.75 0 0 1-1.5 0v-1zm.25 4.25a.75.75 0 1 1 0-1.5h.002a.75.75 0 1 1 0 1.5H8z" />
-                        </svg>
-                        <span class="side-menu__label">FAQ</span>
-                    </a>
-                </li> --}}
 
                 <h3>CMS</h3>
 
@@ -226,18 +185,6 @@
                         <span class="side-menu__label">Newsletter</span>
                     </a>
                 </li>
-
-                {{-- footer --}}
-                {{-- <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
-                        href="{{ route('admin.faq.index') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            class="side-menu__icon" viewBox="0 0 24 24">
-                            <path d="M4 4h16v2H4V4zm0 6h16v2H4v-2zm0 6h16v6H4v-6z" />
-                        </svg>
-                        <span class="side-menu__label">Footer</span>
-                    </a>
-                </li> --}}
 
                 {{-- Setttings --}}
                 <li class="slide">

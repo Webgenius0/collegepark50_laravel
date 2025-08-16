@@ -22,7 +22,7 @@ class VenueManageController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $venues = Venue::latest()->get();
+            $venues = Venue::latest('id')->get();
 
             return DataTables::of($venues)
                 ->addIndexColumn()
