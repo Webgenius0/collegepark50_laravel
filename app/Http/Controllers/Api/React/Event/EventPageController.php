@@ -6,15 +6,17 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Event;
 use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Event\EventResource;
+use App\Http\Resources\Event\EventCollection;
 
 class EventPageController extends Controller
 {
     use ApiResponse;
 
     //get all events
-    public function allEvents()
+    public function allEvents(Request $request)
     {
         try {
             $user = auth('api')->user();
@@ -23,41 +25,24 @@ class EventPageController extends Controller
                 return $this->error([], 'Unauthorized user.', 401);
             }
 
+            // Per page value (default 10)
+            $perPage = $request->input('per_page', 10);
+
             $events = Event::with(['venue', 'user'])
                 ->latest()
-                ->get();
+                ->paginate($perPage);
 
-            return $this->success([
-                'events' => EventResource::collection($events)
-            ], 'Events fetched successfully.');
+            return $this->success(
+                new EventCollection($events),
+                'Events fetched successfully.'
+            );
         } catch (Exception $e) {
             return $this->error([], 'Failed to fetch events. ' . $e->getMessage(), 500);
         }
     }
 
     //upcoming events
-    public function upcomingEvents()
-    {
-        $user = auth('api')->user();
-        $now = Carbon::now();
-
-        $events = Event::where('user_id', $user->id)
-            ->where(function ($query) use ($now) {
-                $query->where('start_date', '>', $now->toDateString())
-                    ->orWhere(function ($q) use ($now) {
-                        $q->where('start_date', '=', $now->toDateString())
-                            ->where('start_time', '>=', $now->toTimeString());
-                    });
-            })
-            ->orderBy('start_date')
-            ->orderBy('start_time')
-            ->get();
-
-        return $this->success(EventResource::collection($events), 'Upcoming events fetched successfully');
-    }
-
-    //get past events
-    public function pastEvents()
+    public function upcomingEvents(Request $request)
     {
         try {
             $user = auth('api')->user();
@@ -65,22 +50,60 @@ class EventPageController extends Controller
             if (!$user) {
                 return $this->error([], 'Unauthorized user.', 401);
             }
+
+            $now = Carbon::now();
+            $perPage = $request->input('per_page', 10);
+
+            $events = Event::where('user_id', $user->id)
+                ->where(function ($query) use ($now) {
+                    $query->where('start_date', '>', $now->toDateString())
+                        ->orWhere(function ($q) use ($now) {
+                            $q->where('start_date', '=', $now->toDateString())
+                                ->where('start_time', '>=', $now->toTimeString());
+                        });
+                })
+                ->orderBy('start_date')
+                ->orderBy('start_time')
+                ->paginate($perPage);
+
+            return $this->success(
+                new EventCollection($events),
+                'Upcoming events fetched successfully'
+            );
+        } catch (Exception $e) {
+            return $this->error([], 'Failed to fetch upcoming events. ' . $e->getMessage(), 500);
+        }
+    }
+
+    //get past events
+    public function pastEvents(Request $request)
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return $this->error([], 'Unauthorized user.', 401);
+            }
+
+            // Number of events per page (default 10)
+            $perPage = $request->input('per_page', 10);
 
             $events = Event::with(['venue', 'user'])
                 ->where('status', 'completed')
                 ->latest()
-                ->get();
+                ->paginate($perPage);
 
-            return $this->success([
-                'events' => EventResource::collection($events)
-            ], 'Past events fetched successfully.');
+            return $this->success(
+                new EventCollection($events),
+                'Past events fetched successfully.'
+            );
         } catch (Exception $e) {
-            return $this->error([], 'Failed to fetch events. ' . $e->getMessage(), 500);
+            return $this->error([], 'Failed to fetch past events. ' . $e->getMessage(), 500);
         }
     }
 
     //get auth user all events
-    public function myEvents()
+    public function myEvents(Request $request)
     {
         try {
             $user = auth('api')->user();
@@ -89,14 +112,18 @@ class EventPageController extends Controller
                 return $this->error([], 'Unauthorized user.', 401);
             }
 
+            // Number of events per page (default 10)
+            $perPage = $request->input('per_page', 10);
+
             $events = Event::with(['venue', 'user'])
                 ->where('user_id', $user->id)
                 ->latest()
-                ->get();
+                ->paginate($perPage);
 
-            return $this->success([
-                'events' => EventResource::collection($events)
-            ], 'Events fetched successfully.');
+            return $this->success(
+                new EventCollection($events),
+                'User events fetched successfully.'
+            );
         } catch (Exception $e) {
             return $this->error([], 'Failed to fetch events. ' . $e->getMessage(), 500);
         }

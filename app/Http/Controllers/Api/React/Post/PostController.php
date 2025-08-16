@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Post\PostResource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Post\PostCollection;
 use App\Notifications\PostCreateNotification;
 
 class PostController extends Controller
@@ -113,9 +114,8 @@ class PostController extends Controller
         }
     }
 
-
     //get all posts of auth user
-    public function index()
+    public function index(Request $request)
     {
         try {
             $user = auth('api')->user();
@@ -124,18 +124,27 @@ class PostController extends Controller
                 return $this->error([], 'Unauthorized user.', 401);
             }
 
+            // Number of posts per page (default: 10)
+            $perPage = $request->input('per_page', 10);
+
+            // Get user's posts with relationships
             $posts = $user
                 ->posts()
-                ->with(['user', 'images', 'videos', 'hashtags', 'comments'])
+                ->with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user'])
                 ->latest()
-                ->get();
+                ->paginate($perPage);
 
-            $is_like = $posts->map(function ($post) use ($user) {
+            // Add is_liked flag
+            $posts->getCollection()->transform(function ($post) use ($user) {
                 $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
                 return $post;
             });
 
-            return $this->success(PostResource::collection($posts), 'User posts retrieved successfully.', 200);
+            return $this->success(
+                new PostCollection($posts),
+                'User posts retrieved successfully.',
+                200
+            );
         } catch (Exception $e) {
             return $this->error([], 'Failed to fetch posts. ' . $e->getMessage(), 500);
         }
@@ -159,25 +168,17 @@ class PostController extends Controller
                 ->latest()
                 ->paginate($perPage);
 
-
-            $is_like = $posts->map(function ($post) use ($user) {
+            // Add is_liked for each post
+            $posts->getCollection()->transform(function ($post) use ($user) {
                 $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
                 return $post;
             });
 
-            // Return paginated data with PostResource
+            // Use PostCollection
             return $this->success(
-                [
-                    'posts' => PostResource::collection($posts),
-                    'pagination' => [
-                        'total' => $posts->total(),
-                        'current_page' => $posts->currentPage(),
-                        'last_page' => $posts->lastPage(),
-                        'per_page' => $posts->perPage(),
-                    ],
-                ],
+                new PostCollection($posts),
                 'Newsfeed posts retrieved successfully.',
-                200,
+                200
             );
         } catch (Exception $e) {
             return $this->error([], 'Failed to fetch posts. ' . $e->getMessage(), 500);
@@ -257,25 +258,45 @@ class PostController extends Controller
     //get posts by tag
     public function postsByTag(Request $request)
     {
-        $tag = $request->query('tag');
+        try {
+            $tag = $request->query('tag');
 
-        if (!$tag) {
-            return $this->error([], 'Tag is required.', 422);
+            if (!$tag) {
+                return $this->error([], 'Tag is required.', 422);
+            }
+
+            $hashtag = Hashtag::where('tag', '#' . $tag)->first();
+
+            if (!$hashtag) {
+                return $this->error([], 'Hashtag not found.', 404);
+            }
+
+            // Number of posts per page (default: 10)
+            $perPage = $request->input('per_page', 10);
+
+            // Fetch posts by tag with relationships
+            $posts = $hashtag
+                ->posts()
+                ->with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user'])
+                ->latest()
+                ->paginate($perPage);
+
+            // Add is_liked flag for authenticated user
+            if ($user = auth('api')->user()) {
+                $posts->getCollection()->transform(function ($post) use ($user) {
+                    $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
+                    return $post;
+                });
+            }
+
+            return $this->success(
+                new PostCollection($posts),
+                'Posts fetched by tag: #' . $tag,
+                200
+            );
+        } catch (Exception $e) {
+            return $this->error([], 'Failed to fetch posts by tag. ' . $e->getMessage(), 500);
         }
-
-        $hashtag = Hashtag::where('tag', '#' . $tag)->first();
-
-        if (!$hashtag) {
-            return $this->error([], 'Hashtag not found.', 404);
-        }
-
-        $posts = $hashtag
-            ->posts()
-            ->with(['images', 'videos', 'hashtags', 'likes', 'comments'])
-            ->latest()
-            ->paginate(10);
-
-        return $this->success(PostResource::collection($posts)->response()->getData(true), 'Posts fetched by tag: #' . $tag, 200);
     }
 
     //update post

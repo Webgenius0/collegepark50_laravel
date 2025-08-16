@@ -517,8 +517,7 @@
                     $('#venue_description').val(response.data.detail.description);
                     $('#venue_features').val(response.data.detail.features);
 
-                    // ধরো তোমার base url আছে (Laravel এ asset() ব্যবহার করলে কাজ করবে)
-                    let baseUrl = "{{ asset('') }}"; // এটি "/" সহ return করবে
+                    let baseUrl = "{{ asset('') }}";
 
                     // Reset Dropify for images
                     let imageInput = $('#venue_images').dropify();

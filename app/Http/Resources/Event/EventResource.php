@@ -54,6 +54,8 @@ class EventResource extends JsonResource
                 'venue_id'   => $this->venue_id,
                 'venue_name' => $this->venue->title ?? null,
                 'location' => $this->venue->location ?? null,
+                'email' => $this->venue->email ?? null,
+                'phone' => $this->venue->phone ?? null,
             ],
 
             //user info

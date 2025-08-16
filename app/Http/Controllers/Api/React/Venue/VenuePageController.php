@@ -3,18 +3,19 @@
 namespace App\Http\Controllers\Api\React\Venue;
 
 use Exception;
+use App\Models\Venue;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Venue\VenueResource;
-use App\Models\Venue;
+use App\Http\Resources\Venue\VenueCollection;
 
 class VenuePageController extends Controller
 {
     use ApiResponse;
 
     //get all venues of auth user
-    public function allVenue()
+    public function allVenue(Request $request)
     {
         try {
             $user = auth('api')->user();
@@ -23,12 +24,14 @@ class VenuePageController extends Controller
                 return $this->error([], 'Unauthorized user.', 401);
             }
 
+            $perPage = $request->input('per_page', 10);
+
             $venues = Venue::with(['detail', 'media', 'reviews'])
                 ->latest()
-                ->get();
+                ->paginate($perPage);
 
             return $this->success(
-                VenueResource::collection($venues),
+                new VenueCollection($venues),
                 'Venues retrieved successfully.',
                 200
             );
@@ -57,4 +60,5 @@ class VenuePageController extends Controller
             return $this->error([], 'Failed to fetch venue. ' . $e->getMessage(), 500);
         }
     }
+    
 }

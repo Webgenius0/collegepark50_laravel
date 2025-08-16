@@ -16,7 +16,11 @@
     font-style: normal
 }
 
-.dropify-font:before, .dropify-wrapper .dropify-message span.file-icon:before, .dropify-wrapper .dropify-preview .dropify-infos .dropify-infos-inner p.dropify-filename span.file-icon:before, [class*=" dropify-font-"]:before, [class^=dropify-font-]:before {
+.dropify-font:before,
+.dropify-wrapper .dropify-message span.file-icon:before,
+.dropify-wrapper .dropify-preview .dropify-infos .dropify-infos-inner p.dropify-filename span.file-icon:before,
+[class*=" dropify-font-"]:before,
+[class^=dropify-font-]:before {
     font-family: dropify;
     font-style: normal;
     font-weight: 400;
@@ -32,15 +36,18 @@
     line-height: 1em
 }
 
-.dropify-wrapper, .dropify-wrapper .dropify-clear {
+.dropify-wrapper,
+.dropify-wrapper .dropify-clear {
     font-family: Roboto, "Helvetica Neue", Helvetica, Arial
 }
 
-.dropify-wrapper.has-error .dropify-message .dropify-error, .dropify-wrapper.has-preview .dropify-clear {
+.dropify-wrapper.has-error .dropify-message .dropify-error,
+.dropify-wrapper.has-preview .dropify-clear {
     display: block
 }
 
-.dropify-font-upload:before, .dropify-wrapper .dropify-message span.file-icon:before {
+.dropify-font-upload:before,
+.dropify-wrapper .dropify-message span.file-icon:before {
     content: '\e800'
 }
 
@@ -282,7 +289,8 @@
     height: 2px
 }
 
-.dropify-wrapper:hover .dropify-clear, .dropify-wrapper:hover .dropify-preview .dropify-infos {
+.dropify-wrapper:hover .dropify-clear,
+.dropify-wrapper:hover .dropify-preview .dropify-infos {
     opacity: 1
 }
 
@@ -310,7 +318,8 @@
     position: relative
 }
 
-.dropify-wrapper.touch-fallback .dropify-preview .dropify-infos .dropify-infos-inner p.dropify-infos-message::before, .dropify-wrapper.touch-fallback.has-preview .dropify-message {
+.dropify-wrapper.touch-fallback .dropify-preview .dropify-infos .dropify-infos-inner p.dropify-infos-message::before,
+.dropify-wrapper.touch-fallback.has-preview .dropify-message {
     display: none
 }
 
