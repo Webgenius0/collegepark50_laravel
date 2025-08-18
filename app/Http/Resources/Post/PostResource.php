@@ -27,6 +27,7 @@ class PostResource extends JsonResource
             'comment_count' => $this->comment_count,
             'share_count' => $this->share_count,
             'is_liked' => $this->is_liked ?? false,
+            'is_my_post' => $this->user_id === optional($request->user())->id,
 
             // Merged media list (images + videos)
             'media' => collect()
