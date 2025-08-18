@@ -151,6 +151,40 @@ class PostController extends Controller
     }
 
     //get all posts of other users
+    // public function getAllPosts(Request $request)
+    // {
+    //     try {
+    //         $user = auth('api')->user();
+
+    //         if (!$user) {
+    //             return $this->error([], 'Unauthorized user.', 401);
+    //         }
+
+    //         // Number of posts per page (default: 10)
+    //         $perPage = $request->input('per_page', 10);
+
+    //         // Get all posts with relationships, paginated
+    //         $posts = Post::with(['user', 'images', 'videos', 'hashtags', 'likes', 'comments.user'])
+    //             ->latest()
+    //             ->paginate($perPage);
+
+    //         // Add is_liked for each post
+    //         $posts->getCollection()->transform(function ($post) use ($user) {
+    //             $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
+    //             return $post;
+    //         });
+
+    //         // Use PostCollection
+    //         return $this->success(
+    //             new PostCollection($posts),
+    //             'Newsfeed posts retrieved successfully.',
+    //             200
+    //         );
+    //     } catch (Exception $e) {
+    //         return $this->error([], 'Failed to fetch posts. ' . $e->getMessage(), 500);
+    //     }
+    // }
+
     public function getAllPosts(Request $request)
     {
         try {
@@ -168,9 +202,13 @@ class PostController extends Controller
                 ->latest()
                 ->paginate($perPage);
 
-            // Add is_liked for each post
+            // Add custom flags for each post
             $posts->getCollection()->transform(function ($post) use ($user) {
                 $post->is_liked = $post->likes()->where('user_id', $user->id)->exists();
+
+                // New custom field
+                $post->is_my_post = $post->user_id === $user->id;
+
                 return $post;
             });
 
@@ -184,6 +222,7 @@ class PostController extends Controller
             return $this->error([], 'Failed to fetch posts. ' . $e->getMessage(), 500);
         }
     }
+
 
     //get single post
     public function show($id)
