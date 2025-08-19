@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'profession' => $this->profession,
             'gender' => $this->gender,
             'age' => $this->age,
-            'avatar' => $this->avatar ? asset($this->avatar) : null,
+            'avatar' => $this->avatar ? asset($this->avatar) : asset('default/default_image.jpg'),
 
 
             'address' => $this->address,

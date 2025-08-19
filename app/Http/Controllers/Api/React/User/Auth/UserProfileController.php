@@ -13,6 +13,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserProfileController extends Controller
 {
@@ -191,5 +192,64 @@ class UserProfileController extends Controller
             Log::info($e->getMessage());
             return $this->error([], $e->getMessage(), 500);
         }
+    }
+
+    //user profile gallery
+    public function gallery(Request $request)
+    {
+        $user = auth('api')->user();
+        if (!$user) {
+            return $this->error([], 'User not found.', 404);
+        }
+
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+
+        // User post images
+        $postImages = $user->postImages()
+            ->select('post_images.id', 'post_images.post_id', 'post_images.image_path')
+            ->get()
+            ->map(function ($img) {
+                return [
+                    'id'         => $img->id,
+                    'post_id'    => $img->post_id,
+                    'image_path' => url($img->image_path), // full URL
+                    'type'       => 'post_image',
+                ];
+            });
+
+        // User event banners
+        $eventBanners = $user->events()
+            ->select('id', 'banner')
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id'         => $event->id,
+                    'post_id'    => null,
+                    'image_path' => url($event->banner),
+                    'type'       => 'event_banner',
+                ];
+            });
+
+        // Merge all images
+        $allImages = $postImages->merge($eventBanners)->values();
+
+        // Manual pagination
+        $total = $allImages->count();
+        $results = $allImages->forPage($page, $perPage);
+        $paginator = new LengthAwarePaginator($results, $total, $perPage, $page, [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]);
+
+        return $this->success([
+            'images'     => $paginator->items(),
+            'pagination' => [
+                'total'        => $paginator->total(),
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+            ],
+        ], 'Images retrieved successfully.');
     }
 }

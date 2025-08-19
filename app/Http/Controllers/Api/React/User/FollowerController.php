@@ -54,109 +54,158 @@ class FollowerController extends Controller
     }
 
     // Get followers of authenticated user
-    public function getFollowers()
+    public function getFollowers(Request $request)
     {
         $user = auth('api')->user();
         if (!$user) {
             return $this->error([], 'User not found.', 404);
         }
 
+        $perPage = $request->input('per_page', 10);
+
         $followers = $user->followers()
             ->select('users.id', 'f_name', 'l_name', 'avatar')
-            ->get()
-            ->map(function ($follower) {
-                return [
-                    'id'     => $follower->id,
-                    'name'   => $follower->f_name . ' ' . $follower->l_name,
-                    'avatar' => $follower->avatar,
-                ];
-            });
+            ->paginate($perPage);
+
+        // Transform follower data
+        $followersData = $followers->getCollection()->transform(function ($follower) {
+            return [
+                'id'     => $follower->id,
+                'name'   => trim($follower->f_name . ' ' . $follower->l_name),
+                'avatar' => $follower->avatar,
+            ];
+        });
 
         return $this->success([
-            'count'     => $user->followers()->count(),
-            'followers' => $followers,
+            'count'      => $followers->total(),
+            'followers'  => $followersData,
+            'pagination' => [
+                'total'        => $followers->total(),
+                'current_page' => $followers->currentPage(),
+                'last_page'    => $followers->lastPage(),
+                'per_page'     => $followers->perPage(),
+            ],
         ], 'Followers retrieved successfully.');
     }
+
 
     // Get followers of any user by user id
-    public function getUserFollowers($id)
+    public function getUserFollowers(Request $request, $id)
     {
         $user = User::find($id);
         if (!$user) {
             return $this->error([], 'User not found.', 404);
         }
 
+        $perPage = $request->input('per_page', 10);
+
         $followers = $user->followers()
             ->select('users.id', 'f_name', 'l_name', 'avatar')
-            ->get()
-            ->map(function ($follower) {
-                return [
-                    'id'     => $follower->id,
-                    'name'   => $follower->f_name . ' ' . $follower->l_name,
-                    'avatar' => $follower->avatar,
-                ];
-            });
+            ->paginate($perPage);
+
+        // Transform follower data
+        $followersData = $followers->getCollection()->transform(function ($follower) {
+            return [
+                'id'     => $follower->id,
+                'name'   => trim($follower->f_name . ' ' . $follower->l_name),
+                'avatar' => $follower->avatar,
+            ];
+        });
 
         return $this->success([
-            'count'     => $user->followers()->count(),
-            'followers' => $followers,
+            'count'      => $followers->total(),
+            'followers'  => $followersData,
+            'pagination' => [
+                'total'        => $followers->total(),
+                'current_page' => $followers->currentPage(),
+                'last_page'    => $followers->lastPage(),
+                'per_page'     => $followers->perPage(),
+            ],
         ], 'Followers retrieved successfully.');
     }
 
+
     // Get followings of authenticated user
-    public function getFollowings()
+    public function getFollowings(Request $request)
     {
         $user = auth('api')->user();
         if (!$user) {
             return $this->error([], 'User not found.', 404);
         }
 
+        $perPage = $request->input('per_page', 10);
+
         $followings = $user->followings()
             ->select('users.id', 'f_name', 'l_name', 'avatar')
-            ->get()
-            ->map(function ($following) {
-                return [
-                    'id'     => $following->id,
-                    'name'   => $following->f_name . ' ' . $following->l_name,
-                    'avatar' => $following->avatar,
-                ];
-            });
+            ->paginate($perPage);
+
+        // Transform following data
+        $followingsData = $followings->getCollection()->transform(function ($following) {
+            return [
+                'id'     => $following->id,
+                'name'   => trim($following->f_name . ' ' . $following->l_name),
+                'avatar' => $following->avatar,
+            ];
+        });
 
         return $this->success([
-            'count'      => $user->followings()->count(),
-            'followings' => $followings,
+            'count'      => $followings->total(),
+            'followings' => $followingsData,
+            'pagination' => [
+                'total'        => $followings->total(),
+                'current_page' => $followings->currentPage(),
+                'last_page'    => $followings->lastPage(),
+                'per_page'     => $followings->perPage(),
+            ],
         ], 'Followings retrieved successfully.');
     }
 
+
     // Get followings of any user
-    public function getUserFollowings($id)
+    public function getUserFollowings(Request $request, $id)
     {
         $user = User::find($id);
         if (!$user) {
             return $this->error([], 'User not found.', 404);
         }
 
+        $perPage = $request->input('per_page', 10);
+
         $followings = $user->followings()
             ->select('users.id', 'f_name', 'l_name', 'avatar')
-            ->get()
-            ->map(function ($following) {
-                return [
-                    'id'     => $following->id,
-                    'name'   => $following->f_name . ' ' . $following->l_name,
-                    'avatar' => $following->avatar,
-                ];
-            });
+            ->paginate($perPage);
+
+        // Transform following data
+        $followingsData = $followings->getCollection()->transform(function ($following) {
+            return [
+                'id'     => $following->id,
+                'name'   => trim($following->f_name . ' ' . $following->l_name),
+                'avatar' => $following->avatar,
+            ];
+        });
 
         return $this->success([
-            'count'      => $user->followings()->count(),
-            'followings' => $followings,
+            'count'      => $followings->total(),
+            'followings' => $followingsData,
+            'pagination' => [
+                'total'        => $followings->total(),
+                'current_page' => $followings->currentPage(),
+                'last_page'    => $followings->lastPage(),
+                'per_page'     => $followings->perPage(),
+            ],
         ], 'Followings retrieved successfully.');
     }
 
-    //Get auth user friend
-    public function getFriends()
+
+    // Get auth user friends (mutuals)
+    public function getFriends(Request $request)
     {
         $authUser = auth('api')->user();
+        if (!$authUser) {
+            return $this->error([], 'User not found.', 404);
+        }
+
+        $perPage = $request->input('per_page', 10);
 
         // Get all user IDs the auth user is following
         $followingIds = $authUser->followings()->pluck('users.id')->toArray();
@@ -164,24 +213,32 @@ class FollowerController extends Controller
         // Get all user IDs who follow the auth user
         $followerIds = $authUser->followers()->pluck('users.id')->toArray();
 
-        // Find mutuals (intersection)
+        // Find mutuals (friends = intersection)
         $friendIds = array_intersect($followingIds, $followerIds);
 
-        // Retrieve friend data
+        // Retrieve friends with pagination
         $friends = User::whereIn('id', $friendIds)
             ->select('id', 'f_name', 'l_name', 'avatar')
-            ->get()
-            ->map(function ($friend) {
-                return [
-                    'id'     => $friend->id,
-                    'name'   => $friend->f_name . ' ' . $friend->l_name,
-                    'avatar' => $friend->avatar,
-                ];
-            });
+            ->paginate($perPage);
+
+        // Transform data
+        $friendsData = $friends->getCollection()->transform(function ($friend) {
+            return [
+                'id'     => $friend->id,
+                'name'   => trim($friend->f_name . ' ' . $friend->l_name),
+                'avatar' => $friend->avatar,
+            ];
+        });
 
         return $this->success([
-            'count'   => count($friendIds),
-            'friends' => $friends,
+            'count'    => $friends->total(),
+            'friends'  => $friendsData,
+            'pagination' => [
+                'total'        => $friends->total(),
+                'current_page' => $friends->currentPage(),
+                'last_page'    => $friends->lastPage(),
+                'per_page'     => $friends->perPage(),
+            ],
         ], 'Friends retrieved successfully.');
     }
 }

@@ -40,6 +40,28 @@ class VenuePageController extends Controller
         }
     }
 
+    //venue list for flutter
+    public function list()
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return $this->error([], 'Unauthorized user.', 401);
+            }
+
+            $venues = Venue::select('id', 'title', 'location', 'latitude', 'longitude')->get();
+
+            return $this->success(
+                $venues,
+                'Venues retrieved successfully.',
+                200
+            );
+        } catch (Exception $e) {
+            return $this->error([], 'Failed to fetch venues. ' . $e->getMessage(), 500);
+        }
+    }
+
     //venue details
     public function venueDetails($id)
     {
@@ -60,5 +82,4 @@ class VenuePageController extends Controller
             return $this->error([], 'Failed to fetch venue. ' . $e->getMessage(), 500);
         }
     }
-    
 }

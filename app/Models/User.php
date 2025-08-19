@@ -71,7 +71,7 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-     public function getAvatarAttribute($value): string | null
+    public function getAvatarAttribute($value): string | null
     {
         if (filter_var($value, FILTER_VALIDATE_URL)) {
             return $value;
@@ -89,11 +89,13 @@ class User extends Authenticatable implements JWTSubject
         return trim("{$this->f_name} {$this->l_name}");
     }
 
-    public function senders() {
+    public function senders()
+    {
         return $this->hasMany(Chat::class, 'sender_id');
     }
 
-    public function receivers() {
+    public function receivers()
+    {
         return $this->hasMany(Chat::class, 'receiver_id');
     }
 
@@ -118,6 +120,21 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Post::class);
     }
+
+    //post images
+    // User.php
+    public function postImages()
+    {
+        return $this->hasManyThrough(
+            PostImage::class, // Final model
+            Post::class,      // Intermediate model
+            'user_id',        // Foreign key on posts table
+            'post_id',        // Foreign key on post_images table
+            'id',             // Local key on users table
+            'id'              // Local key on posts table
+        );
+    }
+
 
     //likes
     public function likes()
@@ -153,6 +170,6 @@ class User extends Authenticatable implements JWTSubject
     //events table relation
     public function events()
     {
-        return $this->hasMany(Venue::class);
+        return $this->hasMany(Event::class);
     }
 }

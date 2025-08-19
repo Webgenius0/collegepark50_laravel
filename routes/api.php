@@ -69,6 +69,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
     Route::delete('/delete-profile', [UserProfileController::class, 'deleteProfile']);
 
+    Route::get('/gallery', [UserProfileController::class, 'gallery']);
+
     //user followers and friends routes
     Route::post('/follow/{id}', [FollowerController::class, 'toggleFollow']); // Follow or unfollow a user by ID (toggle)
     Route::get('/followers', [FollowerController::class, 'getFollowers']); // Get all followers of authenticated user
@@ -110,7 +112,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Venue routes
     Route::prefix('venue')->group(function () {
         //venue page route according to prototype
-        Route::get('/', [VenuePageController::class, 'allVenue']); // List all events
+        Route::get('/', [VenuePageController::class, 'allVenue']); // List all venues
+        Route::get('/list', [VenuePageController::class, 'list']); // List all venues for flutter
         Route::get('/details/{id}', [VenuePageController::class, 'venueDetails']); // get a single venue with detials by id
 
         //venue review/feedback
@@ -151,10 +154,6 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::post('/update/{id}', [EventCommentController::class, 'update']); // Edit comment
             Route::delete('/delete/{id}', [EventCommentController::class, 'destroy']);  // Delete comment
         });
-
-        //event filtering by title
-        Route::get('/search', [EventFilterController::class, 'searchByTitle']); // search event by event and venue title
-        Route::get('/filter-by-date', [EventFilterController::class, 'filterByNearbyDates']); // search event by date
     });
 
     //Notification
