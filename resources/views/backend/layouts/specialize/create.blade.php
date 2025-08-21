@@ -35,12 +35,12 @@
 
                                             <div class="form-group">
                                                 <label for="name" class="form-label">Type:</label>
-                                                
+
                                                 <select name="type" class="form-select">
                                                     <option value="">Select</option>
                                                     <option value="company">Company</option>
                                                     <option value="employee">Employee</option>
-                                                  
+
                                                 </select>
                                             </div>
 
@@ -67,7 +67,7 @@
                                                 @enderror
                                             </div>
 
-                                            
+
 
                                             <div class="form-group mt-4">
                                                 <button class="btn btn-primary" type="submit">Submit</button>
@@ -90,5 +90,5 @@
 <!-- CONTAINER CLOSED -->
 @endsection
 @push('scripts')
-    
+
 @endpush

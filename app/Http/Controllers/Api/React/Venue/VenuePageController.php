@@ -52,6 +52,16 @@ class VenuePageController extends Controller
 
             $venues = Venue::select('id', 'title', 'location', 'latitude', 'longitude')->get();
 
+            // $venues = $venues->map(function ($v) {
+            //     return [
+            //         'id'        => $v->id,
+            //         'title'     => $v->title,
+            //         'location'  => $v->location,
+            //         'latitude'  => round((double) $v->latitude, 8),
+            //         'longitude' => round((float) $v->longitude, 8),
+            //     ];
+            // });
+
             return $this->success(
                 $venues,
                 'Venues retrieved successfully.',

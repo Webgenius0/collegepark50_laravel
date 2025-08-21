@@ -25,6 +25,9 @@ class Venue extends Model
     protected $casts = [
         'service_start_time' => 'datetime:H:i:s',
         'service_end_time' => 'datetime:H:i:s',
+        'latitude'  => 'float',
+        'longitude' => 'float',
+        'ticket_price' => 'float',
     ];
 
 

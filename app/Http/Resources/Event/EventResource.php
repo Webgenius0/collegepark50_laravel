@@ -70,6 +70,8 @@ class EventResource extends JsonResource
             'ticket' => [
                 'id' => $this->ticket->id ?? null,
                 'name' => $this->ticket->ticket_name ?? null,
+                'description' => $this->ticket->description ?? null,
+                'show_description'=> $this->ticket->show_description ?? null,
                 'start_date' => $this->ticket->start_date ?? null,
                 'start_time' => $this->ticket->start_time ?? null,
                 'end_date' => $this->ticket->end_date ?? null,
