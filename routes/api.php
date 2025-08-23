@@ -123,6 +123,7 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::delete('/delete/{id}', [VenueReviewController::class, 'destroy']); // Delete a review
         });
     });
+    //
 
     // Event routes
     Route::prefix('event')->group(function () {
