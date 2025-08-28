@@ -72,6 +72,7 @@ class FollowerController extends Controller
             return [
                 'id'     => $follower->id,
                 'name'   => trim($follower->f_name . ' ' . $follower->l_name),
+                'profession' => $follower->profession ?? '',
                 'avatar' => $follower->avatar,
             ];
         });
@@ -108,6 +109,7 @@ class FollowerController extends Controller
             return [
                 'id'     => $follower->id,
                 'name'   => trim($follower->f_name . ' ' . $follower->l_name),
+                'profession' => $follower->profession ?? '',
                 'avatar' => $follower->avatar,
             ];
         });
@@ -144,6 +146,7 @@ class FollowerController extends Controller
             return [
                 'id'     => $following->id,
                 'name'   => trim($following->f_name . ' ' . $following->l_name),
+                'profession' => $following->profession ?? '',
                 'avatar' => $following->avatar,
             ];
         });
@@ -180,6 +183,7 @@ class FollowerController extends Controller
             return [
                 'id'     => $following->id,
                 'name'   => trim($following->f_name . ' ' . $following->l_name),
+                'profession' => $following->profession ?? '',
                 'avatar' => $following->avatar,
             ];
         });
@@ -226,6 +230,7 @@ class FollowerController extends Controller
             return [
                 'id'     => $friend->id,
                 'name'   => trim($friend->f_name . ' ' . $friend->l_name),
+                'profession' => $friend->profession ?? '',
                 'avatar' => $friend->avatar,
             ];
         });
