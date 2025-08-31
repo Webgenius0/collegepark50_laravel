@@ -1012,6 +1012,7 @@
     </script>
 
 
+<<<<<<< HEAD
     <script>
         // document.addEventListener('DOMContentLoaded', function() {
         //     Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`)
@@ -1038,6 +1039,15 @@
                 Echo.private(`chat-receiver.${user_id}`).listen('MessageSendEvent', function(e) {
                     toastr.success(e.data.text ?? "File Sent");
                     let receiver_id = document.getElementById('ReceiverId').value;
+=======
+        // Laravel Echo for real-time messaging
+        document.addEventListener('DOMContentLoaded', function() {
+            Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`).listen('MessageSendEvent', function(e) {
+                toastr.success(e.data.text ?? "New file received");
+                // alert('get');
+                let receiver_id = document.getElementById('ReceiverId').value;
+                if (receiver_id) {
+>>>>>>> ariful
                     userChat(receiver_id);
                     userList();
                 });

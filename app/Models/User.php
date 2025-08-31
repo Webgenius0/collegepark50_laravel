@@ -68,6 +68,7 @@ class User extends Authenticatable implements JWTSubject
             'reset_password_token_expire_at' => 'datetime',
             'is_otp_verified'                => 'boolean',
             'is_google_signin'               => 'boolean',
+            'last_activity_at' => 'datetime',
         ];
     }
 
