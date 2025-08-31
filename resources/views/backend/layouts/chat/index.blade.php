@@ -1013,7 +1013,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`).listen('MessageSendEvent', function(e) {
                 toastr.success(e.data.text ?? "New file received");
-                alert('get');
+                // alert('get');
                 let receiver_id = document.getElementById('ReceiverId').value;
                 if (receiver_id) {
                     userChat(receiver_id);
