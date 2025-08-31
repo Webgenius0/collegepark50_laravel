@@ -15,6 +15,8 @@ class EventResource extends JsonResource
      */
     public function toArray($request)
     {
+         $authUser = auth('api')->user();
+
         return [
             'id'             => $this->id,
             'title'          => $this->title,
@@ -25,7 +27,7 @@ class EventResource extends JsonResource
             'end_time'       => $this->end_time?->toTimeString(),
             'time_zone'      => $this->time_zone,
             'all_day_event'  => $this->all_day_event,
-            // 'banner_url'     => $this->banner,
+            'is_my_event' => $authUser && $authUser->id === $this->user_id,
             'banner_url' => $this->banner ? url($this->banner) : null,
 
             'tags' => json_decode($this->tags) ?: [],

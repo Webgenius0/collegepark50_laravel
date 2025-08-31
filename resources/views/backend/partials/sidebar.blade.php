@@ -205,14 +205,6 @@
                         </li>
                         <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a>
                         </li>
-
-                        <li><a href="{{ route('setting.mail.index') }}" class="slide-item">Mail Settings</a></li>
-                        <li><a href="{{ route('setting.stripe.index') }}" class="slide-item">Stripe Settings</a></li>
-                        <li><a href="{{ route('admin.testimonial.index') }}" class="slide-item">Testimonials</a></li>
-
-                        <li><a href="{{ route('admin.social_media.index') }}" class="slide-item">Social Media</a>
-                        </li>
-                        <li><a href="{{ route('setting.social.index') }}" class="slide-item">Google Settings</a></li>
                     </ul>
                 </li>
             </ul>

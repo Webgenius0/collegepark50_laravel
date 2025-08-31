@@ -193,7 +193,6 @@ class AuthenticationController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-
             $validatedData = $request->validated();
 
             $user = User::where('email', $validatedData['email'])->first();
