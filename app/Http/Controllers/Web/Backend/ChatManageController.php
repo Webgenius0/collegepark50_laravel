@@ -168,7 +168,7 @@ class ChatManageController extends Controller
             return response()->json(['message' => $validator->errors()->first()], 400);
         }
 
-        $sender_id = Auth::id();
+        $sender_id = auth('api')->id();
 
         $receiver_exist = User::where('id', $receiver_id)->first();
         if (! $receiver_exist || $receiver_id == $sender_id) {
@@ -209,7 +209,7 @@ class ChatManageController extends Controller
             'room:id,first_user_id,second_user_id',
         ]);
 
-        broadcast(new MessageSendEvent($chat))->toOthers();
+        broadcast(new MessageSendEvent($chat));
 
         $data = [
             'chat' => $chat,

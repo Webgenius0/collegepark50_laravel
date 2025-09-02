@@ -5,7 +5,11 @@
     "isEntry": true
   },
   "resources/js/app.js": {
+<<<<<<< HEAD
+    "file": "assets/app-BqyMl_Hs.js",
+=======
     "file": "assets/app-D8mPz2uG.js",
+>>>>>>> ariful
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

@@ -91,7 +91,7 @@
         }
 
         .search-btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(45deg, #55c7d9, #55c7d9);
         }
 
         .refresh-btn {
@@ -136,7 +136,7 @@
 
         .user-item.selected {
             background: linear-gradient(90deg, rgba(52, 152, 219, 0.3), rgba(41, 128, 185, 0.3));
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #55c7d9;
         }
 
         .user-avatar {
@@ -238,7 +238,7 @@
             height: 45px;
             border-radius: 50%;
             overflow: hidden;
-            border: 2px solid #3498db;
+            border: 2px solid #55c7d9;
         }
 
         .chat-header-avatar img {
@@ -256,7 +256,7 @@
         }
 
         .chat-header-info h3:hover {
-            color: #3498db;
+            color: #55c7d9;
         }
 
         .chat-header-info p {
@@ -276,7 +276,7 @@
             height: 40px;
             border: none;
             border-radius: 50%;
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(45deg, #55c7d9, #55c7d9);
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -408,7 +408,7 @@
         }
 
         .message.chat-right .message-bubble {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(45deg, #55c7d9, #55c7d9);
             color: white;
             border-bottom-right-radius: 5px;
         }
@@ -467,7 +467,7 @@
         }
 
         .message-input:focus {
-            border-color: #3498db;
+            border-color: #55c7d9;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
             background: white;
         }
@@ -480,7 +480,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: #3498db;
+            background: #55c7d9;
             color: white;
             cursor: pointer;
             display: flex;
@@ -491,7 +491,7 @@
         }
 
         .file-input-label:hover {
-            background: #2980b9;
+            background: #55c7d9;
             transform: translateY(-50%) scale(1.1);
         }
 
@@ -515,7 +515,7 @@
         }
 
         .send-btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(45deg, #55c7d9, #55c7d9);
         }
 
         .clear-btn {
@@ -673,7 +673,9 @@
                                         <button class="action-btn" id="deleteBtn">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                        <span class="tooltip-text" id="deleteTooltip" onclick="confirmDeleteConversation($('#ReceiverId').val());">Delete Conversation</span>
+                                        <span class="tooltip-text" id="deleteTooltip"
+                                            onclick="confirmDeleteConversation($('#ReceiverId').val());">Delete
+                                            Conversation</span>
                                     </div>
                                 </div>
                             </div>
@@ -1007,8 +1009,37 @@
                 }
             });
         }
+    </script>
 
 
+<<<<<<< HEAD
+    <script>
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`)
+        //         .listen('MessageSendEvent', function(e) {
+        //             console.log('Received event:', e); // Debugging er jonno
+
+        //             // Eikhane data structure change korun
+        //             toastr.success(e.chat.text ?? "New file received");
+        //             alert('Message received: ' + (e.chat.text || "File"));
+
+        //             let receiver_id = document.getElementById('ReceiverId').value;
+        //             if (receiver_id) {
+        //                 userChat(receiver_id);
+        //             }
+        //             userList();
+        //         });
+        // });
+
+
+        var user_id = `{{ auth('web')->check() ? auth('web')->user()->id : null }}`;
+
+        if (user_id) {
+            document.addEventListener('DOMContentLoaded', function() {
+                Echo.private(`chat-receiver.${user_id}`).listen('MessageSendEvent', function(e) {
+                    toastr.success(e.data.text ?? "File Sent");
+                    let receiver_id = document.getElementById('ReceiverId').value;
+=======
         // Laravel Echo for real-time messaging
         document.addEventListener('DOMContentLoaded', function() {
             Echo.private(`chat-receiver.{{ auth('web')->user()->id }}`).listen('MessageSendEvent', function(e) {
@@ -1016,10 +1047,11 @@
                 // alert('get');
                 let receiver_id = document.getElementById('ReceiverId').value;
                 if (receiver_id) {
+>>>>>>> ariful
                     userChat(receiver_id);
-                }
-                userList();
+                    userList();
+                });
             });
-        });
+        }
     </script>
 @endpush

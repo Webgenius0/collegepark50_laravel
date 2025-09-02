@@ -85,9 +85,16 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
+    //name getter
     public function getNameAttribute(): string
     {
         return trim("{$this->f_name} {$this->l_name}");
+    }
+
+    //gender getter
+    public function getGenderAttribute($value)
+    {
+        return ucfirst($value);
     }
 
     public function senders()

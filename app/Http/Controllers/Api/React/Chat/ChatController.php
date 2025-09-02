@@ -137,7 +137,9 @@ class ChatController extends Controller
             'room:id,user_one_id,user_two_id'
         ]);
 
-        broadcast(new MessageSendEvent($chat))->toOthers();
+        // broadcast(new MessageSendEvent($chat));
+         broadcast(new MessageSendEvent($chat))->toOthers();
+
 
         $data = [
             'chat' => $chat

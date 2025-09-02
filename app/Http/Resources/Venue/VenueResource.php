@@ -43,8 +43,11 @@ class VenueResource extends JsonResource
                     'video_url' => $media->video_url,
                 ];
             }),
-
             'reviews' => ReviewResource::collection($this->whenLoaded('reviews')),
+
+            // Average rating
+            'average_rating' => $this->reviews_avg_rating ? round($this->reviews_avg_rating, 1) : null,
+            'reviews_count'=> $this->reviews_count ?? null
         ];
     }
 }
