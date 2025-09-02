@@ -123,8 +123,9 @@ class UserProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'],
+                'avatar' => ['required', 'image', 'max:5120'], // 5MB max
             ]);
+
 
             if ($validator->fails()) {
                 return $this->error([], $validator->errors()->first(), 422);
