@@ -191,3 +191,5 @@ Route::middleware(['auth:api'])->controller(ChatController::class)->prefix('auth
     Route::get('/seen/single/{chat_id}', 'seenSingle');
     Route::delete('/delete/{receiver_id}', 'deleteChat');
 });
+
+//hello
